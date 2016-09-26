@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CyberSource</fullName>
+    <types>
+        <members>CommonUtils</members>
+        <members>CyberSource</members>
+        <members>CyberSourceAPI</members>
+        <members>CyberSourceUtils</members>
+        <members>HttpService</members>
+        <members>MockHttpResponseGenerator</members>
+        <members>PaymentGatewayTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>nxtdev__PaymentGateway__c.MerchantId__c</members>
+        <members>nxtdev__PaymentGateway__c.MerchantReference__c</members>
+        <members>nxtdev__PaymentGateway__c.TestMode__c</members>
+        <members>nxtdev__PaymentGateway__c.TransactionSecurityKey__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>CyberSource_Production</members>
+        <members>CyberSource_Sandbox</members>
+        <name>RemoteSiteSetting</name>
+    </types>
+    <version>37.0</version>
+</Package>

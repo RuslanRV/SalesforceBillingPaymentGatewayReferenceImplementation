@@ -1,0 +1,6 @@
+.idea
+*.iml
+build.properties
+**/.DS_Store
+IlluminatedCloud
+config/.symbols/TestCreateProductsControllerNew.json

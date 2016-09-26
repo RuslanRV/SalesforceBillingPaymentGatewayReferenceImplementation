@@ -1,0 +1,48 @@
+<project name="SteelBrick CPQ ANT" default="usage" basedir="." xmlns:sf="antlib:com.salesforce">
+
+    <property file="build.properties"/>
+    <property name="bb.home" location="../BrickBuild"/>
+    <import file="${bb.home}/ant/build.xml"/>
+
+    <target name="usage">
+        <echo>
+    SteelBrick SFDC build
+
+    Setup:
+    1. Clone the BrickBuild project from github, next to your project folder
+    2. Copy BrickBuild/ant/sample.build.properties into your own build.properties (next to this build.xml)
+    3. Modify build.properties to define your various org credentials
+
+    Targets:
+
+        ant compile     -> push all metadata from your system up to the current configured org
+        ant retrieve    -> pull down all updated metadata from your current configured org
+        </echo>
+    </target>
+
+
+    <!-- Load the package requirements from version.properties -->
+    <loadproperties srcFile="${basedir}/version.properties"/>
+
+    <target name="preUninstall">
+        <trycatch>
+            <try>
+				<!-- Complex dependencies mean we need to strip fields first for Job_Product__c, then all the rest -->
+                <stripFieldsForUninstall srcDir="src" dir="uninstall" includes="Job_Product__c.object"/>
+                <sf:deploy username="${sf.username}" password="${sf.password}" serverurl="${sf.serverurl}"
+                           deployRoot="uninstall" maxPoll="${cumulusci.maxPoll.notest}"/>
+                <stripFieldsForUninstall srcDir="src" dir="uninstall" excludes="Job_Product__c.object"/>
+                <sf:deploy username="${sf.username}" password="${sf.password}" serverurl="${sf.serverurl}"
+                           deployRoot="uninstall" maxPoll="${cumulusci.maxPoll.notest}"/>
+            </try>
+            <catch>
+                <echo>Preuninstall failed, hopefully just because this is the first time we've run against this org
+                and our metadata does not yet exist.</echo>
+            </catch>
+        </trycatch>
+    </target>
+
+    <!-- Compile admin profile for both deploys and dev compiles -->
+    <target name="postDeploy" depends="compileAdminProfile"/>
+    <target name="postCompile" depends="compileAdminProfile"/>
+</project>
