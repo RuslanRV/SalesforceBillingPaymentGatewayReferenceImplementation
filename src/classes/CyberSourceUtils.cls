@@ -14,7 +14,8 @@
 //           @Description
 // ============================================================================================= 
 public class CyberSourceUtils 
-{   //implements PaymentTransactionXMLGenerator
+{   
+    //implements PaymentTransactionXMLGenerator
     // ============================================================================
     // CONSTANT 
     // ============================================================================
@@ -73,11 +74,11 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateTokenXML(List<nxtdev.TransactionParameter> listOfTransactionParameter) 
+    public void generateTokenXML(List<blng.TransactionParameter> listOfTransactionParameter) 
     {
         try
         {    
-            for(nxtdev.TransactionParameter transactionParameterToProcess : listOfTransactionParameter)
+            for(blng.TransactionParameter transactionParameterToProcess : listOfTransactionParameter)
             {
                 XmlStreamWriter writer = new XmlStreamWriter();
                 // Populate Document start
@@ -181,20 +182,20 @@ public class CyberSourceUtils
                                         writer.writeStartElement('','card','');
                                         // Populate accountNumber start
                                         writer.writeStartElement('','accountNumber','');
-                                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().nxtdev__CardNumber__c);
+                                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardNumber__c);
                                         writer.writeEndElement();
                                         // Populate accountNumber end
                                         // Populate expirationMonth start
                                         writer.writeStartElement('','expirationMonth','');
-                                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().nxtdev__CardExpirationMonth__c);
+                                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationMonth__c);
                                         writer.writeEndElement();
                                         // Populate expirationMonth end
                                         // Populate expirationYear start
                                         writer.writeStartElement('','expirationYear','');
-                                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().nxtdev__CardExpirationYear__c);
+                                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
                                         writer.writeEndElement();
                                         // Populate expirationYear end
-                                        if(transactionParameterToProcess.getPaymentMethod().nxtdev__CardType__c == 'VISA')
+                                        if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA')
                                         {
                                              // Populate cardType start
                                             writer.writeStartElement('','cardType','');
@@ -202,7 +203,7 @@ public class CyberSourceUtils
                                             writer.writeEndElement();
                                             // Populate cardType end
                                         }
-                                        else if(transactionParameterToProcess.getPaymentMethod().nxtdev__CardType__c == 'Mastercard')
+                                        else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Mastercard')
                                         {
                                              // Populate cardType start
                                             writer.writeStartElement('','cardType','');
@@ -210,7 +211,7 @@ public class CyberSourceUtils
                                             writer.writeEndElement();
                                             // Populate cardType end
                                         }
-                                        else if(transactionParameterToProcess.getPaymentMethod().nxtdev__CardType__c == 'American Express')
+                                        else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'American Express')
                                         {
                                              // Populate cardType start
                                             writer.writeStartElement('','cardType','');
@@ -218,7 +219,7 @@ public class CyberSourceUtils
                                             writer.writeEndElement();
                                             // Populate cardType end
                                         }
-                                        else if(transactionParameterToProcess.getPaymentMethod().nxtdev__CardType__c == 'Discover')
+                                        else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Discover')
                                         {
                                              // Populate cardType start
                                             writer.writeStartElement('','cardType','');
@@ -269,7 +270,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateAuthorizeXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateAuthorizeXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {
@@ -319,7 +320,7 @@ public class CyberSourceUtils
                 writer.writeStartElement('','merchantReferenceCode','');
                 writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
                 writer.writeEndElement();
-                if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__PaymentGatewayToken__c)
+                if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c)
                 {
                     // Populate billToAddress start
                     writer.writeStartElement('','billTo','');
@@ -381,20 +382,20 @@ public class CyberSourceUtils
                     writer.writeStartElement('','card','');
                     // Populate accountNumber start
                     writer.writeStartElement('','accountNumber','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardNumber__c);
+                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardNumber__c);
                     writer.writeEndElement();
                     // Populate accountNumber end
                     // Populate expirationMonth start
                     writer.writeStartElement('','expirationMonth','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardExpirationMonth__c);
+                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationMonth__c);
                     writer.writeEndElement();
                     // Populate expirationMonth end
                     // Populate expirationYear start
                     writer.writeStartElement('','expirationYear','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardExpirationYear__c);
+                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationYear__c);
                     writer.writeEndElement();
                     // Populate expirationYear end
-                    if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'VISA')
+                    if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'VISA')
                     {
                          // Populate cardType start
                         writer.writeStartElement('','cardType','');
@@ -402,7 +403,7 @@ public class CyberSourceUtils
                         writer.writeEndElement();
                         // Populate cardType end
                     }
-                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'Mastercard')
+                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Mastercard')
                     {
                          // Populate cardType start
                         writer.writeStartElement('','cardType','');
@@ -410,7 +411,7 @@ public class CyberSourceUtils
                         writer.writeEndElement();
                         // Populate cardType end
                     }
-                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'American Express')
+                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'American Express')
                     {
                          // Populate cardType start
                         writer.writeStartElement('','cardType','');
@@ -418,7 +419,7 @@ public class CyberSourceUtils
                         writer.writeEndElement();
                         // Populate cardType end
                     }
-                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'Discover')
+                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Discover')
                     {
                          // Populate cardType start
                         writer.writeStartElement('','cardType','');
@@ -455,7 +456,7 @@ public class CyberSourceUtils
                     // Populate recurringSubscriptionInfo start
                     writer.writeStartElement('','recurringSubscriptionInfo','');
                     writer.writeStartElement('','subscriptionID','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__PaymentGatewayToken__c);
+                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c);
                     writer.writeEndElement();
                     writer.writeEndElement();
                     // Populate recurringSubscriptionInfo end
@@ -493,7 +494,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateChargeXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateChargeXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {    
@@ -545,7 +546,7 @@ public class CyberSourceUtils
                       writer.writeStartElement('','merchantReferenceCode','');
                       writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
                       writer.writeEndElement();
-                      if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__PaymentGatewayToken__c)
+                      if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c)
                       {
                             // Populate billToAddress start
                             writer.writeStartElement('','billTo','');
@@ -607,20 +608,20 @@ public class CyberSourceUtils
                             writer.writeStartElement('','card','');
                             // Populate accountNumber start
                             writer.writeStartElement('','accountNumber','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardNumber__c);
+                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardNumber__c);
                             writer.writeEndElement();
                             // Populate accountNumber end
                             // Populate expirationMonth start
                             writer.writeStartElement('','expirationMonth','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardExpirationMonth__c);
+                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationMonth__c);
                             writer.writeEndElement();
                             // Populate expirationMonth end
                             // Populate expirationYear start
                             writer.writeStartElement('','expirationYear','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardExpirationYear__c);
+                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationYear__c);
                             writer.writeEndElement();
                             // Populate expirationYear end
-                            if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'VISA')
+                            if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'VISA')
                             {
                                   // Populate cardType start
                                   writer.writeStartElement('','cardType','');
@@ -628,7 +629,7 @@ public class CyberSourceUtils
                                   writer.writeEndElement();
                                   // Populate cardType end
                             }
-                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'Mastercard')
+                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Mastercard')
                             {
                                // Populate cardType start
                                writer.writeStartElement('','cardType','');
@@ -636,7 +637,7 @@ public class CyberSourceUtils
                               writer.writeEndElement();
                               // Populate cardType end
                             }
-                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'American Express')
+                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'American Express')
                             {
                                  // Populate cardType start
                               writer.writeStartElement('','cardType','');
@@ -644,7 +645,7 @@ public class CyberSourceUtils
                               writer.writeEndElement();
                               // Populate cardType end
                             }
-                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__CardType__c == 'Discover')
+                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Discover')
                             {
                                  // Populate cardType start
                               writer.writeStartElement('','cardType','');
@@ -688,7 +689,7 @@ public class CyberSourceUtils
                         // Populate recurringSubscriptionInfo start
                         writer.writeStartElement('','recurringSubscriptionInfo','');
                         writer.writeStartElement('','subscriptionID','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__PaymentGatewayToken__c);
+                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c);
                         writer.writeEndElement();
                         writer.writeEndElement();
                         // Populate recurringSubscriptionInfo end
@@ -780,7 +781,7 @@ public class CyberSourceUtils
                     writer.writeAttribute('', '', 'run', 'true');
                     // Populate authRequestID start
                      writer.writeStartElement('','authRequestID','');
-                     writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().nxtdev__GatewayID__c);
+                     writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().blng__GatewayID__c);
                      writer.writeEndElement();
                      // Populate authRequestID end
                     writer.writeEndElement();
@@ -814,7 +815,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateVoidXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateVoidXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {
@@ -837,7 +838,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateRefundXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateRefundXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {
@@ -860,7 +861,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateACHChargeXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateACHChargeXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {    
@@ -972,11 +973,11 @@ public class CyberSourceUtils
                         writer.writeStartElement('','check','');
                         // Populate accountNumber start
                         writer.writeStartElement('','accountNumber','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__BankAccountNumber__c);
+                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountNumber__c);
                         writer.writeEndElement();
                         // Populate accountNumber end
                         // Populate expirationYear end
-                        if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__BankAccountType__c == 'Checking')
+                        if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountType__c == 'Checking')
                         {
                               // Populate cardType start
                               writer.writeStartElement('','accountType','');
@@ -984,7 +985,7 @@ public class CyberSourceUtils
                               writer.writeEndElement();
                               // Populate cardType end
                         }
-                        else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__BankAccountType__c == 'Business Checking')
+                        else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountType__c == 'Business Checking')
                         {
                            // Populate cardType start
                            writer.writeStartElement('','accountType','');
@@ -992,7 +993,7 @@ public class CyberSourceUtils
                           writer.writeEndElement();
                           // Populate cardType end
                         }
-                        else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__BankAccountType__c == 'Savings')
+                        else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountType__c == 'Savings')
                         {
                              // Populate cardType start
                           writer.writeStartElement('','accountType','');
@@ -1002,7 +1003,7 @@ public class CyberSourceUtils
                         }
                         // Populate cardType start
                         writer.writeStartElement('','bankTransitNumber','');
-                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().nxtdev__BankRoutingCode__c);
+                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankRoutingCode__c);
                         writer.writeEndElement();
                           // Populate cardType end
                         writer.writeEndElement();
@@ -1041,7 +1042,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateACHVoidXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateACHVoidXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {
@@ -1097,7 +1098,7 @@ public class CyberSourceUtils
                writer.writeAttribute('', '', 'run', 'true');
                // Populate voidRequestID start
                writer.writeStartElement('','voidRequestID','');
-               writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().nxtdev__GatewayID__c);
+               writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().blng__GatewayID__c);
                writer.writeEndElement();
                // Populate voidRequestID end
                writer.writeEndElement();
@@ -1131,7 +1132,7 @@ public class CyberSourceUtils
      * @remark 
      * @change
      */
-    public void generateACHRefundXML(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    public void generateACHRefundXML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
     {
         try
         {
@@ -1198,7 +1199,7 @@ public class CyberSourceUtils
                 writer.writeAttribute('', '', 'run', 'true');
                 // Populate captureRequestID start
                 writer.writeStartElement('','debitRequestID','');
-                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().nxtdev__GatewayID__c);
+                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().blng__GatewayID__c);
                 writer.writeEndElement();
                 // Populate captureRequestID end
                 writer.writeEndElement();
@@ -1260,9 +1261,9 @@ public class CyberSourceUtils
     * @remark 
     * @change
     */
-    public static void validateCustomerDetails(List<nxtdev.TransactionParameter> listOfTransactionParameter) 
+    public static void validateCustomerDetails(List<blng.TransactionParameter> listOfTransactionParameter) 
     {      
-        for(nxtdev.TransactionParameter transactionParameterToProcess : listOfTransactionParameter)
+        for(blng.TransactionParameter transactionParameterToProcess : listOfTransactionParameter)
         {
             if(String.IsBlank(transactionParameterToProcess.getFirstName()))
             {

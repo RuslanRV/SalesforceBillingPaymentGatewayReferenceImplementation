@@ -15,7 +15,7 @@
 // Changes: @Date Author
 //          @Description
 // ============================================================================================= 
-global class CyberSourceAPI implements nxtdev.PaymentGateWay
+global class CyberSourceAPI implements blng.PaymentGateWay
 {
     // ============================================================================
     // CONSTANT 
@@ -69,7 +69,7 @@ global class CyberSourceAPI implements nxtdev.PaymentGateWay
     * @remark 
     * @change
     */    
-    global static Map<String, nxtdev.TransactionResult> generateToken(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById) 
+    global static Map<String, blng.TransactionResult> generateToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById) 
     {
         return service().generateToken(mapOfTransactionParameterById);
     }
@@ -85,7 +85,7 @@ global class CyberSourceAPI implements nxtdev.PaymentGateWay
     * @remark 
     * @change
     */  
-    global static Map<String, nxtdev.TransactionResult> authorizeTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById) 
+    global static Map<String, blng.TransactionResult> authorizeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById) 
     {
         return service().authorizeTransaction(mapOfTransactionParameterById);
     }
@@ -101,7 +101,7 @@ global class CyberSourceAPI implements nxtdev.PaymentGateWay
     * @remark 
     * @change
     */      
-    global static Map<String, nxtdev.TransactionResult> chargeTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById) 
+    global static Map<String, blng.TransactionResult> chargeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById) 
     {
         return service().chargeTransaction(mapOfTransactionParameterById);
     }
@@ -117,7 +117,7 @@ global class CyberSourceAPI implements nxtdev.PaymentGateWay
     * @remark 
     * @change
     */      
-    global static Map<String, nxtdev.TransactionResult> voidTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById) 
+    global static Map<String, blng.TransactionResult> voidTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById) 
     {
         return service().voidTransaction(mapOfTransactionParameterById);
     }
@@ -133,7 +133,7 @@ global class CyberSourceAPI implements nxtdev.PaymentGateWay
     * @remark 
     * @change
     */ 
-    global static Map<String, nxtdev.TransactionResult> refundTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById) 
+    global static Map<String, blng.TransactionResult> refundTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById) 
     {
         return service().refundTransaction(mapOfTransactionParameterById);
     }

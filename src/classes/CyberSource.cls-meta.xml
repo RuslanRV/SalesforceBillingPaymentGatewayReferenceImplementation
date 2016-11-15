@@ -4,7 +4,7 @@
     <packageVersions>
         <majorNumber>1</majorNumber>
         <minorNumber>0</minorNumber>
-        <namespace>nxtdev</namespace>
+        <namespace>blng</namespace>
     </packageVersions>
     <status>Active</status>
 </ApexClass>

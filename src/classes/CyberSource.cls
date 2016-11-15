@@ -92,7 +92,7 @@ public class CyberSource
     * @remark 
     * @change
     */  
-    public Map<String, nxtdev.TransactionResult> generateToken(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> generateToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {
@@ -100,23 +100,31 @@ public class CyberSource
             {
                 CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
                 CyberSourceUtils.getInstance().generateTokenXML(mapOfTransactionParameterById.Values());
-                for(nxtdev.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+                for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
                 {
-                    HttpService sendHttpRequest = HttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    if(!Test.isRunningTest())
+                    try
                     {
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                         
+                        HttpService sendHttpRequest = HttpService.getInstance();
+                        sendHttpRequest.addHeader('Content-type', 'text/xml');
+                        sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                        sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                        if(!Test.isRunningTest())
+                        {
+                            transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                             
+                        }
+                        else
+                        {
+                            Dom.Document doc = new Dom.Document();
+                            doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
+                            transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                        }
                     }
-                    else
+                    catch (Exception e) 
                     {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                    }
+                        transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                        transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                    }    
                 }    
             } 
             return populateTransactionResultForToken(mapOfTransactionParameterById);
@@ -138,24 +146,26 @@ public class CyberSource
     * @remark 
     * @change
     */ 
-    public Map<String, nxtdev.TransactionResult> populateTransactionResultForToken(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> populateTransactionResultForToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {
-            Map<String, nxtdev.TransactionResult> mapOfTransactionResultById = new Map<String, nxtdev.TransactionResult>();
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
-                nxtdev.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
 
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(true);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
-                
+                transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
                 
                 if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
@@ -186,27 +196,35 @@ public class CyberSource
     * @remark 
     * @change
     */  
-    public Map<String, nxtdev.TransactionResult> authorizeTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> authorizeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {    
             CyberSourceUtils.getInstance().generateAuthorizeXML(mapOfTransactionParameterById);
-            for(nxtdev.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+            for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
             {
-                HttpService sendHttpRequest = HttpService.getInstance();
-                sendHttpRequest.addHeader('Content-type', 'text/xml');
-                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                if(!Test.isRunningTest())
+                try
                 {
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                    HttpService sendHttpRequest = HttpService.getInstance();
+                    sendHttpRequest.addHeader('Content-type', 'text/xml');
+                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                    if(!Test.isRunningTest())
+                    {
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                    }
+                    else
+                    {
+                        Dom.Document doc = new Dom.Document();
+                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                    }
                 }
-                else
+                catch (Exception e) 
                 {
-                    Dom.Document doc = new Dom.Document();
-                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                }
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                }    
             }
             return populateTransactionResultForAuthorize(mapOfTransactionParameterById);
         }
@@ -228,32 +246,35 @@ public class CyberSource
     * @remark 
     * @change
     */ 
-    public Map<String, nxtdev.TransactionResult> populateTransactionResultForAuthorize(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> populateTransactionResultForAuthorize(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {    
-            Map<String, nxtdev.TransactionResult> mapOfTransactionResultById = new Map<String, nxtdev.TransactionResult>();
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
-                nxtdev.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
 
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(true);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
-                
+                transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
                 if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
                 {
@@ -282,35 +303,44 @@ public class CyberSource
     * @remark 
     * @change
     */  
-    public Map<String, nxtdev.TransactionResult> chargeTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> chargeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {
-           for(nxtdev.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+           for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
-                if(transactionParameterToProcess.getPaymentMethod().nxtdev__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                try
+                {    
+                    if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                    {
+                        CyberSourceUtils.getInstance().generateChargeXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
+                    }
+                    else if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_ACH)
+                    {  
+                        CyberSourceUtils.getInstance().generateACHChargeXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                    }
+                    HttpService sendHttpRequest = HttpService.getInstance();
+                    sendHttpRequest.addHeader('Content-type', 'text/xml');
+                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                    
+                    if(!Test.isRunningTest())
+                    {
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                    }
+                    else
+                    {
+                        Dom.Document doc = new Dom.Document();
+                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                    }
+                }
+                catch (Exception e) 
                 {
-                    CyberSourceUtils.getInstance().generateChargeXML(mapOfTransactionParameterById);  
-                }
-                else if(transactionParameterToProcess.getPaymentMethod().nxtdev__PaymentType__c == PAYMENTTYPE_ACH)
-                {  
-                    CyberSourceUtils.getInstance().generateACHChargeXML(mapOfTransactionParameterById);
-                }
-                HttpService sendHttpRequest = HttpService.getInstance();
-                sendHttpRequest.addHeader('Content-type', 'text/xml');
-                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                
-                if(!Test.isRunningTest())
-                {
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                }
-                else
-                {
-                    Dom.Document doc = new Dom.Document();
-                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                }
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                }    
             }
             return populateTransactionResultForCharge(mapOfTransactionParameterById); 
         }
@@ -332,32 +362,35 @@ public class CyberSource
     * @remark 
     * @change
     */ 
-    public Map<String, nxtdev.TransactionResult> populateTransactionResultForCharge(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> populateTransactionResultForCharge(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {
-            Map<String, nxtdev.TransactionResult> mapOfTransactionResultById = new Map<String, nxtdev.TransactionResult>();
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
-                nxtdev.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
 
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(true);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else
                 {
                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
-                
+               transactionParameterToProcess.transactionResult.setId(idToProcess);
                transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
                if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
                 {
@@ -386,34 +419,43 @@ public class CyberSource
     * @remark 
     * @change
     */  
-    public Map<String, nxtdev.TransactionResult> voidTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> voidTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {
-            for(nxtdev.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+            for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
-                if(transactionParameterToProcess.getPaymentMethod().nxtdev__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                try
                 {
-                    CyberSourceUtils.getInstance().generateVoidXML(mapOfTransactionParameterById);  
+                    if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                    {
+                        CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
+                    }
+                    else if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_ACH)
+                    {
+                        CyberSourceUtils.getInstance().generateACHVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                    }
+                    HttpService sendHttpRequest = HttpService.getInstance();
+                    sendHttpRequest.addHeader('Content-type', 'text/xml');
+                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                    if(!Test.isRunningTest())
+                    {
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                    }
+                    else
+                    {
+                        Dom.Document doc = new Dom.Document();
+                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                    }
                 }
-                else if(transactionParameterToProcess.getPaymentMethod().nxtdev__PaymentType__c == PAYMENTTYPE_ACH)
+                catch (Exception e) 
                 {
-                    CyberSourceUtils.getInstance().generateACHVoidXML(mapOfTransactionParameterById);
-                }
-                HttpService sendHttpRequest = HttpService.getInstance();
-                sendHttpRequest.addHeader('Content-type', 'text/xml');
-                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                if(!Test.isRunningTest())
-                {
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                }
-                else
-                {
-                    Dom.Document doc = new Dom.Document();
-                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                }
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                }    
             }
             return populateTransactionResultForVoid(mapOfTransactionParameterById);
         }
@@ -434,32 +476,35 @@ public class CyberSource
     * @remark 
     * @change
     */ 
-    public Map<String, nxtdev.TransactionResult> populateTransactionResultForVoid(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> populateTransactionResultForVoid(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {    
-            Map<String, nxtdev.TransactionResult> mapOfTransactionResultById = new Map<String, nxtdev.TransactionResult>();
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
-                nxtdev.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
 
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(true);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else
                 {
                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
-                
+                transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
                 if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
                 {
@@ -488,35 +533,44 @@ public class CyberSource
     * @remark 
     * @change
     */  
-    public Map<String, nxtdev.TransactionResult> refundTransaction(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> refundTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {   
-            for(nxtdev.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+            for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
-                if(transactionParameterToProcess.getPaymentMethod().nxtdev__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                try
                 {
-                    CyberSourceUtils.getInstance().generateRefundXML(mapOfTransactionParameterById);  
+                    if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                    {
+                        CyberSourceUtils.getInstance().generateRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
+                    }
+                    else if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_ACH)
+                    {
+                        CyberSourceUtils.getInstance().generateACHRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                    }
+                    HttpService sendHttpRequest = HttpService.getInstance();
+                    sendHttpRequest.addHeader('Content-type', 'text/xml');
+                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                    
+                    if(!Test.isRunningTest())
+                    {
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                    }
+                    else
+                    {
+                        Dom.Document doc = new Dom.Document();
+                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                    }
                 }
-                else if(transactionParameterToProcess.getPaymentMethod().nxtdev__PaymentType__c == PAYMENTTYPE_ACH)
+                catch (Exception e) 
                 {
-                    CyberSourceUtils.getInstance().generateACHRefundXML(mapOfTransactionParameterById);
-                }
-                HttpService sendHttpRequest = HttpService.getInstance();
-                sendHttpRequest.addHeader('Content-type', 'text/xml');
-                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                
-                if(!Test.isRunningTest())
-                {
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                }
-                else
-                {
-                    Dom.Document doc = new Dom.Document();
-                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                }
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                }     
             }
             return populateTransactionResultForRefund(mapOfTransactionParameterById);
         }
@@ -537,32 +591,35 @@ public class CyberSource
     * @remark 
     * @change
     */ 
-    public Map<String, nxtdev.TransactionResult> populateTransactionResultForRefund(Map<String, nxtdev.TransactionParameter> mapOfTransactionParameterById)
+    public Map<String, blng.TransactionResult> populateTransactionResultForRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try
         {
-            Map<String, nxtdev.TransactionResult> mapOfTransactionResultById = new Map<String, nxtdev.TransactionResult>();
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
-                nxtdev.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
 
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(true);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
                 else
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
-                
+                transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
                 if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
                 {

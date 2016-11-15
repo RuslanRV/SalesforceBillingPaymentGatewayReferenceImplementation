@@ -3,42 +3,40 @@
     <fields>
         <fullName>MerchantId__c</fullName>
         <externalId>false</externalId>
-        <label>Merchant ID</label>
+        <label>MerchantId</label>
         <length>128</length>
         <maskChar>asterisk</maskChar>
         <maskType>all</maskType>
         <required>false</required>
-        <trackHistory>true</trackHistory>
+        <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>EncryptedText</type>
     </fields>
     <fields>
         <fullName>MerchantReference__c</fullName>
         <externalId>false</externalId>
-        <label>Merchant Reference</label>
+        <label>MerchantReference</label>
         <length>128</length>
         <maskChar>asterisk</maskChar>
         <maskType>all</maskType>
         <required>false</required>
-        <trackHistory>true</trackHistory>
+        <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>EncryptedText</type>
     </fields>
     <fields>
         <fullName>TestMode__c</fullName>
-        <defaultValue>true</defaultValue>
+        <defaultValue>false</defaultValue>
         <externalId>false</externalId>
-        <label>Test Mode</label>
-        <trackHistory>true</trackHistory>
+        <label>TestMode</label>
+        <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>TransactionSecurityKey__c</fullName>
-        <description>Transaction Security Key used by CyberSource</description>
         <externalId>false</externalId>
-        <inlineHelpText>Transaction Security Key used by CyberSource</inlineHelpText>
-        <label>Transaction Security Key</label>
+        <label>TransactionSecurityKey</label>
         <length>32768</length>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>

@@ -24,24 +24,6 @@
     <!-- Load the package requirements from version.properties -->
     <loadproperties srcFile="${basedir}/version.properties"/>
 
-    <target name="preUninstall">
-        <trycatch>
-            <try>
-				<!-- Complex dependencies mean we need to strip fields first for Job_Product__c, then all the rest -->
-                <stripFieldsForUninstall srcDir="src" dir="uninstall" includes="Job_Product__c.object"/>
-                <sf:deploy username="${sf.username}" password="${sf.password}" serverurl="${sf.serverurl}"
-                           deployRoot="uninstall" maxPoll="${cumulusci.maxPoll.notest}"/>
-                <stripFieldsForUninstall srcDir="src" dir="uninstall" excludes="Job_Product__c.object"/>
-                <sf:deploy username="${sf.username}" password="${sf.password}" serverurl="${sf.serverurl}"
-                           deployRoot="uninstall" maxPoll="${cumulusci.maxPoll.notest}"/>
-            </try>
-            <catch>
-                <echo>Preuninstall failed, hopefully just because this is the first time we've run against this org
-                and our metadata does not yet exist.</echo>
-            </catch>
-        </trycatch>
-    </target>
-
     <!-- Compile admin profile for both deploys and dev compiles -->
     <target name="postDeploy" depends="compileAdminProfile"/>
     <target name="postCompile" depends="compileAdminProfile"/>
