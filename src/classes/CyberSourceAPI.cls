@@ -61,8 +61,8 @@ global class CyberSourceAPI implements blng.PaymentGateWay
     /**
     * @name generateToken
     * @description Method to generate Token
-    * @param 
-    * @return
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
+    * @return 
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-22
@@ -77,8 +77,8 @@ global class CyberSourceAPI implements blng.PaymentGateWay
     /**
     * @name authorizeTransaction
     * @description Method to Authorize a payment for a Invoice
-    * @param 
-    * @return
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
+    * @return 
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-22
@@ -93,8 +93,8 @@ global class CyberSourceAPI implements blng.PaymentGateWay
     /**
     * @name chargeTransaction
     * @description Method to Charge a payment for a Invoice
-    * @param 
-    * @return
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
+    * @return 
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-22
@@ -109,8 +109,8 @@ global class CyberSourceAPI implements blng.PaymentGateWay
     /**
     * @name voidTransaction
     * @description Method to Void a payment for a Invoice
-    * @param 
-    * @return
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
+    * @return 
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-22
@@ -125,8 +125,8 @@ global class CyberSourceAPI implements blng.PaymentGateWay
      /**
     * @name refundTransaction
     * @description Method to Refund a payment for a Invoice
-    * @param 
-    * @return
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
+    * @return 
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-22

@@ -1,7 +1,7 @@
 // ============================================================================================= 
 //  Object: CyberSourceUtils 
 //  Company: Salesforce
-//  Author: Himanshu Kapoor/ Vinod KR/ Devender / Manigandan SA
+//  Author:  Vinod KR/ Manigandan SA
 //  Purpose: This class for all the functionality of CyberSource payment gateway XML Generator
 //  Methods: Following are the methods and one line description
 //              
@@ -28,6 +28,8 @@ public class CyberSourceUtils
         private static final String GENERATE_ACH_VOID_XML = 'generateACHVoidXML ';
         private static final String GENERATE_ACH_REFUND_XML = 'generateACHRefundXML ';
         private static final String GET_ELEMENTS = 'getElements ';
+        private static Boolean IS_MULTICURRENCY_ORG = UserInfo.isMultiCurrencyOrganization();
+        private static String CURRENCYISOCODE = 'CurrencyIsoCode';
     // ============================================================================
     // STATIC VARIABLES
     // ============================================================================
@@ -173,7 +175,7 @@ public class CyberSourceUtils
                                         writer.writeStartElement('','purchaseTotals','');
                                         // Populate currency start
                                         writer.writeStartElement('','currency','');
-                                        writer.writeCharacters('USD');
+                                        writer.writeCharacters(validateCurrency(transactionParameterToProcess));
                                         writer.writeEndElement();
                                         // Populate currency end
                                         writer.writeEndElement();
@@ -264,7 +266,7 @@ public class CyberSourceUtils
      * @description Method to Generate Authorize XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-25
      * @remark 
@@ -276,6 +278,7 @@ public class CyberSourceUtils
         {
             for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
             {
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
                 XmlStreamWriter writer = new XmlStreamWriter();
                 // Populate Document start
                 writer.writeStartDocument('utf-8', '1.0');  
@@ -291,13 +294,13 @@ public class CyberSourceUtils
                                         writer.writeStartElement('wsse','UsernameToken','');
                                             // Populate the Username start
                                             writer.writeStartElement('wsse','Username','');
-                                                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                                                writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                                             writer.writeEndElement();
                                             // Populate the Username end
                                             // Populate the Password start
                                             writer.writeStartElement('wsse','Password','');
                                                 writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
-                                                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().TransactionSecurityKey__c);
+                                                writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
                                             writer.writeEndElement();
                                             // Populate the Password end
                                         writer.writeEndElement();
@@ -313,167 +316,133 @@ public class CyberSourceUtils
                 writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
                 // Populate merchantID start
                 writer.writeStartElement('','merchantID','');
-                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                 writer.writeEndElement();
                 // Populate merchantID end
                 // Populate merchantReferenceCode start
                 writer.writeStartElement('','merchantReferenceCode','');
-                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
+                writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
                 writer.writeEndElement();
-                if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c)
+                // Populate merchantReferenceCode end
+                // Populate billToAddress start
+                writer.writeStartElement('','billTo','');
+                // Populate firstName start
+                writer.writeStartElement('','firstName','');
+                writer.writeCharacters(transactionParameterToProcess.getFirstName());
+                writer.writeEndElement();
+                // Populate firstName end
+                // Populate lastName start
+                writer.writeStartElement('','lastName','');
+                writer.writeCharacters(transactionParameterToProcess.getLastName());
+                writer.writeEndElement();
+                // Populate lastName end
+                // Populate street1 start
+                writer.writeStartElement('','street1','');
+                writer.writeCharacters(transactionParameterToProcess.getStreet());
+                writer.writeEndElement();
+                // Populate street1 end
+                // Populate city start
+                writer.writeStartElement('','city','');
+                writer.writeCharacters(transactionParameterToProcess.getCity());
+                writer.writeEndElement();
+                // Populate city end
+                // Populate state start
+                writer.writeStartElement('','state','');
+                writer.writeCharacters(transactionParameterToProcess.getState());
+                writer.writeEndElement();
+                // Populate state end
+                // Populate postalCode start
+                writer.writeStartElement('','postalCode','');
+                writer.writeCharacters(transactionParameterToProcess.getZipCode());
+                writer.writeEndElement();
+                // Populate postalCode end
+                // Populate country start
+                writer.writeStartElement('','country','');
+                writer.writeCharacters(transactionParameterToProcess.getCountry());
+                writer.writeEndElement();
+                // Populate country end
+                // Populate email start
+                writer.writeStartElement('','email','');
+                writer.writeCharacters(transactionParameterToProcess.getEmailId());
+                writer.writeEndElement();
+                // Populate email end
+                writer.writeEndElement();
+                // Populate billToAddress end
+                // Populate purchaseTotals start
+                writer.writeStartElement('','purchaseTotals','');
+                // Populate currency start
+                writer.writeStartElement('','currency','');
+                writer.writeCharacters(validateCurrency(transactionParameterToProcess));
+                writer.writeEndElement();
+                writer.writeStartElement('','grandTotalAmount','');
+                writer.writeCharacters(transactionParameterToProcess.getAmount());
+                writer.writeEndElement();
+                // Populate currency end
+                writer.writeEndElement();
+                // Populate purchaseTotals end
+                // Populate card start
+                writer.writeStartElement('','card','');
+                // Populate accountNumber start
+                writer.writeStartElement('','accountNumber','');
+                writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardNumber__c);
+                writer.writeEndElement();
+                // Populate accountNumber end
+                // Populate expirationMonth start
+                writer.writeStartElement('','expirationMonth','');
+                writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationMonth__c);
+                writer.writeEndElement();
+                // Populate expirationMonth end
+                // Populate expirationYear start
+                writer.writeStartElement('','expirationYear','');
+                writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
+                writer.writeEndElement();
+                // Populate expirationYear end
+                if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA')
                 {
-                    // Populate billToAddress start
-                    writer.writeStartElement('','billTo','');
-                    // Populate firstName start
-                    writer.writeStartElement('','firstName','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getFirstName());
+                     // Populate cardType start
+                    writer.writeStartElement('','cardType','');
+                        writer.writeCharacters('001');
                     writer.writeEndElement();
-                    // Populate firstName end
-                    // Populate lastName start
-                    writer.writeStartElement('','lastName','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getLastName());
-                    writer.writeEndElement();
-                    // Populate lastName end
-                    // Populate street1 start
-                    writer.writeStartElement('','street1','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getStreet());
-                    writer.writeEndElement();
-                    // Populate street1 end
-                    // Populate city start
-                    writer.writeStartElement('','city','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getCity());
-                    writer.writeEndElement();
-                    // Populate city end
-                    // Populate state start
-                    writer.writeStartElement('','state','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getState());
-                    writer.writeEndElement();
-                    // Populate state end
-                    // Populate postalCode start
-                    writer.writeStartElement('','postalCode','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getZipCode());
-                    writer.writeEndElement();
-                    // Populate postalCode end
-                    // Populate country start
-                    writer.writeStartElement('','country','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getCountry());
-                    writer.writeEndElement();
-                    // Populate country end
-                    // Populate email start
-                    writer.writeStartElement('','email','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getEmailId());
-                    writer.writeEndElement();
-                    // Populate email end
-                    writer.writeEndElement();
-                    // Populate billToAddress end
-                    // Populate purchaseTotals start
-                    writer.writeStartElement('','purchaseTotals','');
-                    // Populate currency start
-                    writer.writeStartElement('','currency','');
-                    writer.writeCharacters('USD');
-                    writer.writeEndElement();
-                    writer.writeStartElement('','grandTotalAmount','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
-                    writer.writeEndElement();
-                    // Populate currency end
-                    writer.writeEndElement();
-                    // Populate purchaseTotals end
-                    // Populate card start
-                    writer.writeStartElement('','card','');
-                    // Populate accountNumber start
-                    writer.writeStartElement('','accountNumber','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardNumber__c);
-                    writer.writeEndElement();
-                    // Populate accountNumber end
-                    // Populate expirationMonth start
-                    writer.writeStartElement('','expirationMonth','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationMonth__c);
-                    writer.writeEndElement();
-                    // Populate expirationMonth end
-                    // Populate expirationYear start
-                    writer.writeStartElement('','expirationYear','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationYear__c);
-                    writer.writeEndElement();
-                    // Populate expirationYear end
-                    if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'VISA')
-                    {
-                         // Populate cardType start
-                        writer.writeStartElement('','cardType','');
-                            writer.writeCharacters('001');
-                        writer.writeEndElement();
-                        // Populate cardType end
-                    }
-                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Mastercard')
-                    {
-                         // Populate cardType start
-                        writer.writeStartElement('','cardType','');
-                            writer.writeCharacters('002');
-                        writer.writeEndElement();
-                        // Populate cardType end
-                    }
-                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'American Express')
-                    {
-                         // Populate cardType start
-                        writer.writeStartElement('','cardType','');
-                            writer.writeCharacters('003');
-                        writer.writeEndElement();
-                        // Populate cardType end
-                    }
-                    else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Discover')
-                    {
-                         // Populate cardType start
-                        writer.writeStartElement('','cardType','');
-                            writer.writeCharacters('004');
-                        writer.writeEndElement();
-                        // Populate cardType end
-                    }
-                    writer.writeEndElement();
-                    // Populate card end
-                    writer.writeStartElement('','ccAuthService','');
-                    writer.writeAttribute('', '', 'run', 'true');
-                    writer.writeEndElement();
-                    // Populate ccAuthService end
-                    // Populate RequestMessage end
-                    writer.writeEndElement();
-                    // Populate Body end
-                    writer.writeEndElement();
-                    // Populate Envelope end
-                } 
-                else
-                {
-                    // Populate purchaseTotals start
-                    writer.writeStartElement('','purchaseTotals','');
-                    // Populate currency start
-                    writer.writeStartElement('','currency','');
-                    writer.writeCharacters('USD');
-                    writer.writeEndElement();
-                    // Populate currency end
-                    writer.writeStartElement('','grandTotalAmount','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
-                    writer.writeEndElement();
-                    writer.writeEndElement();
-                    // Populate purchaseTotals end
-                    // Populate recurringSubscriptionInfo start
-                    writer.writeStartElement('','recurringSubscriptionInfo','');
-                    writer.writeStartElement('','subscriptionID','');
-                    writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c);
-                    writer.writeEndElement();
-                    writer.writeEndElement();
-                    // Populate recurringSubscriptionInfo end
-                        // Populate ccAuthService start
-                    writer.writeStartElement('','ccAuthService','');
-                    writer.writeAttribute('', '', 'run', 'true');
-                    writer.writeEndElement();
-                    // Populate ccAuthService end
-                    writer.writeEndElement();
-                    // Populate RequestMessage end
-                    writer.writeEndElement();
-                    // Populate Body end
-                    writer.writeEndElement();
-                    // Populate Envelope end
+                    // Populate cardType end
                 }
+                else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Mastercard')
+                {
+                     // Populate cardType start
+                    writer.writeStartElement('','cardType','');
+                        writer.writeCharacters('002');
+                    writer.writeEndElement();
+                    // Populate cardType end
+                }
+                else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'American Express')
+                {
+                     // Populate cardType start
+                    writer.writeStartElement('','cardType','');
+                        writer.writeCharacters('003');
+                    writer.writeEndElement();
+                    // Populate cardType end
+                }
+                else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Discover')
+                {
+                     // Populate cardType start
+                    writer.writeStartElement('','cardType','');
+                        writer.writeCharacters('004');
+                    writer.writeEndElement();
+                    // Populate cardType end
+                }
+                writer.writeEndElement();
+                // Populate card end
+                writer.writeStartElement('','ccAuthService','');
+                writer.writeAttribute('', '', 'run', 'true');
+                writer.writeEndElement();
+                // Populate ccAuthService end
+                // Populate RequestMessage end
+                writer.writeEndElement();
+                // Populate Body end
+                writer.writeEndElement();
+                // Populate Envelope end
+                
                 writer.writeEndDocument();
-                mapOfTransactionParameterByInvoiceId.get(idToProcess).setRequestBody(writer.getXmlString());
+                transactionParameterToProcess.setRequestBody(writer.getXmlString());
                 writer.close();
             }
         }
@@ -488,7 +457,7 @@ public class CyberSourceUtils
      * @description Method to Generate Charge XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
      * @remark 
@@ -500,9 +469,10 @@ public class CyberSourceUtils
         {    
             for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
             {
-                 XmlStreamWriter writer = new XmlStreamWriter();
-                 if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction()) 
-                 {
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
+                XmlStreamWriter writer = new XmlStreamWriter();
+                if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction()) 
+                {
                      // Populate Document start
                       writer.writeStartDocument('utf-8', '1.0');  
                         // Populate Envelope start
@@ -517,13 +487,13 @@ public class CyberSourceUtils
                                   writer.writeStartElement('wsse','UsernameToken','');
                                     // Populate the Username start
                                     writer.writeStartElement('wsse','Username','');
-                                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                                     writer.writeEndElement();
                                     // Populate the Username end
                                     // Populate the Password start
                                     writer.writeStartElement('wsse','Password','');
                                       writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
-                                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().TransactionSecurityKey__c);
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
                                     writer.writeEndElement();
                                     // Populate the Password end
                                   writer.writeEndElement();
@@ -539,55 +509,55 @@ public class CyberSourceUtils
                       writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
                       // Populate merchantID start
                       writer.writeStartElement('','merchantID','');
-                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                       writer.writeEndElement();
                       // Populate merchantID end
                       // Populate merchantReferenceCode start
                       writer.writeStartElement('','merchantReferenceCode','');
-                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
                       writer.writeEndElement();
-                      if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c)
+                      if(NULL == transactionParameterToProcess.getPaymentMethod().blng__PaymentGatewayToken__c)
                       {
                             // Populate billToAddress start
                             writer.writeStartElement('','billTo','');
                             // Populate firstName start
                             writer.writeStartElement('','firstName','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getFirstName());
+                            writer.writeCharacters(transactionParameterToProcess.getFirstName());
                             writer.writeEndElement();
                             // Populate firstName end
                             // Populate lastName start
                             writer.writeStartElement('','lastName','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getLastName());
+                            writer.writeCharacters(transactionParameterToProcess.getLastName());
                             writer.writeEndElement();
                             // Populate lastName end
                             // Populate street1 start
                             writer.writeStartElement('','street1','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getStreet());
+                            writer.writeCharacters(transactionParameterToProcess.getStreet());
                             writer.writeEndElement();
                             // Populate street1 end
                             // Populate city start
                             writer.writeStartElement('','city','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getCity());
+                            writer.writeCharacters(transactionParameterToProcess.getCity());
                             writer.writeEndElement();
                             // Populate city end
                             // Populate state start
                             writer.writeStartElement('','state','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getState());
+                            writer.writeCharacters(transactionParameterToProcess.getState());
                             writer.writeEndElement();
                             // Populate state end
                             // Populate postalCode start
                             writer.writeStartElement('','postalCode','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getZipCode());
+                            writer.writeCharacters(transactionParameterToProcess.getZipCode());
                             writer.writeEndElement();
                             // Populate postalCode end
                             // Populate country start
                             writer.writeStartElement('','country','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getCountry());
+                            writer.writeCharacters(transactionParameterToProcess.getCountry());
                             writer.writeEndElement();
                             // Populate country end
                             // Populate email start
                             writer.writeStartElement('','email','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getEmailId());
+                            writer.writeCharacters(transactionParameterToProcess.getEmailId());
                             writer.writeEndElement();
                             // Populate email end
                             writer.writeEndElement();
@@ -596,10 +566,10 @@ public class CyberSourceUtils
                             writer.writeStartElement('','purchaseTotals','');
                             // Populate currency start
                             writer.writeStartElement('','currency','');
-                            writer.writeCharacters('USD');
+                            writer.writeCharacters(validateCurrency(transactionParameterToProcess));
                             writer.writeEndElement();
                             writer.writeStartElement('','grandTotalAmount','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
+                            writer.writeCharacters(transactionParameterToProcess.getAmount());
                             writer.writeEndElement();
                             // Populate currency end
                             writer.writeEndElement();
@@ -608,20 +578,20 @@ public class CyberSourceUtils
                             writer.writeStartElement('','card','');
                             // Populate accountNumber start
                             writer.writeStartElement('','accountNumber','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardNumber__c);
+                            writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardNumber__c);
                             writer.writeEndElement();
                             // Populate accountNumber end
                             // Populate expirationMonth start
                             writer.writeStartElement('','expirationMonth','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationMonth__c);
+                            writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationMonth__c);
                             writer.writeEndElement();
                             // Populate expirationMonth end
                             // Populate expirationYear start
                             writer.writeStartElement('','expirationYear','');
-                            writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardExpirationYear__c);
+                            writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
                             writer.writeEndElement();
                             // Populate expirationYear end
-                            if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'VISA')
+                            if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA')
                             {
                                   // Populate cardType start
                                   writer.writeStartElement('','cardType','');
@@ -629,7 +599,7 @@ public class CyberSourceUtils
                                   writer.writeEndElement();
                                   // Populate cardType end
                             }
-                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Mastercard')
+                            else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Mastercard')
                             {
                                // Populate cardType start
                                writer.writeStartElement('','cardType','');
@@ -637,7 +607,7 @@ public class CyberSourceUtils
                               writer.writeEndElement();
                               // Populate cardType end
                             }
-                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'American Express')
+                            else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'American Express')
                             {
                                  // Populate cardType start
                               writer.writeStartElement('','cardType','');
@@ -645,7 +615,7 @@ public class CyberSourceUtils
                               writer.writeEndElement();
                               // Populate cardType end
                             }
-                            else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__CardType__c == 'Discover')
+                            else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Discover')
                             {
                                  // Populate cardType start
                               writer.writeStartElement('','cardType','');
@@ -678,18 +648,18 @@ public class CyberSourceUtils
                         writer.writeStartElement('','purchaseTotals','');
                         // Populate currency start
                         writer.writeStartElement('','currency','');
-                        writer.writeCharacters('USD');
+                        writer.writeCharacters(validateCurrency(transactionParameterToProcess));
                         writer.writeEndElement();
                         // Populate currency end
                         writer.writeStartElement('','grandTotalAmount','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
+                        writer.writeCharacters(transactionParameterToProcess.getAmount());
                         writer.writeEndElement();
                         writer.writeEndElement();
                         // Populate purchaseTotals end
                         // Populate recurringSubscriptionInfo start
                         writer.writeStartElement('','recurringSubscriptionInfo','');
                         writer.writeStartElement('','subscriptionID','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__PaymentGatewayToken__c);
+                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__PaymentGatewayToken__c);
                         writer.writeEndElement();
                         writer.writeEndElement();
                         // Populate recurringSubscriptionInfo end
@@ -717,7 +687,7 @@ public class CyberSourceUtils
                         writer.writeEndElement();
                         // Populate Envelope end
                         writer.writeEndDocument();
-                        mapOfTransactionParameterByInvoiceId.get(idToProcess).setRequestBody(writer.getXmlString());
+                        transactionParameterToProcess.setRequestBody(writer.getXmlString());
                         writer.close();
                 }
                 else
@@ -736,13 +706,13 @@ public class CyberSourceUtils
                                   writer.writeStartElement('wsse','UsernameToken','');
                                     // Populate the Username start
                                     writer.writeStartElement('wsse','Username','');
-                                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                                     writer.writeEndElement();
                                     // Populate the Username end
                                     // Populate the Password start
                                     writer.writeStartElement('wsse','Password','');
                                       writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
-                                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().TransactionSecurityKey__c);
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
                                     writer.writeEndElement();
                                     // Populate the Password end
                                   writer.writeEndElement();
@@ -758,22 +728,22 @@ public class CyberSourceUtils
                       writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
                       // Populate merchantID start
                       writer.writeStartElement('','merchantID','');
-                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                       writer.writeEndElement();
                       // Populate merchantID end
                       // Populate merchantReferenceCode start
                       writer.writeStartElement('','merchantReferenceCode','');
-                      writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
                       writer.writeEndElement();
                       // Populate purchaseTotals start
                      writer.writeStartElement('','purchaseTotals','');
                      // Populate currency start
                      writer.writeStartElement('','currency','');
-                     writer.writeCharacters('USD');
+                     writer.writeCharacters(validateCurrency(transactionParameterToProcess));
                      writer.writeEndElement();
                      // Populate currency end
                      writer.writeStartElement('','grandTotalAmount','');
-                     writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
+                     writer.writeCharacters(transactionParameterToProcess.getAmount());
                      writer.writeEndElement();
                      writer.writeEndElement();
                      // Populate ccCaptureService start
@@ -781,7 +751,7 @@ public class CyberSourceUtils
                     writer.writeAttribute('', '', 'run', 'true');
                     // Populate authRequestID start
                      writer.writeStartElement('','authRequestID','');
-                     writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().blng__GatewayID__c);
+                     writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
                      writer.writeEndElement();
                      // Populate authRequestID end
                     writer.writeEndElement();
@@ -793,7 +763,7 @@ public class CyberSourceUtils
                     writer.writeEndElement();
                     // Populate Envelope end
                     writer.writeEndDocument();
-                    mapOfTransactionParameterByInvoiceId.get(idToProcess).setRequestBody(writer.getXmlString());
+                    transactionParameterToProcess.setRequestBody(writer.getXmlString());
                     writer.close();
                 }       
             }
@@ -801,7 +771,7 @@ public class CyberSourceUtils
         catch (Exception e) 
         {
             throw e;
-        }       
+        }
     }
 
     /**
@@ -809,7 +779,7 @@ public class CyberSourceUtils
      * @description Method to Generate Void XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
      * @remark 
@@ -827,12 +797,13 @@ public class CyberSourceUtils
         }        
     }
 
+   
     /**
-     * @name generateRefundXML
-     * @description Method to Generate Refund XML
+     * @name generateCardRefundXML
+     * @description Method to Generate Card Refund XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
      * @remark 
@@ -842,12 +813,90 @@ public class CyberSourceUtils
     {
         try
         {
-            
+            for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
+            {
+              blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
+              XmlStreamWriter writer = new XmlStreamWriter();
+              // Populate Document start
+              writer.writeStartDocument('utf-8', '1.0');  
+                // Populate Envelope start
+                writer.writeStartElement('s','Envelope','http://schemas.xmlsoap.org/soap/envelope/');
+                  writer.writeAttribute('xmlns', 'http://schemas.xmlsoap.org/soap/envelope/', 's', 'http://schemas.xmlsoap.org/soap/envelope/');
+                    // Populate Header start
+                    writer.writeStartElement('s','Header','http://schemas.xmlsoap.org/soap/envelope/');
+                      // Populate Security start
+                      writer.writeStartElement('wsse','Security','http://schemas.xmlsoap.org/soap/envelope/');
+                        writer.writeAttribute('xmlns', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'wsse', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd');
+                          // Populate UsernameToken start
+                          writer.writeStartElement('wsse','UsernameToken','');
+                            // Populate the Username start
+                            writer.writeStartElement('wsse','Username','');
+                              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                            writer.writeEndElement();
+                            // Populate the Username end
+                            // Populate the Password start
+                            writer.writeStartElement('wsse','Password','');
+                              writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
+                              writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                            writer.writeEndElement();
+                            // Populate the Password end
+                          writer.writeEndElement();
+                          // Populate UsernameToken end
+                      writer.writeEndElement();
+                      // Populate Security end
+                      writer.writeEndElement();
+                     // Populate Header end
+                    // Populate Body start
+                    writer.writeStartElement('s','Body','');
+              // Populate RequestMessage start
+              writer.writeStartElement('','requestMessage','');
+              writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+              // Populate merchantID start
+              writer.writeStartElement('','merchantID','');
+              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+              writer.writeEndElement();
+              // Populate merchantID end
+              // Populate merchantReferenceCode start
+              writer.writeStartElement('','merchantReferenceCode','');
+              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
+              writer.writeEndElement();
+              // Populate purchaseTotals start
+                writer.writeStartElement('','purchaseTotals','');
+                // Populate currency start
+                writer.writeStartElement('','currency','');
+                writer.writeCharacters(validateCurrency(transactionParameterToProcess));
+                writer.writeEndElement();
+                writer.writeStartElement('','grandTotalAmount','');
+                writer.writeCharacters(transactionParameterToProcess.getAmount());
+                writer.writeEndElement();
+                // Populate currency end
+                writer.writeEndElement();
+                // Populate purchaseTotals end
+                // Populate ccCreditService start
+                writer.writeStartElement('','ccCreditService','');
+                writer.writeAttribute('', '', 'run', 'true');
+                // Populate captureRequestID start
+                writer.writeStartElement('','captureRequestID','');
+                writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
+                writer.writeEndElement();
+                // Populate captureRequestID end
+                writer.writeEndElement();
+                // Populate ccCreditService end
+                writer.writeEndElement();
+                // Populate RequestMessage end
+                writer.writeEndElement();
+                // Populate Body end
+                writer.writeEndElement();
+                // Populate Envelope end
+                writer.writeEndDocument();
+                transactionParameterToProcess.setRequestBody(writer.getXmlString());
+                writer.close();
+            }
         } 
         catch (Exception e) 
         {
-            throw e;
-        }    
+           throw e;
+        }        
     }
 
     /**
@@ -855,7 +904,7 @@ public class CyberSourceUtils
      * @description Method to Generate ACH Charge XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
      * @remark 
@@ -867,8 +916,9 @@ public class CyberSourceUtils
         {    
             for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
             {
-                 XmlStreamWriter writer = new XmlStreamWriter();
-                 if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction()) 
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
+                XmlStreamWriter writer = new XmlStreamWriter();
+                 if(NULL == transactionParameterToProcess.getTransaction()) 
                  {
                          // Populate Document start
                           writer.writeStartDocument('utf-8', '1.0');  
@@ -884,13 +934,13 @@ public class CyberSourceUtils
                                       writer.writeStartElement('wsse','UsernameToken','');
                                         // Populate the Username start
                                         writer.writeStartElement('wsse','Username','');
-                                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                                          writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                                         writer.writeEndElement();
                                         // Populate the Username end
                                         // Populate the Password start
                                         writer.writeStartElement('wsse','Password','');
                                           writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
-                                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().TransactionSecurityKey__c);
+                                          writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
                                         writer.writeEndElement();
                                         // Populate the Password end
                                       writer.writeEndElement();
@@ -906,53 +956,53 @@ public class CyberSourceUtils
                           writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
                           // Populate merchantID start
                           writer.writeStartElement('','merchantID','');
-                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                          writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                           writer.writeEndElement();
                           // Populate merchantID end
                           // Populate merchantReferenceCode start
                           writer.writeStartElement('','merchantReferenceCode','');
-                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
+                          writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
                           writer.writeEndElement();
                         // Populate billToAddress start
                         writer.writeStartElement('','billTo','');
                         // Populate firstName start
                         writer.writeStartElement('','firstName','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getFirstName());
+                        writer.writeCharacters(transactionParameterToProcess.getFirstName());
                         writer.writeEndElement();
                         // Populate firstName end
                         // Populate lastName start
                         writer.writeStartElement('','lastName','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getLastName());
+                        writer.writeCharacters(transactionParameterToProcess.getLastName());
                         writer.writeEndElement();
                         // Populate lastName end
                         // Populate street1 start
                         writer.writeStartElement('','street1','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getStreet());
+                        writer.writeCharacters(transactionParameterToProcess.getStreet());
                         writer.writeEndElement();
                         // Populate street1 end
                         // Populate city start
                         writer.writeStartElement('','city','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getCity());
+                        writer.writeCharacters(transactionParameterToProcess.getCity());
                         writer.writeEndElement();
                         // Populate city end
                         // Populate state start
                         writer.writeStartElement('','state','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getState());
+                        writer.writeCharacters(transactionParameterToProcess.getState());
                         writer.writeEndElement();
                         // Populate state end
                         // Populate postalCode start
                         writer.writeStartElement('','postalCode','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getZipCode());
+                        writer.writeCharacters(transactionParameterToProcess.getZipCode());
                         writer.writeEndElement();
                         // Populate postalCode end
                         // Populate country start
                         writer.writeStartElement('','country','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getCountry());
+                        writer.writeCharacters(transactionParameterToProcess.getCountry());
                         writer.writeEndElement();
                         // Populate country end
                         // Populate email start
                         writer.writeStartElement('','email','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getEmailId());
+                        writer.writeCharacters(transactionParameterToProcess.getEmailId());
                         writer.writeEndElement();
                         // Populate email end
                         writer.writeEndElement();
@@ -961,10 +1011,10 @@ public class CyberSourceUtils
                         writer.writeStartElement('','purchaseTotals','');
                         // Populate currency start
                         writer.writeStartElement('','currency','');
-                        writer.writeCharacters('USD');
+                        writer.writeCharacters(validateCurrency(transactionParameterToProcess));
                         writer.writeEndElement();
                         writer.writeStartElement('','grandTotalAmount','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
+                        writer.writeCharacters(transactionParameterToProcess.getAmount());
                         writer.writeEndElement();
                         // Populate currency end
                         writer.writeEndElement();
@@ -973,11 +1023,11 @@ public class CyberSourceUtils
                         writer.writeStartElement('','check','');
                         // Populate accountNumber start
                         writer.writeStartElement('','accountNumber','');
-                        writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountNumber__c);
+                        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__BankAccountNumber__c);
                         writer.writeEndElement();
                         // Populate accountNumber end
                         // Populate expirationYear end
-                        if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountType__c == 'Checking')
+                        if(transactionParameterToProcess.getPaymentMethod().blng__BankAccountType__c == 'Checking')
                         {
                               // Populate cardType start
                               writer.writeStartElement('','accountType','');
@@ -985,7 +1035,7 @@ public class CyberSourceUtils
                               writer.writeEndElement();
                               // Populate cardType end
                         }
-                        else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountType__c == 'Business Checking')
+                        else if(transactionParameterToProcess.getPaymentMethod().blng__BankAccountType__c == 'Business Checking')
                         {
                            // Populate cardType start
                            writer.writeStartElement('','accountType','');
@@ -993,7 +1043,7 @@ public class CyberSourceUtils
                           writer.writeEndElement();
                           // Populate cardType end
                         }
-                        else if(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankAccountType__c == 'Savings')
+                        else if(transactionParameterToProcess.getPaymentMethod().blng__BankAccountType__c == 'Savings')
                         {
                              // Populate cardType start
                           writer.writeStartElement('','accountType','');
@@ -1003,7 +1053,7 @@ public class CyberSourceUtils
                         }
                         // Populate cardType start
                         writer.writeStartElement('','bankTransitNumber','');
-                          writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getPaymentMethod().blng__BankRoutingCode__c);
+                          writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__BankRoutingCode__c);
                         writer.writeEndElement();
                           // Populate cardType end
                         writer.writeEndElement();
@@ -1020,7 +1070,7 @@ public class CyberSourceUtils
                     // Populate Envelope end
                     writer.writeEndDocument();
                     
-                    mapOfTransactionParameterByInvoiceId.get(idToProcess).setRequestBody(writer.getXmlString());
+                    transactionParameterToProcess.setRequestBody(writer.getXmlString());
                     writer.close();
                 }  
             }
@@ -1036,7 +1086,7 @@ public class CyberSourceUtils
      * @description Method to Generate ACH Void XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
      * @remark 
@@ -1048,6 +1098,7 @@ public class CyberSourceUtils
         {
             for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
             {
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
                 XmlStreamWriter writer = new XmlStreamWriter();
                   // Populate Document start
                   writer.writeStartDocument('utf-8', '1.0');  
@@ -1063,13 +1114,13 @@ public class CyberSourceUtils
                               writer.writeStartElement('wsse','UsernameToken','');
                                 // Populate the Username start
                                 writer.writeStartElement('wsse','Username','');
-                                  writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                                  writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                                 writer.writeEndElement();
                                 // Populate the Username end
                                 // Populate the Password start
                                 writer.writeStartElement('wsse','Password','');
                                   writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
-                                  writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().TransactionSecurityKey__c);
+                                  writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
                                 writer.writeEndElement();
                                 // Populate the Password end
                               writer.writeEndElement();
@@ -1085,12 +1136,12 @@ public class CyberSourceUtils
               writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
               // Populate merchantID start
               writer.writeStartElement('','merchantID','');
-              writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
               writer.writeEndElement();
               // Populate merchantID end
               // Populate merchantReferenceCode start
               writer.writeStartElement('','merchantReferenceCode','');
-              writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
+              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
               writer.writeEndElement();
               
                // Populate voidService start
@@ -1098,7 +1149,7 @@ public class CyberSourceUtils
                writer.writeAttribute('', '', 'run', 'true');
                // Populate voidRequestID start
                writer.writeStartElement('','voidRequestID','');
-               writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().blng__GatewayID__c);
+               writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
                writer.writeEndElement();
                // Populate voidRequestID end
                writer.writeEndElement();
@@ -1110,7 +1161,7 @@ public class CyberSourceUtils
                writer.writeEndElement();
                // Populate Envelope end
                writer.writeEndDocument();
-               mapOfTransactionParameterByInvoiceId.get(idToProcess).setRequestBody(writer.getXmlString());
+               transactionParameterToProcess.setRequestBody(writer.getXmlString());
                writer.close();
                  
             }
@@ -1126,7 +1177,7 @@ public class CyberSourceUtils
      * @description Method to Generate ACH Refund XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
-     * @exception CustomException [unexpected exception]
+     * @exception Throw Exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
      * @remark 
@@ -1138,6 +1189,7 @@ public class CyberSourceUtils
         {
             for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
             {
+              blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);  
               XmlStreamWriter writer = new XmlStreamWriter();
               // Populate Document start
               writer.writeStartDocument('utf-8', '1.0');  
@@ -1153,13 +1205,13 @@ public class CyberSourceUtils
                           writer.writeStartElement('wsse','UsernameToken','');
                             // Populate the Username start
                             writer.writeStartElement('wsse','Username','');
-                              writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+                              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
                             writer.writeEndElement();
                             // Populate the Username end
                             // Populate the Password start
                             writer.writeStartElement('wsse','Password','');
                               writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
-                              writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().TransactionSecurityKey__c);
+                              writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
                             writer.writeEndElement();
                             // Populate the Password end
                           writer.writeEndElement();
@@ -1175,35 +1227,35 @@ public class CyberSourceUtils
               writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
               // Populate merchantID start
               writer.writeStartElement('','merchantID','');
-              writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantId__c);
+              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
               writer.writeEndElement();
               // Populate merchantID end
               // Populate merchantReferenceCode start
               writer.writeStartElement('','merchantReferenceCode','');
-              writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getGateWay().MerchantReference__c);
+              writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
               writer.writeEndElement();
               // Populate purchaseTotals start
                 writer.writeStartElement('','purchaseTotals','');
                 // Populate currency start
                 writer.writeStartElement('','currency','');
-                writer.writeCharacters('USD');
+                writer.writeCharacters(validateCurrency(transactionParameterToProcess));
                 writer.writeEndElement();
                 writer.writeStartElement('','grandTotalAmount','');
-                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getAmount());
+                writer.writeCharacters(transactionParameterToProcess.getAmount());
                 writer.writeEndElement();
                 // Populate currency end
                 writer.writeEndElement();
                 // Populate purchaseTotals end
-                // Populate ccCreditService start
+                // Populate ecCreditService start
                 writer.writeStartElement('','ecCreditService','');
                 writer.writeAttribute('', '', 'run', 'true');
                 // Populate captureRequestID start
                 writer.writeStartElement('','debitRequestID','');
-                writer.writeCharacters(mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction().blng__GatewayID__c);
+                writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
                 writer.writeEndElement();
                 // Populate captureRequestID end
                 writer.writeEndElement();
-                // Populate ccCreditService end
+                // Populate ecCreditService end
                 writer.writeEndElement();
                 // Populate RequestMessage end
                 writer.writeEndElement();
@@ -1211,7 +1263,7 @@ public class CyberSourceUtils
                 writer.writeEndElement();
                 // Populate Envelope end
                 writer.writeEndDocument();
-                mapOfTransactionParameterByInvoiceId.get(idToProcess).setRequestBody(writer.getXmlString());
+                transactionParameterToProcess.setRequestBody(writer.getXmlString());
                 writer.close();
             }
         } 
@@ -1366,5 +1418,37 @@ public class CyberSourceUtils
         mapOfMessageByErrorCode.put('250','Error: The request was received, but there was a timeout at the payment processor');
         mapOfMessageByErrorCode.put('388','Error: The routing number did not pass verification');
         return mapOfMessageByErrorCode;
-    } 
+    }
+
+   public String validateCurrency(blng.TransactionParameter transactionParameterToProcess)
+   {
+       
+       if(IS_MULTICURRENCY_ORG)
+        {
+            if(NULL != transactionParameterToProcess.getInvoice())
+            {
+                return getCurrencyISOCode(transactionParameterToProcess.getInvoice());
+            }
+            else if(NULL != transactionParameterToProcess.getAccount())
+            {
+                return getCurrencyISOCode(transactionParameterToProcess.getAccount());
+            }    
+            
+        }
+        else
+        {
+            return UserInfo.getDefaultCurrency();
+        }
+
+       return NULL;     
+   }
+    
+   public String getCurrencyISOCode(SObject sObjectInstance)
+   {
+      if(UserInfo.isMultiCurrencyOrganization()) 
+      {
+          return (String)sObjectInstance.get(CURRENCYISOCODE);
+      }
+      return NULL;
+   } 
 }

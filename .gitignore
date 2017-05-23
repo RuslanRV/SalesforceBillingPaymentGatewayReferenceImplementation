@@ -3,4 +3,15 @@
 build.properties
 **/.DS_Store
 IlluminatedCloud
-config/.symbols/TestCreateProductsControllerNew.json
+config/
+debug/
+Billing2.sublime-project
+sfcreds.properties
+Billing2.sublime-workspace
+src/classes/ErrorCode.cls-meta.xml
+src/classes/ErrorCode.cls-meta.xml
+Raghu Org.sublime-project
+Billing2 for Avalara.sublime-project
+Billing2 for Avalara.sublime-workspace
+NewBillingDhana.sublime-project
+NewBillingDhana.sublime-workspace

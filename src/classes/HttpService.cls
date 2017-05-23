@@ -59,7 +59,7 @@ public with sharing class HttpService
     /**
 * @name get
 * @description Get Method to get a HTTP request
-* @param 
+* @param endPoint
 * @return 
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
@@ -75,7 +75,7 @@ public with sharing class HttpService
     /**
 * @name post
 * @description Post Method to Post a HTTP request
-* @param 
+* @param endPoint and requestBody
 * @return 
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
@@ -91,7 +91,7 @@ public with sharing class HttpService
     /**
 * @name addHeader
 * @description addHeader Methods to add all the defualt Header's required fo rthe request
-* @param 
+* @param name and value
 * @return 
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
@@ -107,7 +107,7 @@ public with sharing class HttpService
     /**
 * @name setHeader
 * @description setHeader Methods to set setHeader for the request
-* @param 
+* @param request
 * @return 
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
@@ -126,7 +126,7 @@ public with sharing class HttpService
     /**
 * @name setAuthorizationHeader
 * @description setAuthorizationHeader Methods to set Authorization Header for the request
-* @param 
+* @param userName and password
 * @return 
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
@@ -147,7 +147,7 @@ public with sharing class HttpService
     /**
 * @name setTokenisationHeader
 * @description setTokenisationHeader Methods to set Tokenisation Header for the request
-* @param 
+* @param userName and password
 * @return 
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
@@ -168,8 +168,8 @@ public with sharing class HttpService
     /**
 * @name newRequest
 * @description newRequest Methods to make a new request
-* @param 
-* @return 
+* @param method and endPoint
+* @return newRequest
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
 * @created 2016-06-16
@@ -184,8 +184,8 @@ public with sharing class HttpService
     /**
 * @name newRequest
 * @description newRequest Methods to make a new request
-* @param 
-* @return 
+* @param method, endPoint and requestBody
+* @return request
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
 * @created 2016-06-16
@@ -209,9 +209,9 @@ public with sharing class HttpService
     /**
 * @name send
 * @description send Methods to send a request
-* @param 
+* @param request
 * @return 
-* @exception
+* @exception Throws Exception
 * @author Himanshu Kapoor/ Vinod KR
 * @created 2016-06-16
 * @remark 
@@ -221,21 +221,19 @@ public with sharing class HttpService
     {
         try 
         {
-            
             httpResponse = new Http().send(request);
-             
         }
-        catch(System.CalloutException e) 
+        catch(Exception e) 
         {
-            
+          throw e;    
         }
     }
     
     /**
 * @name getResponse
 * @description getResponse Method to get the Response
-* @param 
-* @return 
+* @param NA
+* @return httpResponse
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
 * @created 2016-06-16
@@ -244,15 +242,14 @@ public with sharing class HttpService
 */
     public HttpResponse getResponse()
     {
-        system.debug('httpResponse-->'+httpResponse);
         return httpResponse;
     }
     
     /**
 * @name getResponseToString
 * @description getResponse Method to get the Response
-* @param 
-* @return 
+* @param NA
+* @return getResponse
 * @exception
 * @author Himanshu Kapoor/ Vinod KR
 * @created 2016-06-16

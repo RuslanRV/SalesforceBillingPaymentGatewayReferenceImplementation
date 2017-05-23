@@ -84,9 +84,9 @@ public class CyberSource
     /**
     * @name generateToken
     * @description Method to process Token Transaction request
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-14
     * @remark 
@@ -123,7 +123,7 @@ public class CyberSource
                     catch (Exception e) 
                     {
                         transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                        transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                        transactionParameterToProcess.transactionResult.setError(e.getMessage());
                     }    
                 }    
             } 
@@ -138,9 +138,9 @@ public class CyberSource
     /**
     * @name populateTransactionResultForToken
     * @description Method to populate Transaction Result for CyberSource Token
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-14
     * @remark 
@@ -188,9 +188,9 @@ public class CyberSource
     /**
     * @name authorizeTransaction
     * @description Method to process Authorize Transaction request
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-25
     * @remark 
@@ -223,7 +223,7 @@ public class CyberSource
                 catch (Exception e) 
                 {
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage());
                 }    
             }
             return populateTransactionResultForAuthorize(mapOfTransactionParameterById);
@@ -238,9 +238,9 @@ public class CyberSource
     /**
     * @name populateTransactionResultForAuthorize
     * @description Method to populate Transaction Result for CyberSource Authorize
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String,Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-14
     * @remark 
@@ -295,9 +295,9 @@ public class CyberSource
     /**
     * @name chargeTransaction
     * @description Method to process Charge Transaction request
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-26
     * @remark 
@@ -339,7 +339,7 @@ public class CyberSource
                 catch (Exception e) 
                 {
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage());
                 }    
             }
             return populateTransactionResultForCharge(mapOfTransactionParameterById); 
@@ -354,9 +354,9 @@ public class CyberSource
     /**
     * @name populateTransactionResultForCharge
     * @description Method to populate Transaction Result for CyberSource authorize
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-14
     * @remark 
@@ -375,11 +375,13 @@ public class CyberSource
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
                     transactionParameterToProcess.transactionResult.setIsSuccess(true);
+                    transactionParameterToProcess.transactionResult.setResponseMessage('SUCCESS');
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                    transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 }
                 else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
                 {
@@ -397,7 +399,7 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
                 }
                transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
-               transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
+               
                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             return mapOfTransactionResultById;
@@ -411,9 +413,9 @@ public class CyberSource
     /**
     * @name voidTransaction
     * @description Method to process Void Transaction request
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-26
     * @remark 
@@ -454,7 +456,7 @@ public class CyberSource
                 catch (Exception e) 
                 {
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage());
                 }    
             }
             return populateTransactionResultForVoid(mapOfTransactionParameterById);
@@ -468,9 +470,9 @@ public class CyberSource
      /**
     * @name populateTransactionResultForVoid
     * @description Method to populate Transaction Result for CyberSource void
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-14
     * @remark 
@@ -521,13 +523,12 @@ public class CyberSource
             throw  e; 
         }     
     } 
-
     /**
     * @name refundTransaction
     * @description Method to process Refund Transaction request
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception 
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-26
     * @remark 
@@ -542,14 +543,17 @@ public class CyberSource
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 try
                 {
-                    if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
-                    {
-                        CyberSourceUtils.getInstance().generateRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
-                    }
-                    else if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_ACH)
-                    {
-                        CyberSourceUtils.getInstance().generateACHRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                    }
+                   if(NULL != transactionParameterToProcess.getTransaction())
+                   {
+                        if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
+                        {
+                            CyberSourceUtils.getInstance().generateRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
+                        }
+                        else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
+                        {
+                            CyberSourceUtils.getInstance().generateACHRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                        }
+                    }   
                     HttpService sendHttpRequest = HttpService.getInstance();
                     sendHttpRequest.addHeader('Content-type', 'text/xml');
                     sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
@@ -569,7 +573,7 @@ public class CyberSource
                 catch (Exception e) 
                 {
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                    transactionParameterToProcess.transactionResult.setError(e.getMessage() + e.getStackTraceString());
+                    transactionParameterToProcess.transactionResult.setError(e.getMessage());
                 }     
             }
             return populateTransactionResultForRefund(mapOfTransactionParameterById);
@@ -583,9 +587,9 @@ public class CyberSource
      /**
     * @name populateTransactionResultForRefund
     * @description method to populate Transaction Result for CyberSource refund
-    * @param NA
+    * @param Map[Key => String [unique Id],Value => TransactionParameter]
     * @return Map[Key => String [unique Id],Value => TransactionResult]
-    * @exception CustomException [unexpected exception]
+    * @exception Throw Exception 
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-14
     * @remark 
