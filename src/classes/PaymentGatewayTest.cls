@@ -314,6 +314,88 @@ private class PaymentGatewayTest
             CyberSourceAPI.ChargeTransaction(mapOfTransactionParameter);
         Test.stopTest();    
     }
+    public static testMethod void CyberSourceChargeCCLevel3VISA()
+    {
+        insert PaymentGatewayTest.getConfiguration();
+        blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
+                                    blng__GatewayType__c = 'CyberSource', 
+                                    TestMode__c = true, 
+                                    MerchantID__c = 'salesforcebilling', 
+                                    MerchantReference__c= 'salesforcebilling', 
+                                    TransactionSecurityKey__c= '465456'
+                                );
+        insert gateway; 
+        Account account1 = new Account(Name = 'Test Account');
+        insert account1;
+        blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
+                                            blng__PaymentType__c= 'ACH', 
+                                            blng__BillingEmail__c = 'madhu@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Madhu', 
+                                            blng__BillingLastName__c = 'Kesav', 
+                                            blng__Account__c = account1.id, 
+                                            blng__BillingAddress__c = '123',
+                                            blng__BillingCity__c = 'CA',
+                                            blng__BillingStateProvince__c = 'California',
+                                            blng__BillingZipPostal__c = '11111',
+                                            blng__BillingCountry__c = 'United States',
+                                            blng__BankAccountNumber__c='4100',
+                                            blng__BankAccountName__c='ABC',
+                                            blng__BankAccountType__c='CHECKING',
+                                            blng__BankName__c='Test',
+                                            blng__BankRoutingCode__c='071923284'
+                                        );
+        insert paymentMethod1;
+        blng__PaymentMethod__c paymentMethod2 = new blng__PaymentMethod__c(
+                                            blng__BillingEmail__c = 'madhu@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Madhu', 
+                                            blng__BillingLastName__c = 'Kesav', 
+                                            blng__Account__c = account1.id, 
+                                            blng__CVV__c = '123', 
+                                            blng__CardType__c = 'VISA', 
+                                            blng__CardNumber__c = '4111111111111111', 
+                                            blng__CardExpirationYear__c = '2020', 
+                                            blng__CardExpirationMonth__c = '10',
+                                            blng__BillingAddress__c = 'Prabhat Aracade',
+                                            blng__BillingCity__c = 'US',
+                                            blng__BillingStateProvince__c = 'UK',
+                                            blng__BillingZipPostal__c = '505001',
+                                            blng__BillingCountry__c = 'United States', 
+                                            blng__PaymentType__c='Credit Card'
+                                        );
+        insert paymentMethod2;
+        blng__PaymentTransaction__c paymentTransaction = new blng__PaymentTransaction__c(
+                                                    blng__ResponseStatus__c = 'Approved' ,
+                                                    blng__GatewayID__c = '123456',
+                                                    blng__PaymentGateway__c=gateway.id,
+                                                    blng__PaymentMethod__c=paymentMethod2.id,
+                                                    blng__Amount__c=20,blng__Type__c='Charge'
+                                                );
+        insert paymentTransaction;
+        blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
+        transactionParameter.SetAccount(account1);
+        transactionParameter.setFirstName('ManiGandanSA');
+        transactionParameter.setLastName('SA');
+        transactionParameter.setEmailId('m1@g.com');
+        transactionParameter.setStreet('12');
+        transactionParameter.setCity('CA');
+        transactionParameter.setState('California');
+        transactionParameter.setZipCode('11111');
+        transactionParameter.setCountry('United States');
+        transactionParameter.setPhone('111');
+        transactionParameter.setCurrencyId('USD');
+        transactionParameter.setAmount('1.00');
+        transactionParameter.setGateWay(gateway);
+        transactionParameter.setPaymentMethod(paymentMethod2);
+        transactionParameter.setTransaction(paymentTransaction);
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        Test.startTest();
+            //CyberSourceAPI.ChargeTransaction(mapOfTransactionParameter);
+             CyberSourceUtils.getInstance().generateChargeLevel3XML(mapOfTransactionParameter);
+        Test.stopTest();    
+    }
     public static testMethod void CyberSourcechargeByTokenCCVISA()
     {
         insert PaymentGatewayTest.getConfiguration();
@@ -602,6 +684,188 @@ private class PaymentGatewayTest
             CyberSourceAPI.ChargeTransaction(mapOfTransactionParameter);
         Test.stopTest();    
     }
+     public static testMethod void CyberSourceCaptureCCAmericanExpress()
+    {
+        insert PaymentGatewayTest.getConfiguration();
+        blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
+                                    blng__GatewayType__c = 'CyberSource', 
+                                    TestMode__c = true, 
+                                    MerchantID__c = 'salesforcebilling', 
+                                    MerchantReference__c= 'salesforcebilling', 
+                                    TransactionSecurityKey__c= '465456'
+                                );
+        insert gateway; 
+        Account account1 = new Account(Name = 'Test Account');
+        insert account1;
+        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = account1.Id);
+        insert invoice;
+        blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
+                                            blng__PaymentType__c= 'ACH', 
+                                            blng__BillingEmail__c = 'madhu@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Madhu', 
+                                            blng__BillingLastName__c = 'Kesav', 
+                                            blng__Account__c = account1.id, 
+                                            blng__BillingAddress__c = '123',
+                                            blng__BillingCity__c = 'CA',
+                                            blng__BillingStateProvince__c = 'California',
+                                            blng__BillingZipPostal__c = '11111',
+                                            blng__BillingCountry__c = 'United States',
+                                            blng__BankAccountNumber__c='4100',
+                                            blng__BankAccountName__c='ABC',
+                                            blng__BankAccountType__c='CHECKING',
+                                            blng__BankName__c='Test',
+                                            blng__BankRoutingCode__c='071923284'
+                                        );
+        insert paymentMethod1;
+        blng__PaymentMethod__c paymentMethod2 = new blng__PaymentMethod__c(
+                                            blng__BillingEmail__c = 'madhu@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Madhu', 
+                                            blng__BillingLastName__c = 'Kesav', 
+                                            blng__Account__c = account1.id, 
+                                            blng__CVV__c = '123', 
+                                            blng__CardType__c = 'American Express', 
+                                            blng__CardNumber__c = '4111111111111111', 
+                                            blng__CardExpirationYear__c = '2020', 
+                                            blng__CardExpirationMonth__c = '10',
+                                            blng__BillingAddress__c = 'Prabhat Aracade',
+                                            blng__BillingCity__c = 'US',
+                                            blng__BillingStateProvince__c = 'UK',
+                                            blng__BillingZipPostal__c = '505001',
+                                            blng__BillingCountry__c = 'United States', 
+                                            blng__PaymentType__c='Credit Card'
+                                        );
+        insert paymentMethod2;
+        blng__PaymentTransaction__c paymentTransaction = new blng__PaymentTransaction__c(
+                                                    blng__ResponseStatus__c = 'Approved',
+                                                    blng__GatewayID__c='4961250208446642103009',
+                                                    blng__PaymentGateway__c=gateway.id,
+                                                    blng__PaymentMethod__c=paymentMethod2.id,
+                                                    //blng__RequestTypeOfPayment__c = 'Credit Card',
+                                                    blng__Amount__c=20,blng__Type__c='Authorization'
+                                                );
+        insert paymentTransaction;
+        blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
+        transactionParameter.SetAccount(account1);
+        transactionParameter.setFirstName('ManiGandanSA');
+        transactionParameter.setLastName('SA');
+        transactionParameter.setEmailId('m1@g.com');
+        transactionParameter.setStreet('12');
+        transactionParameter.setCity('CA');
+        transactionParameter.setState('California');
+        transactionParameter.setZipCode('11111');
+        transactionParameter.setCountry('United States');
+        transactionParameter.setPhone('111');
+        transactionParameter.setCurrencyId('USD');
+        transactionParameter.setAmount('1.00');
+        transactionParameter.setGateWay(gateway);
+        transactionParameter.setInvoice(invoice);
+        //transactionParameter.setPaymentTransaction(paymentTransaction1);
+        transactionParameter.setPaymentMethod(paymentMethod2);
+        //transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD
+        transactionParameter.setTransaction(paymentTransaction);
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        //Map<String, blng.TransactionParameter> mapOfTransactionParameterById = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        Test.startTest();
+             CyberSourceUtils.getInstance().generateCaptureXML(mapOfTransactionParameter);
+            
+            //CyberSourceAPI.captureTransaction(mapOfTransactionParameter);
+        Test.stopTest();    
+    }
+    public static testMethod void CyberSourceCapturelevel3CCAmericanExpress()
+    {
+        insert PaymentGatewayTest.getConfiguration();
+        blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
+                                    blng__GatewayType__c = 'CyberSource', 
+                                    TestMode__c = true, 
+                                    MerchantID__c = 'salesforcebilling', 
+                                    MerchantReference__c= 'salesforcebilling', 
+                                    TransactionSecurityKey__c= '465456'
+                                );
+        insert gateway; 
+        Account account1 = new Account(Name = 'Test Account');
+        insert account1;
+        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = account1.Id);
+        insert invoice;
+        blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
+                                            blng__PaymentType__c= 'ACH', 
+                                            blng__BillingEmail__c = 'madhu@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Madhu', 
+                                            blng__BillingLastName__c = 'Kesav', 
+                                            blng__Account__c = account1.id, 
+                                            blng__BillingAddress__c = '123',
+                                            blng__BillingCity__c = 'CA',
+                                            blng__BillingStateProvince__c = 'California',
+                                            blng__BillingZipPostal__c = '11111',
+                                            blng__BillingCountry__c = 'United States',
+                                            blng__BankAccountNumber__c='4100',
+                                            blng__BankAccountName__c='ABC',
+                                            blng__BankAccountType__c='CHECKING',
+                                            blng__BankName__c='Test',
+                                            blng__BankRoutingCode__c='071923284'
+                                        );
+        insert paymentMethod1;
+        blng__PaymentMethod__c paymentMethod2 = new blng__PaymentMethod__c(
+                                            blng__BillingEmail__c = 'madhu@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Madhu', 
+                                            blng__BillingLastName__c = 'Kesav', 
+                                            blng__Account__c = account1.id, 
+                                            blng__CVV__c = '123', 
+                                            blng__CardType__c = 'American Express', 
+                                            blng__CardNumber__c = '4111111111111111', 
+                                            blng__CardExpirationYear__c = '2020', 
+                                            blng__CardExpirationMonth__c = '10',
+                                            blng__BillingAddress__c = 'Prabhat Aracade',
+                                            blng__BillingCity__c = 'US',
+                                            blng__BillingStateProvince__c = 'UK',
+                                            blng__BillingZipPostal__c = '505001',
+                                            blng__BillingCountry__c = 'United States', 
+                                            blng__PaymentType__c='Credit Card'
+                                        );
+        insert paymentMethod2;
+        blng__PaymentTransaction__c paymentTransaction = new blng__PaymentTransaction__c(
+                                                    blng__ResponseStatus__c = 'Approved',
+                                                    blng__GatewayID__c='4961250208446642103009',
+                                                    blng__PaymentGateway__c=gateway.id,
+                                                    blng__PaymentMethod__c=paymentMethod2.id,
+                                                    blng__RequestTypeOfPayment__c = 'Credit Card',
+                                                    blng__Amount__c=20,blng__Type__c='Authorization'
+            
+                                                );
+        insert paymentTransaction;
+        blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
+        transactionParameter.SetAccount(account1);
+        transactionParameter.setFirstName('ManiGandanSA');
+        transactionParameter.setLastName('SA');
+        transactionParameter.setEmailId('m1@g.com');
+        transactionParameter.setStreet('12');
+        transactionParameter.setCity('CA');
+        transactionParameter.setState('California');
+        transactionParameter.setZipCode('11111');
+        transactionParameter.setCountry('United States');
+        transactionParameter.setPhone('111');
+        transactionParameter.setCurrencyId('USD');
+        transactionParameter.setAmount('1.00');
+        transactionParameter.setGateWay(gateway);
+        transactionParameter.setInvoice(invoice);
+        //transactionParameter.setPaymentTransaction(paymentTransaction1);
+        transactionParameter.setPaymentMethod(paymentMethod2);
+        //transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD
+        transactionParameter.setTransaction(paymentTransaction);
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        //Map<String, blng.TransactionParameter> mapOfTransactionParameterById = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        Test.startTest();
+             CyberSourceUtils.getInstance().generateCaptureLevel3XML(mapOfTransactionParameter);
+             
+            //CyberSourceAPI.captureTransaction(mapOfTransactionParameter);
+        Test.stopTest();    
+    }
+    
     public static testMethod void CyberSourceTokenCCVISA()
     {
         insert PaymentGatewayTest.getConfiguration();
@@ -1257,6 +1521,11 @@ private class PaymentGatewayTest
         insert gateway; 
         Account account1 = new Account(Name = 'Test Account');
         insert account1;
+         
+        /*blng__PaymentTransaction__c paymentTransaction = NEW blng__PaymentTransaction__c(
+                                                        blng__GatewayID__c = '4974325404976911503008',
+                                                        blng__RequestTypeOfPayment__c = 'Credit Card');
+        insert paymentTransaction;*/
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
                                             blng__PaymentType__c= 'ACH', 
                                             blng__BillingEmail__c = 'madhu@gmail.com', 
@@ -1462,7 +1731,87 @@ private class PaymentGatewayTest
         Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         Test.startTest();
+                           
             CyberSourceAPI.refundTransaction(mapOfTransactionParameter);
+        Test.stopTest();    
+    }
+    public static testMethod void CyberSourceVoidRefundTransaction()
+    {
+        insert PaymentGatewayTest.getConfiguration();
+        blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
+                                    blng__GatewayType__c = 'CyberSource', 
+                                    TestMode__c = true, 
+                                    MerchantID__c = 'salesforcebilling', 
+                                    MerchantReference__c= 'salesforcebilling', 
+                                    TransactionSecurityKey__c= '465456'
+                                );
+        insert gateway; 
+        Account account1 = new Account(Name = 'Test Account');
+        insert account1;
+        blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
+                                            blng__PaymentType__c= 'ACH', 
+                                            blng__BillingEmail__c = 'bala@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Bala', 
+                                            blng__BillingLastName__c = 'medoju', 
+                                            blng__Account__c = account1.id, 
+                                            blng__BillingAddress__c = '123',
+                                            blng__BillingCity__c = 'CA',
+                                            blng__BillingStateProvince__c = 'California',
+                                            blng__BillingZipPostal__c = '11111',
+                                            blng__BillingCountry__c = 'United States',
+                                            blng__BankAccountNumber__c='4100',
+                                            blng__BankAccountName__c='ABC',
+                                            blng__BankAccountType__c='CHECKING',
+                                            blng__BankName__c='Test',
+                                            blng__BankRoutingCode__c='071923284'
+                                        );
+        insert paymentMethod1;
+        blng__PaymentMethod__c paymentMethod2 = new blng__PaymentMethod__c(
+                                            blng__BillingEmail__c = 'mani@gmail.com', 
+                                            blng__BillingPhone__c = '9999999', 
+                                            blng__BillingFirstName__c = 'Mani', 
+                                            blng__BillingLastName__c = 'SA', 
+                                            blng__Account__c = account1.id, 
+                                            blng__CVV__c = '123', 
+                                            blng__CardNumber__c = '4111111111111111', 
+                                            blng__CardExpirationYear__c = '2020', 
+                                            blng__CardExpirationMonth__c = '10',
+                                            blng__BillingAddress__c = 'Prabhat Aracade',
+                                            blng__BillingCity__c = 'US',
+                                            blng__BillingStateProvince__c = 'UK',
+                                            blng__BillingZipPostal__c = '505001',
+                                            blng__BillingCountry__c = 'United States', 
+                                            blng__PaymentType__c='Credit Card'
+                                        );
+        insert paymentMethod2;
+        blng__PaymentTransaction__c paymentTransaction = new blng__PaymentTransaction__c(
+                                                    blng__PaymentGateway__c = gateway.Id, 
+                                                    blng__RequestTypeOfPayment__c= 'Credit Card',
+             										blng__GatewayID__c='4961250208446642103009'
+                                                );
+        insert paymentTransaction;
+        blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
+        transactionParameter.SetAccount(account1);
+        transactionParameter.setFirstName('ManiGandanSA');
+        transactionParameter.setLastName('SA');
+        transactionParameter.setEmailId('m1@g.com');
+        transactionParameter.setStreet('12');
+        transactionParameter.setCity('CA');
+        transactionParameter.setState('California');
+        transactionParameter.setZipCode('11111');
+        transactionParameter.setCountry('United States');
+        transactionParameter.setPhone('111');
+        transactionParameter.setCurrencyId('USD');
+        transactionParameter.setAmount('1.00');
+        transactionParameter.setGateWay(gateway);
+        transactionParameter.setPaymentMethod(paymentMethod2);
+        transactionParameter.setTransaction(paymentTransaction);
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        Test.startTest();
+            CyberSourceUtils.getInstance().generateVoidRefundXML(mapOfTransactionParameter);            
+            //CyberSourceAPI.refundTransaction(mapOfTransactionParameter);
         Test.stopTest();    
     }
     public static testMethod void CyberSourceAuthorizeRefundACH()
@@ -1657,8 +2006,8 @@ private class PaymentGatewayTest
         insert gateway; 
         
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -1732,8 +2081,8 @@ private class PaymentGatewayTest
         insert gateway; 
         
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -1800,8 +2149,8 @@ private class PaymentGatewayTest
         insert gateway; 
         
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -1868,8 +2217,8 @@ private class PaymentGatewayTest
      
         insert gateway; 
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -1937,8 +2286,8 @@ private class PaymentGatewayTest
                                 );
         insert gateway; 
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -2004,8 +2353,8 @@ private class PaymentGatewayTest
                                 );
         insert gateway; 
         Account account1 = new Account(
-                        Name = 'Test Account',  
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account'  
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -2084,8 +2433,8 @@ private class PaymentGatewayTest
                                 );
         insert gateway; 
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -2152,8 +2501,8 @@ private class PaymentGatewayTest
         insert gateway; 
         
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(
@@ -2219,8 +2568,8 @@ private class PaymentGatewayTest
                                 );
         insert gateway; 
         Account account1 = new Account(
-                        Name = 'Test Account', 
-                        blng__CustomerProfileId__c = '1807887970'
+                        Name = 'Test Account' 
+                        //blng__CustomerProfileId__c = '1807887970'
                     );
         insert account1;
         blng__PaymentMethod__c paymentMethod1 = new blng__PaymentMethod__c(

@@ -30,6 +30,7 @@ public class CyberSourceUtils
         private static final String GET_ELEMENTS = 'getElements ';
         private static Boolean IS_MULTICURRENCY_ORG = UserInfo.isMultiCurrencyOrganization();
         private static String CURRENCYISOCODE = 'CurrencyIsoCode';
+        
     // ============================================================================
     // STATIC VARIABLES
     // ============================================================================
@@ -542,8 +543,7 @@ public class CyberSourceUtils
             throw e;
         }     
     } 
-
-  /**
+     /**
      * @name generateCaptureXML
      * @description Method to Generate Charge XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
@@ -616,7 +616,9 @@ public class CyberSourceUtils
                      writer.writeCharacters(transactionParameterToProcess.getAmount());
                      writer.writeEndElement();
                      writer.writeEndElement();
-                     // Populate ccCaptureService start
+                     
+                     
+                    // Populate ccCaptureService start
                     writer.writeStartElement('','ccCaptureService','');
                     writer.writeAttribute('', '', 'run', 'true');
                     // Populate authRequestID start
@@ -624,7 +626,12 @@ public class CyberSourceUtils
                      writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
                      writer.writeEndElement();
                      // Populate authRequestID end
-                    writer.writeEndElement();
+                    
+                     //writer.writeStartElement('','purchasingLevel','');
+                     //writer.writeCharacters('3');
+                     //writer.writeEndElement();
+                     writer.writeEndElement();
+                    
                     // Populate ccCaptureService End
                     writer.writeEndElement();
                     // Populate RequestMessage end
@@ -643,8 +650,7 @@ public class CyberSourceUtils
             throw e;
         }
     }
-
-    /**
+   /**
      * @name generateChargeXML
      * @description Method to Generate Charge XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
@@ -819,7 +825,7 @@ public class CyberSourceUtils
                             }
                             writer.writeEndElement();
                             // Populate card end
-                           // Populate ccAuthService start
+                        // Populate ccAuthService start
                         writer.writeStartElement('','ccAuthService','');
                         writer.writeAttribute('', '', 'run', 'true');
                             
@@ -829,10 +835,13 @@ public class CyberSourceUtils
                         writer.writeEndElement();
                         // Populate authType End
                         writer.writeEndElement();
-                        // Populate ccAuthService End
+                        // Populate ccAuthService End     
                         // Populate ccCaptureService start
                         writer.writeStartElement('','ccCaptureService','');
                         writer.writeAttribute('', '', 'run', 'true');
+                        //writer.writeStartElement('','purchasingLevel','');
+                        //writer.writeCharacters('3');
+                        //writer.writeEndElement();
                         writer.writeEndElement();
                         // Populate ccCaptureService End
                     }
@@ -861,7 +870,6 @@ public class CyberSourceUtils
                         // Populate ccAuthService start
                         writer.writeStartElement('','ccAuthService','');
                         writer.writeAttribute('', '', 'run', 'true');
-                        
                         // Populate authType start
                         writer.writeStartElement('','authType','');
                         writer.writeCharacters('AUTOCAPTURE');
@@ -872,6 +880,9 @@ public class CyberSourceUtils
                         // Populate ccCaptureService start
                         writer.writeStartElement('','ccCaptureService','');
                         writer.writeAttribute('', '', 'run', 'true');
+                        //writer.writeStartElement('','purchasingLevel','');
+                        //writer.writeCharacters('3');
+                        //writer.writeEndElement();
                         writer.writeEndElement();
                         // Populate ccCaptureService End
                     }
@@ -890,7 +901,6 @@ public class CyberSourceUtils
                         {
                             transactionParameterToProcess.setRequestBody(writer.getXmlString());
                         }
-                        
                         writer.close();
                 }
                 else
@@ -957,6 +967,9 @@ public class CyberSourceUtils
                      writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
                      writer.writeEndElement();
                      // Populate authRequestID end
+                     //writer.writeStartElement('','purchasingLevel','');
+                     //writer.writeCharacters('3');
+                     //writer.writeEndElement();
                     writer.writeEndElement();
                     // Populate ccCaptureService End
                     writer.writeEndElement();
@@ -975,6 +988,461 @@ public class CyberSourceUtils
                         transactionParameterToProcess.setRequestBody(writer.getXmlString());
                     }
                     writer.close();
+                }       
+            }
+        } 
+        catch (Exception e) 
+        {
+            throw e;
+        }
+    }
+  /**
+     * @name generateCaptureLevel3XML
+     * @description Method to Generate Charge XML
+     * @param Map[Key => String [unique Id],Value => TransactionParameter]
+     * @return NA
+     * @exception Throw Exception
+     * @author Manigandan SA
+     * @created 2017-05-30
+     * @remark 
+     * @change
+     */
+    public void generateCaptureLevel3XML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    {
+        try
+        {    
+            for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
+            {
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
+                XmlStreamWriter writer = new XmlStreamWriter();
+                        // Populate Document start
+                      writer.writeStartDocument('utf-8', '1.0');  
+                        // Populate Envelope start
+                        writer.writeStartElement('s','Envelope','http://schemas.xmlsoap.org/soap/envelope/');
+                          writer.writeAttribute('xmlns', 'http://schemas.xmlsoap.org/soap/envelope/', 's', 'http://schemas.xmlsoap.org/soap/envelope/');
+                            // Populate Header start
+                            writer.writeStartElement('s','Header','http://schemas.xmlsoap.org/soap/envelope/');
+                              // Populate Security start
+                              writer.writeStartElement('wsse','Security','http://schemas.xmlsoap.org/soap/envelope/');
+                                writer.writeAttribute('xmlns', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'wsse', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd');
+                                  // Populate UsernameToken start
+                                  writer.writeStartElement('wsse','UsernameToken','');
+                                    // Populate the Username start
+                                    writer.writeStartElement('wsse','Username','');
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                                    writer.writeEndElement();
+                                    // Populate the Username end
+                                    // Populate the Password start
+                                    writer.writeStartElement('wsse','Password','');
+                                      writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                                    writer.writeEndElement();
+                                    // Populate the Password end
+                                  writer.writeEndElement();
+                                  // Populate UsernameToken end
+                              writer.writeEndElement();
+                              // Populate Security end
+                              writer.writeEndElement();
+                             // Populate Header end
+                            // Populate Body start
+                            writer.writeStartElement('s','Body',''); 
+                      // Populate RequestMessage start
+                      writer.writeStartElement('','requestMessage','');
+                      writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+                      // Populate merchantID start
+                      writer.writeStartElement('','merchantID','');
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                      writer.writeEndElement();
+                      // Populate merchantID end
+                      // Populate merchantReferenceCode start
+                      writer.writeStartElement('','merchantReferenceCode','');
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
+                      writer.writeEndElement();
+                      // Populate purchaseTotals start
+                     writer.writeStartElement('','purchaseTotals','');
+                     // Populate currency start
+                     writer.writeStartElement('','currency','');
+                     writer.writeCharacters(validateCurrency(transactionParameterToProcess));
+                     writer.writeEndElement();
+                     // Populate currency end
+                     writer.writeStartElement('','grandTotalAmount','');
+                     writer.writeCharacters(transactionParameterToProcess.getAmount());
+                     writer.writeEndElement();
+                     writer.writeEndElement();
+                     
+                     
+                    // Populate ccCaptureService start
+                    writer.writeStartElement('','ccCaptureService','');
+                    writer.writeAttribute('', '', 'run', 'true');
+                    // Populate authRequestID start
+                     writer.writeStartElement('','authRequestID','');
+                     writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
+                     writer.writeEndElement();
+                     // Populate authRequestID end
+                    
+                     writer.writeStartElement('','purchasingLevel','');
+                     writer.writeCharacters('3');
+                     writer.writeEndElement();
+                     writer.writeEndElement();
+                    
+                    // Populate ccCaptureService End
+                    writer.writeEndElement();
+                    // Populate RequestMessage end
+                    writer.writeEndElement();
+                    // Populate Body end
+                    writer.writeEndElement();
+                    // Populate Envelope end
+                    writer.writeEndDocument();
+                    transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getInvoice().id,transactionParameterToProcess));
+                    writer.close();
+                     
+            }
+        } 
+        catch (Exception e) 
+        {
+            throw e;
+        }
+    }
+
+    /**
+     * @name generateChargeLevel3XML
+     * @description Method to Generate Charge XML
+     * @param Map[Key => String [unique Id],Value => TransactionParameter]
+     * @return NA
+     * @exception Throw Exception
+     * @author Manigandan SA / Vinod KR
+     * @created 2016-07-26
+     * @remark 
+     * @change
+     */
+    public void generateChargeLevel3XML(Map<String, blng.TransactionParameter> mapOfTransactionParameterByInvoiceId)
+    {
+        try
+        {    
+            for(String idToProcess : mapOfTransactionParameterByInvoiceId.keySet())
+            {
+                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterByInvoiceId.get(idToProcess);
+                XmlStreamWriter writer = new XmlStreamWriter();
+                if(NULL == mapOfTransactionParameterByInvoiceId.get(idToProcess).getTransaction()) 
+                {
+                     // Populate Document start
+                      writer.writeStartDocument('utf-8', '1.0');  
+                        // Populate Envelope start
+                        writer.writeStartElement('s','Envelope','http://schemas.xmlsoap.org/soap/envelope/');
+                          writer.writeAttribute('xmlns', 'http://schemas.xmlsoap.org/soap/envelope/', 's', 'http://schemas.xmlsoap.org/soap/envelope/');
+                            // Populate Header start
+                            writer.writeStartElement('s','Header','http://schemas.xmlsoap.org/soap/envelope/');
+                              // Populate Security start
+                              writer.writeStartElement('wsse','Security','http://schemas.xmlsoap.org/soap/envelope/');
+                                writer.writeAttribute('xmlns', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'wsse', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd');
+                                  // Populate UsernameToken start
+                                  writer.writeStartElement('wsse','UsernameToken','');
+                                    // Populate the Username start
+                                    writer.writeStartElement('wsse','Username','');
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                                    writer.writeEndElement();
+                                    // Populate the Username end
+                                    // Populate the Password start
+                                    writer.writeStartElement('wsse','Password','');
+                                      writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                                    writer.writeEndElement();
+                                    // Populate the Password end
+                                  writer.writeEndElement();
+                                  // Populate UsernameToken end
+                              writer.writeEndElement();
+                              // Populate Security end
+                              writer.writeEndElement();
+                             // Populate Header end
+                            // Populate Body start
+                            writer.writeStartElement('s','Body','');
+                      // Populate RequestMessage start
+                      writer.writeStartElement('','requestMessage','');
+                      writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+                      // Populate merchantID start
+                      writer.writeStartElement('','merchantID','');
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                      writer.writeEndElement();
+                      // Populate merchantID end
+                      // Populate merchantReferenceCode start
+                      writer.writeStartElement('','merchantReferenceCode','');
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
+                      writer.writeEndElement();
+                      //Added by DL,W-3931366, for cardmapping
+                      String cardMapping = getCardMapping(transactionParameterToProcess.getPaymentMethod());
+                      if(NULL == cardMapping)
+                      {
+                            // Populate billToAddress start
+                            writer.writeStartElement('','billTo','');
+                            // Populate firstName start
+                            writer.writeStartElement('','firstName','');
+                            writer.writeCharacters(transactionParameterToProcess.getFirstName());
+                            writer.writeEndElement();
+                            // Populate firstName end
+                            // Populate lastName start
+                            writer.writeStartElement('','lastName','');
+                            writer.writeCharacters(transactionParameterToProcess.getLastName());
+                            writer.writeEndElement();
+                            // Populate lastName end
+                            // Populate street1 start
+                            writer.writeStartElement('','street1','');
+                            writer.writeCharacters(transactionParameterToProcess.getStreet());
+                            writer.writeEndElement();
+                            // Populate street1 end
+                            // Populate city start
+                            writer.writeStartElement('','city','');
+                            writer.writeCharacters(transactionParameterToProcess.getCity());
+                            writer.writeEndElement();
+                            // Populate city end
+                            // Populate state start
+                            writer.writeStartElement('','state','');
+                            writer.writeCharacters(transactionParameterToProcess.getState());
+                            writer.writeEndElement();
+                            // Populate state end
+                            // Populate postalCode start
+                            writer.writeStartElement('','postalCode','');
+                            writer.writeCharacters(transactionParameterToProcess.getZipCode());
+                            writer.writeEndElement();
+                            // Populate postalCode end
+                            // Populate country start
+                            writer.writeStartElement('','country','');
+                            writer.writeCharacters(transactionParameterToProcess.getCountry());
+                            writer.writeEndElement();
+                            // Populate country end
+                            // Populate email start
+                            writer.writeStartElement('','email','');
+                            writer.writeCharacters(transactionParameterToProcess.getEmailId());
+                            writer.writeEndElement();
+                            // Populate email end
+                            writer.writeEndElement();
+                            // Populate billToAddress end
+                            // Populate purchaseTotals start
+                            writer.writeStartElement('','purchaseTotals','');
+                            // Populate currency start
+                            writer.writeStartElement('','currency','');
+                            writer.writeCharacters(validateCurrency(transactionParameterToProcess));
+                            writer.writeEndElement();
+                            writer.writeStartElement('','grandTotalAmount','');
+                            writer.writeCharacters(transactionParameterToProcess.getAmount());
+                            writer.writeEndElement();
+                            // Populate currency end
+                            writer.writeEndElement();
+                            // Populate purchaseTotals end
+                            // Populate card start
+                            writer.writeStartElement('','card','');
+                            // Populate accountNumber start
+                            writer.writeStartElement('','accountNumber','');
+                            writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardNumber__c);
+                            writer.writeEndElement();
+                            // Populate accountNumber end
+                            // Populate expirationMonth start
+                            writer.writeStartElement('','expirationMonth','');
+                            writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationMonth__c);
+                            writer.writeEndElement();
+                            // Populate expirationMonth end
+                            // Populate expirationYear start
+                            writer.writeStartElement('','expirationYear','');
+                            writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
+                            writer.writeEndElement();
+                            // Populate expirationYear end
+                            if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA')
+                            {
+                                  // Populate cardType start
+                                  writer.writeStartElement('','cardType','');
+                                    writer.writeCharacters('001');
+                                  writer.writeEndElement();
+                                  // Populate cardType end
+                            }
+                            else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Mastercard')
+                            {
+                               // Populate cardType start
+                               writer.writeStartElement('','cardType','');
+                                writer.writeCharacters('002');
+                              writer.writeEndElement();
+                              // Populate cardType end
+                            }
+                            else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'American Express')
+                            {
+                                 // Populate cardType start
+                              writer.writeStartElement('','cardType','');
+                                writer.writeCharacters('003');
+                              writer.writeEndElement();
+                              // Populate cardType end
+                            }
+                            else if(transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'Discover')
+                            {
+                                 // Populate cardType start
+                              writer.writeStartElement('','cardType','');
+                                writer.writeCharacters('004');
+                              writer.writeEndElement();
+                              // Populate cardType end
+                            }
+                            writer.writeEndElement();
+                            // Populate card end
+                        // Populate ccAuthService start
+                        writer.writeStartElement('','ccAuthService','');
+                        writer.writeAttribute('', '', 'run', 'true');
+                            
+                        // Populate authType start
+                        writer.writeStartElement('','authType','');
+                        writer.writeCharacters('AUTOCAPTURE');
+                        writer.writeEndElement();
+                        // Populate authType End
+                        writer.writeEndElement();
+                        // Populate ccAuthService End     
+                        // Populate ccCaptureService start
+                        writer.writeStartElement('','ccCaptureService','');
+                        writer.writeAttribute('', '', 'run', 'true');
+                        writer.writeStartElement('','purchasingLevel','');
+                        writer.writeCharacters('3');
+                        writer.writeEndElement();
+                        writer.writeEndElement();
+                        // Populate ccCaptureService End
+                    }
+                    else
+                    {
+                        // Populate purchaseTotals start
+                        writer.writeStartElement('','purchaseTotals','');
+                        // Populate currency start
+                        writer.writeStartElement('','currency','');
+                        writer.writeCharacters(validateCurrency(transactionParameterToProcess));
+                        writer.writeEndElement();
+                        // Populate currency end
+                        writer.writeStartElement('','grandTotalAmount','');
+                        writer.writeCharacters(transactionParameterToProcess.getAmount());
+                        writer.writeEndElement();
+                        writer.writeEndElement();
+                        // Populate purchaseTotals end
+                        // Populate recurringSubscriptionInfo start
+                        writer.writeStartElement('','recurringSubscriptionInfo','');
+                        writer.writeStartElement('','subscriptionID','');
+                        //Added by DL,W-3931366, for cardmapping
+                        writer.writeCharacters(cardMapping);
+                        writer.writeEndElement();
+                        writer.writeEndElement();
+                        // Populate recurringSubscriptionInfo end
+                        // Populate ccAuthService start
+                        writer.writeStartElement('','ccAuthService','');
+                        writer.writeAttribute('', '', 'run', 'true');
+                        // Populate authType start
+                        writer.writeStartElement('','authType','');
+                        writer.writeCharacters('AUTOCAPTURE');
+                        writer.writeEndElement();
+                        // Populate authType End
+                        writer.writeEndElement();
+                        // Populate ccAuthService End
+                        // Populate ccCaptureService start
+                        writer.writeStartElement('','ccCaptureService','');
+                        writer.writeAttribute('', '', 'run', 'true');
+                        writer.writeStartElement('','purchasingLevel','');
+                        writer.writeCharacters('3');
+                        writer.writeEndElement();
+                        writer.writeEndElement();
+                        // Populate ccCaptureService End
+                    }
+                        writer.writeEndElement();
+                        // Populate RequestMessage end
+                        writer.writeEndElement();
+                        // Populate Body end
+                        writer.writeEndElement();
+                        // Populate Envelope end
+                        writer.writeEndDocument();
+                        if(transactionParameterToProcess.getInvoice() != NULL)
+                        {
+                            transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getInvoice().Id,transactionParameterToProcess));
+                        }
+                        else
+                        {
+                            transactionParameterToProcess.setRequestBody(writer.getXmlString());
+                        }
+                        writer.close();
+                }
+                else
+                {
+                        // Populate Document start
+                      writer.writeStartDocument('utf-8', '1.0');  
+                        // Populate Envelope start
+                        writer.writeStartElement('s','Envelope','http://schemas.xmlsoap.org/soap/envelope/');
+                          writer.writeAttribute('xmlns', 'http://schemas.xmlsoap.org/soap/envelope/', 's', 'http://schemas.xmlsoap.org/soap/envelope/');
+                            // Populate Header start
+                            writer.writeStartElement('s','Header','http://schemas.xmlsoap.org/soap/envelope/');
+                              // Populate Security start
+                              writer.writeStartElement('wsse','Security','http://schemas.xmlsoap.org/soap/envelope/');
+                                writer.writeAttribute('xmlns', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'wsse', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd');
+                                  // Populate UsernameToken start
+                                  writer.writeStartElement('wsse','UsernameToken','');
+                                    // Populate the Username start
+                                    writer.writeStartElement('wsse','Username','');
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                                    writer.writeEndElement();
+                                    // Populate the Username end
+                                    // Populate the Password start
+                                    writer.writeStartElement('wsse','Password','');
+                                      writer.writeAttribute(NULL, NULL, 'Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText');
+                                      writer.writeCharacters(transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                                    writer.writeEndElement();
+                                    // Populate the Password end
+                                  writer.writeEndElement();
+                                  // Populate UsernameToken end
+                              writer.writeEndElement();
+                              // Populate Security end
+                              writer.writeEndElement();
+                             // Populate Header end
+                            // Populate Body start
+                            writer.writeStartElement('s','Body','');
+                      // Populate RequestMessage start
+                      writer.writeStartElement('','requestMessage','');
+                      writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+                      // Populate merchantID start
+                      writer.writeStartElement('','merchantID','');
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
+                      writer.writeEndElement();
+                      // Populate merchantID end
+                      // Populate merchantReferenceCode start
+                      writer.writeStartElement('','merchantReferenceCode','');
+                      writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantReference__c);
+                      writer.writeEndElement();
+                      // Populate purchaseTotals start
+                     writer.writeStartElement('','purchaseTotals','');
+                     // Populate currency start
+                     writer.writeStartElement('','currency','');
+                     writer.writeCharacters(validateCurrency(transactionParameterToProcess));
+                     writer.writeEndElement();
+                     // Populate currency end
+                     writer.writeStartElement('','grandTotalAmount','');
+                     writer.writeCharacters(transactionParameterToProcess.getAmount());
+                     writer.writeEndElement();
+                     writer.writeEndElement();
+                     // Populate ccCaptureService start
+                    writer.writeStartElement('','ccCaptureService','');
+                    writer.writeAttribute('', '', 'run', 'true');
+                    // Populate authRequestID start
+                     writer.writeStartElement('','authRequestID','');
+                     writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
+                     writer.writeEndElement();
+                     // Populate authRequestID end
+                     writer.writeStartElement('','purchasingLevel','');
+                     writer.writeCharacters('3');
+                     writer.writeEndElement();
+                    writer.writeEndElement();
+                    // Populate ccCaptureService End
+                    writer.writeEndElement();
+                    // Populate RequestMessage end
+                    writer.writeEndElement();
+                    // Populate Body end
+                    writer.writeEndElement();
+                    // Populate Envelope end
+                    writer.writeEndDocument();
+                    if(transactionParameterToProcess.getInvoice() != NULL)
+                    {
+                        transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getInvoice().Id,transactionParameterToProcess));
+                    }
+                    else
+                    {
+                        transactionParameterToProcess.setRequestBody(writer.getXmlString());
+                    }
+                    writer.close();
+                    
                 }       
             }
         } 
@@ -1162,7 +1630,6 @@ public class CyberSourceUtils
                     {
                         transactionParameterToProcess.setRequestBody(writer.getXmlString());
                     }
-                    system.debug('-----getXmlString----->'+ writer.getXmlString());
                     writer.close();
                 }  
             }
@@ -1366,7 +1833,6 @@ public class CyberSourceUtils
                 // Populate Envelope end
                 writer.writeEndDocument();
                 transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getTransaction().blng__RequestInvoice__c,transactionParameterToProcess));
-                system.debug('----Refund--->'+ writer.getXmlString());
                 writer.close();
             }
         } 
@@ -1660,7 +2126,6 @@ public class CyberSourceUtils
                 // Populate Envelope end
                 writer.writeEndDocument();
                 transactionParameterToProcess.setRequestBody(writer.getXmlString());
-                system.debug('----Refund--->'+ writer.getXmlString());
                 writer.close();
             }
         } 
@@ -2035,7 +2500,6 @@ public class CyberSourceUtils
      */  
     public static Map<string, string> getElements(DOM.XMLNode node) 
     {
-    
         if(node.getNodeType() == DOM.XMLNodeType.ELEMENT)
         {
             if(String.IsNotBlank(node.getText().trim())) 
@@ -2192,7 +2656,11 @@ public class CyberSourceUtils
             else if(NULL != transactionParameterToProcess.getAccount())
             {
                 return getCurrencyISOCode(transactionParameterToProcess.getAccount());
-            }    
+            }
+            else if(NULL != transactionParameterToProcess.getTransaction() )
+            {
+                return getCurrencyISOCode(transactionParameterToProcess.getTransaction());
+            }
             
         }
         else
@@ -2327,10 +2795,8 @@ public class CyberSourceUtils
                 }
             }  
         }
-        System.debug('invice-->xMLRequest===='+xMLRequest);
-        getInvoiceLineDetail(xMLRequest, invoiceId,transactionParameterToProcess);
-        return xMLRequest;
-    }
+        return getInvoiceLineDetail(xMLRequest, invoiceId,transactionParameterToProcess);
+     }
 
     /**
     * @name getInvoiceLineDetail
@@ -2354,17 +2820,19 @@ public class CyberSourceUtils
             String xMLRequestBeforeMRC =  xMLRequest.substringBefore('<purchaseTotals>');
             String xMLRequestAfterMRC =  xMLRequest.substringAfter('<purchaseTotals>');
             String invoiceLineDetail = '';
+            integer counter = 0;
             for(blng__InvoiceLine__c invoiceLine : listOfInvoiceLines)
             {
                 if(NULL != invoiceLine.get(invoiceLineDetailAPIValue))
-                {
-                    invoiceLineDetail += '<item id= "' +invoiceLine.Id+'">';
+                {   
+                     
+                    invoiceLineDetail += '<item id= "' +counter+'">';
                     invoiceLineDetail += invoiceLine.get(invoiceLineDetailAPIValue);
                     invoiceLineDetail += '</item>';
+                    counter = counter + 1;
                 }
             }
             xMLRequest = xMLRequestBeforeMRC + invoiceLineDetail + '<purchaseTotals>' + xMLRequestAfterMRC;
-            System.debug('inviceline-->xMLRequest===='+xMLRequest);
         }
         return xMLRequest;
     }
