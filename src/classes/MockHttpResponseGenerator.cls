@@ -20,7 +20,7 @@ public class MockHttpResponseGenerator implements HttpCalloutMock
     public HTTPResponse respond(HTTPRequest req) 
     {
         HttpResponse res = new HttpResponse();
-        res.setBody(CommonUtils.TEST_REQUEST_BODY);
+        res.setBody(CyberSourceCommonUtils.TEST_REQUEST_BODY);
         res.setStatusCode(200);
         return res;
     }

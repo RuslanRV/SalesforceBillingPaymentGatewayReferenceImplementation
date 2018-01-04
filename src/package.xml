@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>CyberSource for Salesforce Billing</fullName>
-    <apiAccessLevel>Unrestricted</apiAccessLevel>
-    <description>Integrator between Salesforce Billing and the payment gateway Cybersource, enabling payment processing.</description>
-    <namespacePrefix>csblng</namespacePrefix>
-    <postInstallClass>PostInstallClass</postInstallClass>
+    <fullName>CyberSource+for+Salesforce+Billing</fullName>
     <types>
-        <members>CommonUtils</members>
         <members>CyberSource</members>
         <members>CyberSourceAPI</members>
+        <members>CyberSourceCommonUtils</members>
+        <members>CyberSourceHttpService</members>
         <members>CyberSourceUtils</members>
-        <members>HttpService</members>
         <members>MockHttpResponseGenerator</members>
         <members>PaymentGatewayTest</members>
         <members>PostInstallClass</members>
@@ -24,6 +20,9 @@
         <name>CustomField</name>
     </types>
     <types>
+        <name>CustomObject</name>
+    </types>
+    <types>
         <members>blng__PaymentGateway__c-CyberSource Gateway Layout</members>
         <name>Layout</name>
     </types>
@@ -32,5 +31,5 @@
         <members>CyberSource_Sandbox</members>
         <name>RemoteSiteSetting</name>
     </types>
-    <version>36.0</version>
+    <version>39.0</version>
 </Package>

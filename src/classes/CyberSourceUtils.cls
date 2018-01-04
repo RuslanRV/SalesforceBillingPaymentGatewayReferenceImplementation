@@ -1833,6 +1833,7 @@ public class CyberSourceUtils
                 // Populate Envelope end
                 writer.writeEndDocument();
                 transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getTransaction().blng__RequestInvoice__c,transactionParameterToProcess));
+                system.debug('----Refund--->'+ writer.getXmlString());
                 writer.close();
             }
         } 
@@ -2795,6 +2796,7 @@ public class CyberSourceUtils
                 }
             }  
         }
+         System.debug('invice-->xMLRequest===='+xMLRequest);
         return getInvoiceLineDetail(xMLRequest, invoiceId,transactionParameterToProcess);
      }
 
@@ -2833,6 +2835,7 @@ public class CyberSourceUtils
                 }
             }
             xMLRequest = xMLRequestBeforeMRC + invoiceLineDetail + '<purchaseTotals>' + xMLRequestAfterMRC;
+            System.debug('inviceline-->xMLRequest===='+xMLRequest);
         }
         return xMLRequest;
     }
