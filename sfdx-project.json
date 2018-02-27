@@ -1,0 +1,28 @@
+{
+  "sourceApiVersion":"40.0",
+  "namespace":"",
+  "enableTokenEncryption": false,
+  "packageDirectories" : [
+    {
+      "path" : "pkg", "default": true,
+      "id": "0Ho1O000000000GSAQ",
+      "versionName": "Summer '18",
+      "versionDescription": "Summer '18",
+      "versionNumber": "214.0.0.NEXT",
+      "ancestorId": null,
+      "dependencies": [
+        {
+          "packageId": "0Ho1O000000000BSAQ",
+          "versionNumber": "214.0.0.LATEST"
+        }
+      ],
+      "orgPreferences": {
+        "enabled": [
+          "S1DesktopEnabled",
+          "Translation"
+        ],
+        "disabled": []
+      }
+    }
+  ]
+}

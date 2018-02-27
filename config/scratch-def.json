@@ -1,0 +1,19 @@
+{
+  "orgName": "CyberSource SFDX",
+  "adminEmail": "nope@steelbrick.com",
+  "edition": "Developer",
+  "features": ["DebugApex"],
+  "orgPreferences": {
+    "enabled": [
+      "DisableParallelApexTesting",
+      "ChatterEnabled",
+      "S1DesktopEnabled",
+      "Translation",
+      "IsEntitlementsEnabled",
+      "IsNegativeQuantityEnabled",
+      "IsOrdersEnabled",
+      "IsReductionOrdersEnabled"
+    ],
+    "disabled": []
+  }
+}

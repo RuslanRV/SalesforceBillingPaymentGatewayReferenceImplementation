@@ -1,0 +1,7 @@
+{
+  "runWebAutomations" : true,
+  "suites" : [
+    "test/tests/revenue/*",
+    "test/tests/payment/*"
+  ]
+}
