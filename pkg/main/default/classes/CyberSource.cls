@@ -726,7 +726,8 @@ public class CyberSource
                             }
                         
                     }
-                    catch (Exception e) 
+                    catch (Exception e)
+					{					
                         transactionParameterToProcess.transactionResult.setIsSuccess(false);
                         transactionParameterToProcess.transactionResult.setError(e.getMessage());
                     }    

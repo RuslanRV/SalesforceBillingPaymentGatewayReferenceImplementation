@@ -88,12 +88,6 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>blng__Account__c</fields>
-        <fields>blng__Active__c</fields>
-        <relatedList>blng__PaymentMethod__c.blng__PaymentGateway__c</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>NAME</fields>
         <relatedList>blng__PaymentTransaction__c.blng__PaymentGateway__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
