@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>236</label>
+    <protected>true</protected>
+    <values>
+        <field>Response_Code__c</field>
+        <value xsi:type="xsd:string">236</value>
+    </values>
+    <values>
+        <field>Gateway_Status__c</field>
+        <value xsi:type="xsd:string">Fail</value>
+    </values>
+</CustomMetadata>

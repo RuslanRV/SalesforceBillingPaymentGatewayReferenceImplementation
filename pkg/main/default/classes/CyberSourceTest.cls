@@ -15,7 +15,7 @@
 //          @Description
 // =============================================================================================
 @isTest (SeeALLData=false)
-private class PaymentGatewayTest
+private class CyberSourceTest
 {
     // ============================================================================================= 
     // Author: Manigandan SA
@@ -26,7 +26,7 @@ private class PaymentGatewayTest
     // =============================================================================================
     public static testMethod void CyberSourceTokenCCMasterCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -88,7 +88,7 @@ private class PaymentGatewayTest
     // =============================================================================================
     public static testMethod void InvalidMasterCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -150,7 +150,7 @@ private class PaymentGatewayTest
     // =============================================================================================
     public static testMethod void InvalidCardNumber()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -212,7 +212,7 @@ private class PaymentGatewayTest
     // =============================================================================================
     public static testMethod void ExpiredCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -274,7 +274,7 @@ private class PaymentGatewayTest
     // =============================================================================================
     public static testMethod void InvalidEmail()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -329,7 +329,7 @@ private class PaymentGatewayTest
     
     public static testMethod void CyberSourceChargeACHChecking()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, MerchantId__c = 'salesforcebilling', 
@@ -401,7 +401,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeACHSaving()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -470,7 +470,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeACHBusinessChecking()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -539,7 +539,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeCCVISA()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -618,7 +618,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeCCLevel3VISA()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -698,7 +698,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourcechargeByTokenCCVISA()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -769,7 +769,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeCCMasterCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -839,7 +839,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeCCDiscoverCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, MerchantID__c = 'salesforcebilling', 
@@ -908,7 +908,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceChargeCCAmericanExpress()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -978,7 +978,7 @@ private class PaymentGatewayTest
     }
      public static testMethod void CyberSourceCaptureCCAmericanExpress()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1066,7 +1066,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceCapturelevel3CCAmericanExpress()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1156,7 +1156,7 @@ private class PaymentGatewayTest
     
     public static testMethod void CyberSourceTokenCCVISA()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1228,7 +1228,7 @@ private class PaymentGatewayTest
     //start-DL
     public static testMethod void CyberSourceVoidTokenTransaction()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1285,7 +1285,7 @@ private class PaymentGatewayTest
     
     public static testMethod void CyberSourceTokenCCDiscover()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1356,7 +1356,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceTokenCCAmericanExpress()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1427,7 +1427,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeCCVISA()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1497,7 +1497,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeByTokenCCVISA()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1569,7 +1569,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeCCMasterCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1640,7 +1640,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeCCDiscover()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1710,7 +1710,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeCCAmericanExpress()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1786,7 +1786,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeVoid()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1855,7 +1855,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeRefund()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -1931,7 +1931,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceVoidRefundTransaction()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2008,7 +2008,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceAuthorizeRefundACH()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2090,7 +2090,7 @@ private class PaymentGatewayTest
      */
     public static testMethod void testCyberSourceVoidTransactionForCreditCard()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2137,7 +2137,7 @@ private class PaymentGatewayTest
      */
     public static testMethod void testCyberSourceVoidTransactionForACH()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2185,7 +2185,7 @@ private class PaymentGatewayTest
      */
     public static testMethod void testCyberSourceVoidRefundTransactionForCreditCard()
     {
-        insert PaymentGatewayTest.getConfiguration();  
+        insert CyberSourceTest.getConfiguration();  
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2258,7 +2258,7 @@ private class PaymentGatewayTest
      */
     public static testMethod void testCyberSourceVoidRefundTransactionForACH()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2324,7 +2324,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void captureTransaction()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2391,7 +2391,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void cyberSourcegetTransactionDetails()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2459,7 +2459,7 @@ private class PaymentGatewayTest
     }
      public static testMethod void nonReferredRefundForCC()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2524,7 +2524,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void CyberSourceNonReferrencedRefund()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2602,7 +2602,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void nonReferredRefundForACH()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2668,7 +2668,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void nonReferredRefundForACHBusinessChecking()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2735,7 +2735,7 @@ private class PaymentGatewayTest
     }
     public static testMethod void nonReferredRefundForACHSavings()
     {
-        insert PaymentGatewayTest.getConfiguration();
+        insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                                     blng__GatewayType__c = 'CyberSource', 
                                     TestMode__c = true, 
@@ -2798,6 +2798,38 @@ private class PaymentGatewayTest
         Test.startTest();
          CyberSourceAPI.nonReferredRefund(mapOfTransactionParameter);
         Test.stopTest();      
+    }
+    /**
+     * Tests the Gateway status mapping for the success case
+     */
+    public static testMethod void GatewayStatusSuccess()
+    {
+        insert CyberSourceTest.getConfiguration();
+        blng.TransactionResult transactionResult = new blng.TransactionResult();
+        transactionResult.setResponseCode('100');
+        CyberSourceAPI.populateGatewayStatus(transactionResult);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.Success, transactionResult.getGatewayStatus());
+    }
+    /**
+     * Tests the Gateway status mapping for the case where the return code is not configured in the mapper
+     */
+    public static testMethod void GatewayStatusMissingCode()
+    {
+        insert CyberSourceTest.getConfiguration();
+        blng.TransactionResult transactionResult = new blng.TransactionResult();
+        transactionResult.setResponseCode('MISSING_CODE');
+        CyberSourceAPI.populateGatewayStatus(transactionResult);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
+    }
+    /**
+     * Tests the Gateway status mapping for the case where the return code is null
+     */
+    public static testMethod void GatewayStatusNullCode()
+    {
+        insert CyberSourceTest.getConfiguration();
+        blng.TransactionResult transactionResult = new blng.TransactionResult();
+        CyberSourceAPI.populateGatewayStatus(transactionResult);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
     }
     public static List<blng__BillingConfig__c> getConfiguration() 
     {
