@@ -65,6 +65,8 @@ public class CyberSource
                 mapGatewayStatusEnumTypesByStrings.put(enumValues.get(i).name(), enumValues.get(i));
             }
         }
+        // default Gateway Status
+        private static final blng.TransactionResult.GatewayStatusType defaultGatewayStatus = blng.TransactionResult.GatewayStatusType.Indeterminate;
     // ============================================================================
     // VARIABLES
     // ============================================================================
