@@ -54,7 +54,18 @@ public class CyberSource
     // STATIC VARIABLES
     // ============================================================================    
         // private Attribute to implement singleton pattern for transaction Service class
-         private static CyberSource cyberSourceInstance;
+        private static CyberSource cyberSourceInstance;
+        //Gateway Status related variables
+        private static Map<string, blng.TransactionResult.GatewayStatusType> mapGatewayStatusEnumTypesByStrings =
+                new Map<string, blng.TransactionResult.GatewayStatusType>();
+        static {
+            List<blng.TransactionResult.GatewayStatusType> enumValues = blng.TransactionResult.GatewayStatusType.values();
+            for (Integer i = 0; i < enumValues.size(); i++) {
+                mapGatewayStatusEnumTypesByStrings.put(enumValues.get(i).name(), enumValues.get(i));
+            }
+        }
+        // default Gateway Status
+        private static final blng.TransactionResult.GatewayStatusType defaultGatewayStatus = blng.TransactionResult.GatewayStatusType.Indeterminate;
     // ============================================================================
     // VARIABLES
     // ============================================================================
@@ -202,7 +213,8 @@ public class CyberSource
                 } 
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
-                
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -315,7 +327,8 @@ public class CyberSource
                 } 
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
-                
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -435,6 +448,8 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -601,7 +616,8 @@ public class CyberSource
                 }
                 //Populating payment gateway response
                transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
-               
+               //Populate gateway status
+               populateGatewayStatus(transactionParameterToProcess.transactionResult);
                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -816,6 +832,8 @@ public class CyberSource
                 //Populating payment gateway response
                 
                transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
+               //Populate gateway status
+               populateGatewayStatus(transactionParameterToProcess.transactionResult);
                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -942,6 +960,8 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -1110,6 +1130,8 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -1252,6 +1274,8 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -1378,6 +1402,8 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             // Return map of transaction results
@@ -1491,7 +1517,8 @@ public class CyberSource
                 } 
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
-                
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             }
             //Return map of transaction results
@@ -1501,6 +1528,27 @@ public class CyberSource
         {
             throw e; 
         }   
-    } 
+    }
 
+    /**
+     * Does a SOQL lookup on the mapper table and gets the gateway status mapped to the return code
+     * Returns the default enum if no match is found
+     * @param transactionResult
+     */
+     public void populateGatewayStatus(blng.TransactionResult transactionResult) {
+         blng.TransactionResult.GatewayStatusType gatewayStatus = defaultGatewayStatus;
+         String returnCode = transactionResult.getResponseCode();
+         if (returnCode != null) {
+             List<GatewayStatusMapping__mdt> gatewayStatusMaps = [
+                     SELECT GatewayStatus__c
+                     FROM GatewayStatusMapping__mdt
+                     WHERE ResponseCode__c = :returnCode
+                     LIMIT 1
+             ];
+             if (gatewayStatusMaps.size() > 0) {
+                 gatewayStatus = mapGatewayStatusEnumTypesByStrings.get(gatewayStatusMaps.get(0).blng__GatewayStatus__c);
+             }
+         }
+         transactionResult.setGatewayStatus(gatewayStatus);
+     }
 }
