@@ -4,7 +4,7 @@
     <caseSensitive>true</caseSensitive>
     <externalId>false</externalId>
     <fieldManageability>SubscriberControlled</fieldManageability>
-    <label>Response Code</label>
+    <label>Response from Gateway</label>
     <length>40</length>
     <required>true</required>
     <type>Text</type>

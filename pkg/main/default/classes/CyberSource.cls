@@ -60,8 +60,7 @@ public class CyberSource
                 new Map<string, blng.TransactionResult.GatewayStatusType>();
         static {
             List<blng.TransactionResult.GatewayStatusType> enumValues = blng.TransactionResult.GatewayStatusType.values();
-            // we do not populate SystemIssue as it is not part of a gateway mapping setup
-            for (Integer i = 0; i < enumValues.size() - 1; i++) {
+            for (Integer i = 0; i < enumValues.size(); i++) {
                 mapGatewayStatusEnumTypesByStrings.put(enumValues.get(i).name(), enumValues.get(i));
             }
         }
@@ -1540,9 +1539,9 @@ public class CyberSource
          blng.TransactionResult.GatewayStatusType gatewayStatus = defaultGatewayStatus;
          String returnCode = transactionResult.getResponseCode();
          if (returnCode != null) {
-             List<GatewayStatusMap__mdt> gatewayStatusMaps = [
+             List<GatewayStatusMapping__mdt> gatewayStatusMaps = [
                      SELECT GatewayStatus__c
-                     FROM GatewayStatusMap__mdt
+                     FROM GatewayStatusMapping__mdt
                      WHERE ResponseCode__c = :returnCode
                      LIMIT 1
              ];

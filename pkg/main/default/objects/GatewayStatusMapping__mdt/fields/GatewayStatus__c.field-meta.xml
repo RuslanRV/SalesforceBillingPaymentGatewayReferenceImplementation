@@ -3,8 +3,8 @@
     <fullName>GatewayStatus__c</fullName>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
-    <inlineHelpText>Payment Gateway Status</inlineHelpText>
-    <label>Gateway Status</label>
+    <inlineHelpText>Corresponding Gateway Status</inlineHelpText>
+    <label>Corresponding Gateway Status</label>
     <required>true</required>
     <type>Picklist</type>
     <valueSet>
@@ -22,19 +22,29 @@
                 <label>Decline</label>
             </value>
             <value>
-                <fullName>Fail</fullName>
+                <fullName>ValidationError</fullName>
                 <default>false</default>
-                <label>Fail</label>
+                <label>Validation Error</label>
             </value>
             <value>
-                <fullName>Review</fullName>
+                <fullName>PermanentFail</fullName>
                 <default>false</default>
-                <label>Review</label>
+                <label>Permanent Fail</label>
+            </value>
+            <value>
+                <fullName>RequiresReview</fullName>
+                <default>false</default>
+                <label>Requires Review</label>
             </value>
             <value>
                 <fullName>Indeterminate</fullName>
                 <default>false</default>
                 <label>Indeterminate</label>
+            </value>
+            <value>
+                <fullName>SystemError</fullName>
+                <default>false</default>
+                <label>System Error</label>
             </value>
         </valueSetDefinition>
     </valueSet>
