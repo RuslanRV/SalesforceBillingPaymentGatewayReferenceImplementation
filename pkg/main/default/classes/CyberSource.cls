@@ -1547,6 +1547,9 @@ public class CyberSource
              ];
              if (gatewayStatusMaps.size() > 0) {
                  gatewayStatus = mapGatewayStatusEnumTypesByStrings.get(gatewayStatusMaps.get(0).blng__GatewayStatus__c);
+                 if (gatewayStatus == null) {
+                     gatewayStatus = defaultGatewayStatus;
+                 }
              }
          }
          transactionResult.setGatewayStatus(gatewayStatus);
