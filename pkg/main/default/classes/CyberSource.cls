@@ -38,7 +38,7 @@ public class CyberSource
         private static final String INVALID_FIELD = 'invalidField';
         private static final String PAYMENTTYPE_CREDITCARD = 'Credit Card';
         private static final String PAYMENTTYPE_ACH = 'ACH';
-        private static final String TEST_REQUEST_BODY_CYBER_SOURCE = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision>ACCEPT</c:decision><c:reasonCode>100</c:reasonCode><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>100</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>100</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>100</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
+        public static String TEST_REQUEST_BODY_CYBER_SOURCE = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision>ACCEPT</c:decision><c:reasonCode>100</c:reasonCode><c:invalidField>Invalid Field X</c:invalidField><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>100</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>100</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>100</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
         private static final String GENERATE_TOKEN = 'generateToken ';
         private static final String POPULATE_GENERATE_TOKEN = 'populateTransactionResultForToken ';
         private static final String AUTHORIZE_TRANSACTION = 'authorizeTransaction ';
@@ -121,7 +121,7 @@ public class CyberSource
                     try
                     {
                         // Calling CyberSourceHttpService class to send a Request
-                         if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c) )
+                        if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c) )
                         {
                             CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
                             sendHttpRequest.addHeader('Content-type', 'text/xml');
@@ -142,14 +142,15 @@ public class CyberSource
                                 transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                                 
                             }
-                        }else
-                        {   string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
+                        } else {
+                            string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
                             transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
                             transactionParameterToProcess.transactionResult.setIsSuccess(false);
                             transactionParameterToProcess.transactionResult.setResponseMessage('FAILURE');
                             transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
                             transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information "Email"');
                             transactionParameterToProcess.transactionResult.setGatewayId(NULL);
+                            transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                             mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                             return mapOfTransactionResultById;
                         }
@@ -492,6 +493,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                 return mapOfTransactionResultById;
             }
@@ -508,6 +510,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                 return mapOfTransactionResultById;
             }
@@ -660,6 +663,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                 return mapOfTransactionResultById;
             }
@@ -676,6 +680,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                 return mapOfTransactionResultById;
             }
@@ -1005,6 +1010,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                 return mapOfTransactionResultById;
             }
@@ -1021,6 +1027,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                 return mapOfTransactionResultById;
             }
@@ -1546,7 +1553,7 @@ public class CyberSource
                      LIMIT 1
              ];
              if (gatewayStatusMaps.size() > 0) {
-                 gatewayStatus = mapGatewayStatusEnumTypesByStrings.get(gatewayStatusMaps.get(0).blng__GatewayStatus__c);
+                 gatewayStatus = mapGatewayStatusEnumTypesByStrings.get(gatewayStatusMaps.get(0).GatewayStatus__c);
                  if (gatewayStatus == null) {
                      gatewayStatus = defaultGatewayStatus;
                  }
