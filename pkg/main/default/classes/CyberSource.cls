@@ -148,7 +148,7 @@ public class CyberSource
                             transactionParameterToProcess.transactionResult.setIsSuccess(false);
                             transactionParameterToProcess.transactionResult.setResponseMessage('FAILURE');
                             transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                            transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information "Email"');
+                            transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information: Email');
                             transactionParameterToProcess.transactionResult.setGatewayId(NULL);
                             transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                             mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
@@ -748,8 +748,9 @@ public class CyberSource
                         transactionParameterToProcess.transactionResult.setResponseCode('ERROR');                
                         transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information: Email');
                         transactionParameterToProcess.transactionResult.setGatewayId(NULL);
+                        transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
                         mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-                        system.debug('mapOfTransactionResultByIdCyberSource'+mapOfTransactionResultById);
+                        return mapOfTransactionResultById;
                     }     
                 }
                 // Calling populate Transaction Result For Charge class to Return map of transaction results
@@ -805,15 +806,7 @@ public class CyberSource
                 }
                 else
                 {
-                    if (transactionParameterToProcess.transactionResult.getResponseToValidate() != EMAIL_MISSING)
-                    {
-                        transactionParameterToProcess.transactionResult.setResponseToValidate('');
-                    }
-                    else
-                    {
-                        transactionParameterToProcess.transactionResult.setResponseCode('CyberSource:101');
-                    }
-                   		
+                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -872,12 +865,12 @@ public class CyberSource
                 {
                     if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
                     {
-                        // Calling AuthorizeDotNetUtils class to populate the Request for generate void for credit card XML
+                        // Calling Utils class to populate the Request for generate void for credit card XML
                         CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
                     }
                     else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
                     {
-                        // Calling AuthorizeDotNetUtils class to populate the Request for generate void for ACH XML
+                        // Calling Utils class to populate the Request for generate void for ACH XML
                         CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                     }
                     // Calling CyberSourceHttpService class to send a Request
@@ -1186,12 +1179,12 @@ public class CyberSource
                     {
                         if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
                         {
-                            // Calling PayFlowProUtils class to populate the Request for CC Payment  
+                            // Calling Utils class to populate the Request for CC Payment
                             CyberSourceUtils.getInstance().generateCardnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                         }
                         else
                         {
-                            // Calling PayFlowProUtils class to populate the Request for ACH Payment  
+                            // Calling Utils class to populate the Request for ACH Payment
                             CyberSourceUtils.getInstance().generateACHnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                         }
                     }
@@ -1316,12 +1309,12 @@ public class CyberSource
                 {
                     if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
                     {
-                        // Calling AuthorizeDotNetUtils class to populate the Request for generate Void Refund for credit card XML
+                        // Calling Utils class to populate the Request for generate Void Refund for credit card XML
                         CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
                     }
                     else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
                     {
-                        // Calling AuthorizeDotNetUtils class to populate the Request for generate Void Refund for ACH XML
+                        // Calling Utils class to populate the Request for generate Void Refund for ACH XML
                         CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                     }
                     // Calling CyberSourceHttpService class to send a Request
