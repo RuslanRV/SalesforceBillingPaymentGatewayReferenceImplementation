@@ -163,6 +163,44 @@ private class CyberSourceTest
         callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
+    /**
+     * generateCaptureLevel3XML() method is called when the config for
+     * INVOICE_DETAIL has the name of a TextArea field in blng__StringValue__c.
+     * Invoice__c does not have a TextArea, but a customer can add one.
+     * Since we cannot add a new field in the test, we will call this method directly
+     */
+    public static testMethod void CaptureTransactionLevel3XML()
+    {
+        blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
+        insert invoice;
+        transactionParameter.setInvoice(invoice);
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.startTest();
+        CyberSourceUtils.getInstance().generateCaptureLevel3XML(mapOfTransactionParameter);
+        System.assertNotEquals(null, transactionParameter.getRequestBody(), 'Request body should be populated');
+        Test.stopTest();
+    }
+
+    /**
+     * generateChargeLevel3XML() method is called when the config for
+     * INVOICE_DETAIL has the name of a TextArea field in blng__StringValue__c.
+     * Invoice__c does not have a TextArea, but a customer can add one.
+     * Since we cannot add a new field in the test, we will call this method directly
+     */
+    public static testMethod void ChargeTransactionLevel3XML()
+    {
+        blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
+        insert invoice;
+        transactionParameter.setInvoice(invoice);
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.startTest();
+        CyberSourceUtils.getInstance().generateChargeLevel3XML(mapOfTransactionParameter);
+        System.assertNotEquals(null, transactionParameter.getRequestBody(), 'Request body should be populated');
+        Test.stopTest();
+    }
+
     // charge transaction tests
     public static testMethod void ChargeTransactionMissingEmail()
     {
@@ -174,16 +212,19 @@ private class CyberSourceTest
 
     public static testMethod void ChargeTransactionACHSuccess()
     {
-        blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
         callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void ChargeTransactionCCSuccess()
+    public static testMethod void ChargeTransactionCCnoPayTxnSuccess()
+    {
+        blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
+    }
+
+    public static testMethod void ChargeTransactionCCwithPayTxnSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
-        insert invoice;
-        transactionParameter.setInvoice(invoice);
         callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
@@ -218,9 +259,6 @@ private class CyberSourceTest
     public static testMethod void VoidTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
-        insert invoice;
-        transactionParameter.setInvoice(invoice);
         callAndVerify(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
@@ -255,18 +293,12 @@ private class CyberSourceTest
     public static testMethod void RefundTransactionCCPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
-        insert invoice;
-        transactionParameter.setInvoice(invoice);
         callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void RefundTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
-        insert invoice;
-        transactionParameter.setInvoice(invoice);
         callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
@@ -347,9 +379,6 @@ private class CyberSourceTest
     public static testMethod void VoidRefundTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
-        insert invoice;
-        transactionParameter.setInvoice(invoice);
         callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
@@ -569,7 +598,7 @@ private class CyberSourceTest
                 blng__BankRoutingCode__c='071923284'
         );
         insert paymentMethod;
-        
+
         blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
         transactionParameter.SetAccount(account);
         transactionParameter.setFirstName('Manigandan');
