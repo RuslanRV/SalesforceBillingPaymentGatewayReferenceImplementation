@@ -30,6 +30,7 @@ public class CyberSourceUtils
         private static final String GET_ELEMENTS = 'getElements ';
         private static Boolean IS_MULTICURRENCY_ORG = UserInfo.isMultiCurrencyOrganization();
         private static String CURRENCYISOCODE = 'CurrencyIsoCode';
+        private static final String TEXTAREA = 'TEXTAREA';
         
     // ============================================================================
     // STATIC VARIABLES
@@ -2572,16 +2573,69 @@ public class CyberSourceUtils
     }
 
     /**
-    * @name getErrorCyberSourceCode
-    * @description Return's Map of Cyber source error description By code
-    * @param NA
-    * @return Map [Key => String [Code] , Value => String [Error Message]]
-    * @exception To do
-    * @author Manigandan SA / Vinod KR
-    * @created 2016-07-15
-    * @remark 
-    * @change
-    */ 
+     * Method verifies if any field name was added to Invoice and InvoiceLine config
+     * If the field type is not TEXTAREA, then the process is aborted and the appropriate
+     * TransactionResult is returned.
+     * @param mapOfTransactionParameterById
+     * @param invoiceDetailAPIValue
+     *
+     * @return
+     */
+    public static Map<String, blng.TransactionResult> validateInvoiceConfig(
+            Map<String, blng.TransactionParameter> mapOfTransactionParameterById,
+            String invoiceDetailAPIValue)
+    {
+        String invoiceLineDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_LINE_DETAIL').blng__StringValue__c;
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        Schema.DisplayType fielddataType;
+        if(NULL != invoiceDetailAPIValue)
+        {
+            fielddataType = ((Schema.getGlobalDescribe().get('blng__Invoice__c')).getDescribe().fields.getMap()).get(invoiceDetailAPIValue).getDescribe().getType();
+        }
+        if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA)
+        {
+            string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
+            blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+            transactionParameterToProcess.transactionResult.setIsSuccess(false);
+            transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
+            transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
+            transactionParameterToProcess.transactionResult.setId(idToProcess);
+            transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+            transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
+            mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            return mapOfTransactionResultById;
+        }
+        if(NULL != invoiceLineDetailAPIValue)
+        {
+            fielddataType = ((Schema.getGlobalDescribe().get('blng__InvoiceLine__c')).getDescribe().fields.getMap()).get(invoiceLineDetailAPIValue).getDescribe().getType();
+        }
+        if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA)
+        {
+            string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
+            blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+            transactionParameterToProcess.transactionResult.setIsSuccess(false);
+            transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
+            transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
+            transactionParameterToProcess.transactionResult.setId(idToProcess);
+            transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+            transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
+            mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            return mapOfTransactionResultById;
+        }
+        return mapOfTransactionResultById;
+    }
+
+        /**
+        * @name getErrorCyberSourceCode
+        * @description Return's Map of Cyber source error description By code
+        * @param NA
+        * @return Map [Key => String [Code] , Value => String [Error Message]]
+        * @exception To do
+        * @author Manigandan SA / Vinod KR
+        * @created 2016-07-15
+        * @remark
+        * @change
+        */
     public static map<string,string> getErrorCyberSourceCode()
     {
         Map<string, string> mapOfMessageByErrorCode = new Map<string, string>();

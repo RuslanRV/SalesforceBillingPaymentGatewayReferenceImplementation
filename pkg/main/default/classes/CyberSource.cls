@@ -49,7 +49,6 @@ public class CyberSource
         private static final String POPULATE_VOID_TRANSACTION = 'populateTransactionResultForVoid ';
         private static final String REFUND_TRANSACTION = 'refundTransaction ';
         private static final String POPULATE_REFUND_TRANSACTION = 'populateTransactionResultForRefund ';
-        private static final String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
     // ============================================================================
     // STATIC VARIABLES
     // ============================================================================    
@@ -477,45 +476,10 @@ public class CyberSource
         try
         {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
-            String invoiceLineDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_LINE_DETAIL').blng__StringValue__c;
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            Schema.DisplayType fielddataType;
-            if(NULL != invoiceDetailAPIValue)
-            {
-                fielddataType = ((Schema.getGlobalDescribe().get('blng__Invoice__c')).getDescribe().fields.getMap()).get(invoiceDetailAPIValue).getDescribe().getType();
-            }
-            if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != CyberSourceCommonUtils.TEXTAREA)
-            {
-                string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
-                transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
+            if (mapOfTransactionResultById.size() > 0) {
                 return mapOfTransactionResultById;
-            }
-            if(NULL != invoiceLineDetailAPIValue)
-            {
-                fielddataType = ((Schema.getGlobalDescribe().get('blng__InvoiceLine__c')).getDescribe().fields.getMap()).get(invoiceLineDetailAPIValue).getDescribe().getType();
-            }
-            if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != CyberSourceCommonUtils.TEXTAREA)
-            {
-                string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
-                transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-                return mapOfTransactionResultById;
-            }
-            else
-            {
+            } else {
                 for(String idToProcess : mapOfTransactionParameterById.keySet())
                 {
                     blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
@@ -647,50 +611,12 @@ public class CyberSource
         try
         {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
-            String invoiceLineDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_LINE_DETAIL').blng__StringValue__c;
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            Schema.DisplayType fielddataType;
-            if(NULL != invoiceDetailAPIValue)
-            {
-                fielddataType = ((Schema.getGlobalDescribe().get('blng__Invoice__c')).getDescribe().fields.getMap()).get(invoiceDetailAPIValue).getDescribe().getType();
-            }
-            if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != CyberSourceCommonUtils.TEXTAREA)
-            {
-                string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
-                transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
+            if (mapOfTransactionResultById.size() > 0) {
                 return mapOfTransactionResultById;
-            }
-            if(NULL != invoiceLineDetailAPIValue)
-            {
-                fielddataType = ((Schema.getGlobalDescribe().get('blng__InvoiceLine__c')).getDescribe().fields.getMap()).get(invoiceLineDetailAPIValue).getDescribe().getType();
-            }
-            if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != CyberSourceCommonUtils.TEXTAREA)
-            {    
-                string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
-                transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-                return mapOfTransactionResultById;
-            }
-            
-            else
-            {    
+            } else {
                 for(String idToProcess : mapOfTransactionParameterById.keySet())
-                    
-                {    
-                    
+                {
                     blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                     if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c))
                     {
@@ -987,45 +913,10 @@ public class CyberSource
         try
         {   
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
-            String invoiceLineDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_LINE_DETAIL').blng__StringValue__c;
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            Schema.DisplayType fielddataType;
-            if(NULL != invoiceDetailAPIValue)
-            {
-                fielddataType = ((Schema.getGlobalDescribe().get('blng__Invoice__c')).getDescribe().fields.getMap()).get(invoiceDetailAPIValue).getDescribe().getType();
-            }
-            if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != CyberSourceCommonUtils.TEXTAREA)
-            {
-                string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
-                transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
+            if (mapOfTransactionResultById.size() > 0) {
                 return mapOfTransactionResultById;
-            }
-            if(NULL != invoiceLineDetailAPIValue)
-            {
-                fielddataType = ((Schema.getGlobalDescribe().get('blng__InvoiceLine__c')).getDescribe().fields.getMap()).get(invoiceLineDetailAPIValue).getDescribe().getType();
-            }
-            if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != CyberSourceCommonUtils.TEXTAREA)
-            {
-                string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
-                transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-                return mapOfTransactionResultById;
-            }
-            else
-            {
+            } else {
                 for(String idToProcess : mapOfTransactionParameterById.keySet())
                 {
                     blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);

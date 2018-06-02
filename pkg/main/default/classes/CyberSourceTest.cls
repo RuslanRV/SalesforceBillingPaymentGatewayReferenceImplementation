@@ -825,7 +825,6 @@ private class CyberSourceTest
      */
     public static testMethod void GatewayStatusSuccess()
     {
-        insert CyberSourceTest.getConfiguration();
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         transactionResult.setResponseCode('100');
         CyberSourceAPI.populateGatewayStatus(transactionResult);
@@ -836,7 +835,6 @@ private class CyberSourceTest
      */
     public static testMethod void GatewayStatusMissingCode()
     {
-        insert CyberSourceTest.getConfiguration();
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         transactionResult.setResponseCode('MISSING_CODE');
         CyberSourceAPI.populateGatewayStatus(transactionResult);
@@ -847,11 +845,11 @@ private class CyberSourceTest
      */
     public static testMethod void GatewayStatusNullCode()
     {
-        insert CyberSourceTest.getConfiguration();
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         CyberSourceAPI.populateGatewayStatus(transactionResult);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
     }
+
     private static List<blng__BillingConfig__c> getConfiguration()
     {
         list<blng__BillingConfig__c> listofConfiguration = new list<blng__BillingConfig__c>();
