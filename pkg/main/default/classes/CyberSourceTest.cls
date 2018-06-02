@@ -14,12 +14,12 @@ private class CyberSourceTest
     private static final String PENDING = 'PENDING';
     private static final String PAYMENTTYPE_CREDITCARD = 'Credit Card';
     private static final String PAYMENTTYPE_ACH = 'ACH';
-    private static final String SUCCESS_MESSAGE = 'Successful transaction';
-    private static final String REJECT_MESSAGE = 'The request is missing one or more required fields.Possible action: see the reply fields missingField_0...N for which fields are missing. Resend the request with the complete information. For information about missing or invalid fields';
-    private static final String PENDING_MESSAGE = 'Invalid data';
+    private static final String SUCCESS_MESSAGE = 'Successful transaction'; // hardcoded in utils for 100
+    private static final String REJECT_MESSAGE = 'The request is missing one or more required fields.Possible action: see the reply fields missingField_0...N for which fields are missing. Resend the request with the complete information. For information about missing or invalid fields'; // hardcoded in utils for 101
+    private static final String PENDING_MESSAGE = 'Invalid data'; // hardcoded in utils for 102
     private static final String EMAIL_MISSING = 'Email is Missing';
-    private static final String INVALID_FIELD_MESSAGE = 'Invalid Field X';
-    private static final String GATEWAY_ID = '4436893298465000001516';
+    private static final String INVALID_FIELD_MESSAGE = 'Invalid Field X'; // some arbitrary value we have in the soap responses
+    private static final String GATEWAY_ID = '4436893298465000001516'; // some arbitrary value we have in the soap responses
 
     private static final String GENERATE_TOKEN = 'generateToken';
     private static final String AUTHORIZE_TRANSACTION = 'authorizeTransaction';
@@ -34,6 +34,7 @@ private class CyberSourceTest
     private static final String NON_REFERRED_REFUND = 'nonReferredRefund';
     /**
      * validate one of the failures to make sure the customer validation works
+     * TODO this will change after we implement the service improvements
      */
     public static testMethod void ValidateCustomerFailure()
     {
@@ -59,33 +60,15 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GENERATE_TOKEN);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, null, SUCCESS_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
     public static testMethod void GenerateTokenReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GENERATE_TOKEN);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, null, REJECT_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(GENERATE_TOKEN, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
     }
 
     public static testMethod void GenerateTokenMissingEmail()
@@ -93,50 +76,22 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GENERATE_TOKEN);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            blng.TransactionResult transactionResult = response.values().get(0);
-            verify(transactionResult, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
-            System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
-        }
-        Test.stopTest();
+        blng.TransactionResult transactionResult = callAndVerify(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
     }
 
     // void token tests
     public static testMethod void VoidTokenTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TOKEN_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, null, SUCCESS_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TOKEN_TRANSACTION, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
     public static testMethod void VoidTokenTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TOKEN_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, null, REJECT_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TOKEN_TRANSACTION, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
     }
 
     // authorize transaction tests
@@ -144,83 +99,38 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(AUTHORIZE_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void AuthorizeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(AUTHORIZE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void AuthorizeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(AUTHORIZE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void AuthorizeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(AUTHORIZE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     // capture transaction tests
     public static testMethod void CaptureTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CAPTURE_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void CaptureTransactionCCSuccess()
@@ -229,66 +139,28 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CAPTURE_TRANSACTION);        
-        Test.startTest();
-        // we call this to check if it passes, because calling this in code would mean creating a TEXTAREA field in blng_invoice__c
-        CyberSourceUtils.getInstance().generateCaptureLevel3XML(mapOfTransactionParameter);
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void CaptureTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CAPTURE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void CaptureTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CAPTURE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void CaptureTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CAPTURE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     // charge transaction tests
@@ -296,33 +168,14 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CHARGE_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            blng.TransactionResult transactionResult = response.values().get(0);
-            verify(transactionResult, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
-            System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
-        }
-        Test.stopTest();
+        blng.TransactionResult transactionResult = callAndVerify(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
     }
 
     public static testMethod void ChargeTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CHARGE_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void ChargeTransactionCCSuccess()
@@ -331,82 +184,35 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CHARGE_TRANSACTION);
-        Test.startTest();
-        // we call this to check if it passes, because calling this in code would mean creating a TEXTAREA field in blng_invoice__c
-        CyberSourceUtils.getInstance().generateChargeLevel3XML(mapOfTransactionParameter);
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void ChargeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CHARGE_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, INVALID_FIELD_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void ChargeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CHARGE_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '102', PENDING, null, null, GATEWAY_ID);
     }
 
     public static testMethod void ChargeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(CHARGE_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
     
     // Void transaction tests
     public static testMethod void VoidTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidTransactionCCSuccess()
@@ -415,80 +221,35 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TRANSACTION); 
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_TRANSACTION); 
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     // refund tests
     public static testMethod void RefundTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(REFUND_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void RefundTransactionCCPaymentTransactionSuccess()
@@ -497,16 +258,7 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void RefundTransactionCCSuccess()
@@ -515,190 +267,81 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void RefundTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(REFUND_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void RefundTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void RefundTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     //NonReferredRefund tests
     public static testMethod void NonReferredRefundACHPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        CyberSourceUtils.getInstance().generateACHnonReferencedRefundXML(mapOfTransactionParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void NonReferredRefundACHPaymentMethodSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void NonReferredRefundCCPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void NonReferredRefundCCPaymentMethodSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void NonReferredRefundReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void NonReferredRefundPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void NonReferredRefundEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(NON_REFERRED_REFUND);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     //Void Refund Transaction tests
     public static testMethod void VoidRefundTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_REFUND_TRANSACTION);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidRefundTransactionCCSuccess()
@@ -707,66 +350,28 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_REFUND_TRANSACTION);
-        Test.startTest();
-        // we call this to check if it passes, because calling this in code would mean creating a TEXTAREA field in blng_invoice__c
-        CyberSourceUtils.getInstance().generateVoidRefundXML(mapOfTransactionParameter);
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidRefundTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidRefundTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
     public static testMethod void VoidRefundTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(VOID_REFUND_TRANSACTION);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '103', '', null, null, GATEWAY_ID);
-        }
-        Test.stopTest();
+        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     //GetPaymentStatus tests
@@ -774,33 +379,15 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GET_PAYMENT_STATUS);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, null, SUCCESS_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(GET_PAYMENT_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
     public static testMethod void GetPaymentStatusReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GET_PAYMENT_STATUS);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '101', FAILURE, null, REJECT_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(GET_PAYMENT_STATUS, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
     }
 
     //GetRefundStatus calls GetPaymentStatus
@@ -808,16 +395,7 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GET_REFUND_STATUS);        
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            verify(response.values().get(0), '100', SUCCESS, null, SUCCESS_MESSAGE, null);
-        }
-        Test.stopTest();
+        callAndVerify(GET_REFUND_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
     /**
@@ -850,6 +428,11 @@ private class CyberSourceTest
         System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
     }
 
+    /**
+     * inserts the config data
+     *
+     * @return
+     */
     private static List<blng__BillingConfig__c> getConfiguration()
     {
         list<blng__BillingConfig__c> listofConfiguration = new list<blng__BillingConfig__c>();
@@ -941,6 +524,14 @@ private class CyberSourceTest
         return listofConfiguration;
     }
 
+    /**
+     * inserts config data, then
+     * inserts gateway, account, payment method
+     * and adds them to the parameter to be passed to the APIs
+     * @param paymentType
+     *
+     * @return
+     */
     private static blng.TransactionParameter setupData(String paymentType) {
         insert CyberSourceTest.getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
@@ -997,6 +588,13 @@ private class CyberSourceTest
         return transactionParameter;
     }
 
+    /**
+     * calls setupData, then inserts PaymentTransaction
+     * and adds it to the parameter to be passed to the APIs
+     * @param paymentType
+     *
+     * @return
+     */
     private static blng.TransactionParameter setupDataWithPaymentTransaction(String paymentType) {
         blng.TransactionParameter transactionParameter = setupData(paymentType);
         blng__PaymentTransaction__c paymentTransaction = new blng__PaymentTransaction__c(
@@ -1012,14 +610,40 @@ private class CyberSourceTest
         insert paymentTransaction;
         transactionParameter.setTransaction(paymentTransaction);
         return transactionParameter;
-    }    
+    }
 
-    private static void verify(blng.TransactionResult transactionResult,
+    /**
+     * assembles rapameters for the callout, makes the api call, asserts
+     * returns the TransactionResult for the caller to make further asserts particular to the test cases
+     *
+     * @param apiMethod
+     * @param transactionParameter
+     * @param responseCode
+     * @param responseToValidate
+     * @param responseMessage
+     * @param responseCodeMessage
+     * @param gatewayId
+     *
+     * @return
+     */
+    private static blng.TransactionResult callAndVerify(
+            String apiMethod,
+            blng.TransactionParameter transactionParameter,
             String responseCode,
             String responseToValidate,
             String responseMessage,
             String responseCodeMessage,
             String gatewayId) {
+        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
+        paymentGatewayParameter.setTransactionType(apiMethod);
+
+        Test.startTest();
+        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
+        System.assertNotEquals(0, response.size(), apiMethod + ' should return a transaction result');
+        blng.TransactionResult transactionResult = response.values().get(0);
+
         System.assertEquals(responseCode, transactionResult.getResponseCode(), 'Wrong responseCode');
         System.assertEquals(responseToValidate, transactionResult.getResponseToValidate(), 'Wrong responseToValidate');
         System.assertEquals(responseMessage, transactionResult.getResponseMessage(), 'Wrong responseMessage');
@@ -1030,7 +654,11 @@ private class CyberSourceTest
         } else if (!String.isBlank(responseToValidate)){
             System.assertEquals(false, transactionResult.getIsSuccess(), 'Wrong IsSuccess');
         }
+
+        Test.stopTest();
+        return transactionResult;
     }
+
     @isTest   
     static void installScript() 
     {
