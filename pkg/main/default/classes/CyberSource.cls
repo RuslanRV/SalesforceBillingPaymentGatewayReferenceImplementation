@@ -106,8 +106,7 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> generateToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
              Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             if(!mapOfTransactionParameterById.IsEmpty())
             {
@@ -117,8 +116,7 @@ public class CyberSource
                 CyberSourceUtils.getInstance().generateTokenXML(mapOfTransactionParameterById.Values());
                 for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
                 {
-                    try
-                    {
+                    try {
                         // Calling CyberSourceHttpService class to send a Request
                         if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c) )
                         {
@@ -184,8 +182,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -238,8 +235,7 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> voidTokenTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             if(!mapOfTransactionParameterById.IsEmpty())
             {
                 // check validate Customer Details
@@ -248,8 +244,7 @@ public class CyberSource
                 CyberSourceUtils.getInstance().generateVoidTokenXML(mapOfTransactionParameterById.Values());
                 for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
                 {
-                    try
-                    {
+                    try {
                         // Calling CyberSourceHttpService class to send a Request
                         CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
                         sendHttpRequest.addHeader('Content-type', 'text/xml');
@@ -298,8 +293,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForVoidToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -352,14 +346,12 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> authorizeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {    
+        try {
             // Calling CyberSourceUtils class to populate the Request for generate Authorize XML
             CyberSourceUtils.getInstance().generateAuthorizeXML(mapOfTransactionParameterById);
             for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
             {
-                try
-                {
+                try {
                     // Calling CyberSourceHttpService class to send a Request
                     CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
                     sendHttpRequest.addHeader('Content-type', 'text/xml');
@@ -409,8 +401,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForAuthorize(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {    
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -473,8 +464,7 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> captureTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
             Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
             if (mapOfTransactionResultById.size() > 0) {
@@ -483,14 +473,13 @@ public class CyberSource
             for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try
-                {
+                try {
                     if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
                     {
                      if(NULL != invoiceDetailAPIValue)
                      {
                          CyberSourceUtils.getInstance().generateCaptureLevel3XML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                     }else
+                     } else
                          {
                          // Calling CyberSourceUtils class to populate the Request for generate Capture XML for Credit card
                          CyberSourceUtils.getInstance().generateCaptureXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
@@ -542,8 +531,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForCapture(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -607,8 +595,7 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> chargeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
             Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
             if (mapOfTransactionResultById.size() > 0) {
@@ -619,14 +606,13 @@ public class CyberSource
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c))
                 {
-                   try
-                   {
+                   try {
                         if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD )
                         {
                             if(NULL != invoiceDetailAPIValue)
                             {
                              CyberSourceUtils.getInstance().generateChargeLevel3XML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                            }else
+                            } else
                             {
                              // Calling CyberSourceUtils class to populate the Request for generate Capture XML for Credit card
                              CyberSourceUtils.getInstance().generateChargeXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
@@ -664,7 +650,7 @@ public class CyberSource
                         transactionParameterToProcess.transactionResult.setIsSuccess(false);
                         transactionParameterToProcess.transactionResult.setError(e.getMessage());
                     }
-                }else
+                } else
                 {
                     transactionParameterToProcess.transactionResult.setResponseToValidate(EMAIL_MISSING);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
@@ -701,8 +687,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForCharge(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -780,13 +765,11 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> voidTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try
-                {
+                try {
                     if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
                     {
                         // Calling Utils class to populate the Request for generate void for credit card XML
@@ -843,8 +826,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForVoid(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {    
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -908,8 +890,7 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> refundTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {   
+        try {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
             Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
             if (mapOfTransactionResultById.size() > 0) {
@@ -918,8 +899,7 @@ public class CyberSource
             for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try
-                {
+                try {
                    if(NULL != transactionParameterToProcess.getTransaction())
                    {
                         if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
@@ -979,8 +959,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -1043,13 +1022,11 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> nonReferencedRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {   
+        try {
             for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try
-                {
+                try {
                    if(NULL != transactionParameterToProcess.getTransaction())
                    {
                         if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
@@ -1123,8 +1100,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultFornonReferencedRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -1188,13 +1164,11 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> voidRefundTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             for(String idToProcess : mapOfTransactionParameterById.keySet())
             {
                 blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try
-                {
+                try {
                     if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
                     {
                         // Calling Utils class to populate the Request for generate Void Refund for credit card XML
@@ -1251,8 +1225,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForvoidRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {    
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {
@@ -1316,8 +1289,7 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> getPaymentStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             if(!mapOfTransactionParameterById.IsEmpty())
             {
                 CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
@@ -1325,8 +1297,7 @@ public class CyberSource
                 CyberSourceUtils.getInstance().generateGetPaymentStatusXML(mapOfTransactionParameterById.Values());
                 for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
                 {
-                    try
-                    {
+                    try {
                         // Calling CyberSourceHttpService class to send a Request
                         CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
                         sendHttpRequest.addHeader('Content-type', 'text/xml');
@@ -1376,8 +1347,7 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForgetPaymentStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try
-        {
+        try {
             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
             for(String idToProcess : mapOfTransactionParameterById.KeySet())
             {

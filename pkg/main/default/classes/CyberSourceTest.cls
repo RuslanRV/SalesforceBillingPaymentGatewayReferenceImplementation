@@ -32,11 +32,22 @@ private class CyberSourceTest
     private static final String GET_PAYMENT_STATUS = 'getPaymentStatus';
     private static final String GET_REFUND_STATUS = 'getRefundStatus';
     private static final String NON_REFERRED_REFUND = 'nonReferredRefund';
+
     /**
-     * validate one of the failures to make sure the customer validation works
+    * @name testValidateCustomerFailure
+    * @description validate one of the failures to make sure the customer validation works
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    /**
      * TODO this will change after we implement the service improvements
      */
-    public static testMethod void ValidateCustomerFailure()
+    public static testMethod void testValidateCustomerFailure()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
@@ -56,9 +67,17 @@ private class CyberSourceTest
     }
 
     /**
-     * generate token success case
-     */
-    public static testMethod void GenerateTokenSuccess()
+    * @name testGenerateTokenSuccess
+    * @description generate token success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGenerateTokenSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // setupData sets the payment token, but since generate token does does require it, remove it here
@@ -67,9 +86,17 @@ private class CyberSourceTest
     }
 
     /**
-     * generate token reject case
-     */
-    public static testMethod void GenerateTokenReject()
+    * @name testGenerateTokenReject
+    * @description generate token reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGenerateTokenReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // setupData sets the payment token, but since generate token does does require it, remove it here
@@ -80,9 +107,17 @@ private class CyberSourceTest
     }
 
     /**
-     * generate token missing email case
-     */
-    public static testMethod void GenerateTokenMissingEmail()
+    * @name testGenerateTokenForMissingEmail
+    * @description generate token missing email case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGenerateTokenForMissingEmail()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // setupData sets the payment token, but since generate token does does require it, remove it here
@@ -94,18 +129,34 @@ private class CyberSourceTest
     }
 
     /**
-     * void token success case
-     */
-    public static testMethod void VoidTokenTransactionSuccess()
+    * @name testVoidTokenTransactionSuccess
+    * @description void token success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTokenTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(VOID_TOKEN_TRANSACTION, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
     /**
-     * void token reject case
-     */
-    public static testMethod void VoidTokenTransactionReject()
+    * @name testVoidTokenTransactionReject
+    * @description void token reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTokenTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
@@ -114,9 +165,17 @@ private class CyberSourceTest
     }
 
     /**
-     * authorize transaction success case
-     */
-    public static testMethod void AuthorizeTransactionSuccess()
+    * @name testAuthorizeTransactionSuccess
+    * @description authorize transaction success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testAuthorizeTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // payment token does not exist for this api call, so empty it
@@ -125,9 +184,17 @@ private class CyberSourceTest
     }
 
     /**
-     * authorize transaction reject case
-     */
-    public static testMethod void AuthorizeTransactionReject()
+    * @name testAuthorizeTransactionReject
+    * @description authorize transaction reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testAuthorizeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // payment token does not exist for this api call, so empty it
@@ -138,9 +205,17 @@ private class CyberSourceTest
     }
 
     /**
-     * authorize transaction pending case
-     */
-    public static testMethod void AuthorizeTransactionPending()
+    * @name testAuthorizeTransactionPending
+    * @description authorize transaction pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testAuthorizeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // payment token does not exist for this api call, so empty it
@@ -151,9 +226,17 @@ private class CyberSourceTest
     }
 
     /**
-     * authorize transaction empty decision case
-     */
-    public static testMethod void AuthorizeTransactionEmptyDecision()
+    * @name testAuthorizeTransactionEmptyDecision
+    * @description authorize transaction empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testAuthorizeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // payment token does not exist for this api call, so empty it
@@ -164,18 +247,34 @@ private class CyberSourceTest
     }
 
     /**
-     * capture transaction ACH success case
+     * @name testCaptureTransactionACHSuccess
+     * @description capture transaction ACH success case
+     * @Param
+     * @return NA
+     * @exception NA
+     * @author Lopa
+     * @created 2018-06-5
+     * @remark
+     * @change
      */
-    public static testMethod void CaptureTransactionACHSuccess()
+    public static testMethod void testCaptureTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * capture transaction CC success case
-     */
-    public static testMethod void CaptureTransactionCCSuccess()
+    * @name testCaptureTransactionCCSuccess
+    * @description capture transaction CC success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testCaptureTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         // this API call for credit card needs an invoice
@@ -186,9 +285,17 @@ private class CyberSourceTest
     }
 
     /**
-     * capture transaction reject case
-     */
-    public static testMethod void CaptureTransactionReject()
+    * @name testCaptureTransactionReject
+    * @description capture transaction reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testCaptureTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
@@ -197,9 +304,17 @@ private class CyberSourceTest
     }
 
     /**
-     * capture transaction pending case
-     */
-    public static testMethod void CaptureTransactionPending()
+    * @name testCaptureTransactionPending
+    * @description capture transaction pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testCaptureTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the pending message
@@ -208,9 +323,17 @@ private class CyberSourceTest
     }
 
     /**
-     * capture transaction empty decision case
-     */
-    public static testMethod void CaptureTransactionEmptyDecision()
+    * @name testCaptureTransactionEmptyDecision
+    * @description capture transaction empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testCaptureTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the empty <decision> message
@@ -219,12 +342,21 @@ private class CyberSourceTest
     }
 
     /**
-     * generateCaptureLevel3XML() method is called when the config for
-     * INVOICE_DETAIL has the name of a TextArea field in blng__StringValue__c.
-     * Invoice__c does not have a TextArea, but a customer can add one.
-     * Since we cannot add a new field in the test, we will call this method directly
-     */
-    public static testMethod void CaptureTransactionLevel3XML()
+    * @name testCaptureTransactionLevel3XML
+    * @description
+    * generateCaptureLevel3XML() method is called when the config for
+    * INVOICE_DETAIL has the name of a TextArea field in blng__StringValue__c.
+    * Invoice__c does not have a TextArea, but a customer can add one.
+    * Since we cannot add a new field in the test, we will call this method directly
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testCaptureTransactionLevel3XML()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
@@ -238,12 +370,21 @@ private class CyberSourceTest
     }
 
     /**
-     * generateChargeLevel3XML() method is called when the config for
-     * INVOICE_DETAIL has the name of a TextArea field in blng__StringValue__c.
-     * Invoice__c does not have a TextArea, but a customer can add one.
-     * Since we cannot add a new field in the test, we will call this method directly
-     */
-    public static testMethod void ChargeTransactionLevel3XML()
+    * @name testChargeTransactionLevel3XML
+    * @description
+    * generateChargeLevel3XML() method is called when the config for
+    * INVOICE_DETAIL has the name of a TextArea field in blng__StringValue__c.
+    * Invoice__c does not have a TextArea, but a customer can add one.
+    * Since we cannot add a new field in the test, we will call this method directly
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionLevel3XML()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
@@ -257,9 +398,17 @@ private class CyberSourceTest
     }
 
     /**
-     * charge transaction missing email case
-     */
-    public static testMethod void ChargeTransactionMissingEmail()
+    * @name testChargeTransactionMissingEmail
+    * @description charge transaction missing email case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionMissingEmail()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // empty the email field
@@ -269,36 +418,68 @@ private class CyberSourceTest
     }
 
     /**
-     * charge transaction ACH success case
-     */
-    public static testMethod void ChargeTransactionACHSuccess()
+    * @name testChargeTransactionACHSuccess
+    * @description charge transaction ACH success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * charge transaction 'CC with payment transaction' success case
-     */
-    public static testMethod void ChargeTransactionCCwithPaymentTransactionSuccess()
+    * @name testChargeTransactionCCwithPaymentTransactionSuccess
+    * @description charge transaction 'CC with payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * charge transaction 'CC with no payment transaction' success case
-     */
-    public static testMethod void ChargeTransactionCCnoPaymentTransactionSuccess()
+    * @name testChargeTransactionCCnoPaymentTransactionSuccess
+    * @description charge transaction 'CC without payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionCCnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * charge transaction reject case
-     */
-    public static testMethod void ChargeTransactionReject()
+    * @name testChargeTransactionReject
+    * @description charge transaction reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
@@ -307,9 +488,17 @@ private class CyberSourceTest
     }
 
     /**
-     * charge transaction pending case
-     */
-    public static testMethod void ChargeTransactionPending()
+    * @name testChargeTransactionPending
+    * @description charge transaction pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the pending message
@@ -318,9 +507,17 @@ private class CyberSourceTest
     }
 
     /**
-     * charge transaction empty decision case
-     */
-    public static testMethod void ChargeTransactionEmptyDecision()
+    * @name testChargeTransactionEmptyDecision
+    * @description charge transaction empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testChargeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the empty <decision> message
@@ -329,27 +526,51 @@ private class CyberSourceTest
     }
 
     /**
-     * void transaction ACH success case
-     */
-    public static testMethod void VoidTransactionACHSuccess()
+    * @name testVoidTransactionACHSuccess
+    * @description void transaction ACH success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * void transaction CC success case
-     */
-    public static testMethod void VoidTransactionCCSuccess()
+    * @name testVoidTransactionCCSuccess
+    * @description void transaction CC success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * void transaction reject case
-     */
-    public static testMethod void VoidTransactionReject()
+    * @name testVoidTransactionReject
+    * @description void transaction reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
@@ -358,9 +579,17 @@ private class CyberSourceTest
     }
 
     /**
-     * void transaction pending case
-     */
-    public static testMethod void VoidTransactionPending()
+    * @name testVoidTransactionPending
+    * @description void transaction pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the pending message
@@ -369,9 +598,17 @@ private class CyberSourceTest
     }
 
     /**
-     * void transaction empty decision case
-     */
-    public static testMethod void VoidTransactionEmptyDecision()
+    * @name testVoidTransactionEmptyDecision
+    * @description void transaction empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the empty <decision> message
@@ -380,36 +617,68 @@ private class CyberSourceTest
     }
 
     /**
-     * refund transaction ACH success case
-     */
-    public static testMethod void RefundTransactionACHSuccess()
+    * @name testRefundTransactionACHSuccess
+    * @description refund transaction ACH success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testRefundTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * refund transaction 'CC with payment transaction' success case
-     */
-    public static testMethod void RefundTransactionCCwithPaymentTransactionSuccess()
+    * @name testRefundTransactionCCwithPaymentTransactionSuccess
+    * @description refund transaction 'CC with payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testRefundTransactionCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * refund transaction 'CC without payment transaction' success case
-     */
-    public static testMethod void RefundTransactionCCnoPaymentTransactionSuccess()
+    * @name testRefundTransactionCCnoPaymentTransactionSuccess
+    * @description refund transaction 'CC without payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testRefundTransactionCCnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * refund transaction reject case
-     */
-    public static testMethod void RefundTransactionReject()
+    * @name testRefundTransactionReject
+    * @description refund transaction reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testRefundTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
@@ -418,9 +687,17 @@ private class CyberSourceTest
     }
 
     /**
-     * refund transaction pending case
-     */
-    public static testMethod void RefundTransactionPending()
+    * @name testRefundTransactionPending
+    * @description refund transaction pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testRefundTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the pending message
@@ -429,9 +706,17 @@ private class CyberSourceTest
     }
 
     /**
-     * refund transaction empty decision case
-     */
-    public static testMethod void RefundTransactionEmptyDecision()
+    * @name testRefundTransactionEmptyDecision
+    * @description refund transaction empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testRefundTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the empty <decision> message
@@ -440,45 +725,85 @@ private class CyberSourceTest
     }
 
     /**
-     * NonReferred Refund 'ACH with payment transaction' success case
-     */
-    public static testMethod void NonReferredRefundACHwithPaymentTransactionSuccess()
+    * @name testNonReferredRefundACHwithPaymentTransactionSuccess
+    * @description NonReferred Refund 'ACH with payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundACHwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * NonReferred Refund 'ACH without payment transaction' success case
-     */
-    public static testMethod void NonReferredRefundACHnoPaymentTransactionSuccess()
+    * @name testNonReferredRefundACHnoPaymentTransactionSuccess
+    * @description NonReferred Refund 'ACH without payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundACHnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * NonReferred Refund 'CC with payment transaction' success case
-     */
-    public static testMethod void NonReferredRefundCCwithPaymentTransactionSuccess()
+    * @name testNonReferredRefundCCwithPaymentTransactionSuccess
+    * @description NonReferred Refund 'CC with payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * NonReferred Refund 'CC without payment transaction' success case
-     */
-    public static testMethod void NonReferredRefundCCnoPaymentTransactionSuccess()
+    * @name testNonReferredRefundCCnoPaymentTransactionSuccess
+    * @description NonReferred Refund 'CC without payment transaction' success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundCCnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * NonReferred Refund reject case
-     */
-    public static testMethod void NonReferredRefundReject()
+    * @name testNonReferredRefundReject
+    * @description NonReferred Refund reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         // change the response message to be the reject message
@@ -487,9 +812,17 @@ private class CyberSourceTest
     }
 
     /**
-     * NonReferred Refund pending case
-     */
-    public static testMethod void NonReferredRefundPending()
+    * @name testNonReferredRefundPending
+    * @description NonReferred Refund pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         // change the response message to be the pending message
@@ -498,9 +831,17 @@ private class CyberSourceTest
     }
 
     /**
-     * NonReferred Refund empty decision case
-     */
-    public static testMethod void NonReferredRefundEmptyDecision()
+    * @name testNonReferredRefundEmptyDecision
+    * @description NonReferred Refund empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testNonReferredRefundEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         // change the response message to be the empty <decision> message
@@ -509,27 +850,51 @@ private class CyberSourceTest
     }
 
     /**
-     * Void Refund ACH success case
-     */
-    public static testMethod void VoidRefundTransactionACHSuccess()
+    * @name testVoidRefundTransactionACHSuccess
+    * @description Void Refund ACH success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidRefundTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * Void Refund CC success case
-     */
-    public static testMethod void VoidRefundTransactionCCSuccess()
+    * @name testVoidRefundTransactionCCSuccess
+    * @description Void Refund CC success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidRefundTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
     /**
-     * Void Refund reject case
-     */
-    public static testMethod void VoidRefundTransactionReject()
+    * @name testVoidRefundTransactionReject
+    * @description Void Refund reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidRefundTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
@@ -538,9 +903,17 @@ private class CyberSourceTest
     }
 
     /**
-     * Void Refund pending case
-     */
-    public static testMethod void VoidRefundTransactionPending()
+    * @name testVoidRefundTransactionPending
+    * @description Void Refund pending case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidRefundTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the pending message
@@ -549,9 +922,17 @@ private class CyberSourceTest
     }
 
     /**
-     * Void Refund empty decision case
-     */
-    public static testMethod void VoidRefundTransactionEmptyDecision()
+    * @name testVoidRefundTransactionEmptyDecision
+    * @description Void Refund empty decision case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testVoidRefundTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the empty <decision> message
@@ -560,9 +941,17 @@ private class CyberSourceTest
     }
 
     /**
-     * Payment Status success case
-     */
-    public static testMethod void GetPaymentStatusSuccess()
+    * @name testGetPaymentStatusSuccess
+    * @description Payment Status success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGetPaymentStatusSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // this api call does not need payment token, so empty it
@@ -571,9 +960,17 @@ private class CyberSourceTest
     }
 
     /**
-     * Payment Status reject case
-     */
-    public static testMethod void GetPaymentStatusReject()
+    * @name testGetPaymentStatusReject
+    * @description Payment Status reject case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGetPaymentStatusReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // this api call does not need payment token, so empty it
@@ -584,9 +981,17 @@ private class CyberSourceTest
     }
 
     /**
-     * Refund Status calls Payment Status, so we test one case only
-     */
-    public static testMethod void GetRefundStatusSuccess()
+    * @name testGetRefundStatusSuccess
+    * @description Refund Status calls Payment Status, so we test one case only
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGetRefundStatusSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // this api call does not need payment token, so empty it
@@ -595,29 +1000,55 @@ private class CyberSourceTest
     }
 
     /**
-     * Tests the Gateway status mapping for the success case
-     */
-    public static testMethod void GatewayStatusSuccess()
+    * @name testGatewayStatusSuccess
+    * @description Tests the Gateway status mapping for the success case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGatewayStatusSuccess()
     {
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         transactionResult.setResponseCode('100');
         CyberSourceAPI.populateGatewayStatus(transactionResult);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.Success, transactionResult.getGatewayStatus());
     }
+
     /**
-     * Tests the Gateway status mapping for the case where the return code is not configured in the mapper
-     */
-    public static testMethod void GatewayStatusMissingCode()
+    * @name testGatewayStatusForMissingCode
+    * @description Tests the Gateway status mapping for the case where the return code is not configured in the mapper
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGatewayStatusForMissingCode()
     {
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         transactionResult.setResponseCode('MISSING_CODE');
         CyberSourceAPI.populateGatewayStatus(transactionResult);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
     }
+
     /**
-     * Tests the Gateway status mapping for the case where the return code is null
-     */
-    public static testMethod void GatewayStatusNullCode()
+    * @name testGatewayStatusForNullCode
+    * @description Tests the Gateway status mapping for the case where the return code is null
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
+    public static testMethod void testGatewayStatusForNullCode()
     {
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         CyberSourceAPI.populateGatewayStatus(transactionResult);
@@ -625,10 +1056,16 @@ private class CyberSourceTest
     }
 
     /**
-     * inserts the gateway config data
-     *
-     * @return
-     */
+    * @name getConfiguration
+    * @description inserts the gateway config data
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
     private static List<blng__BillingConfig__c> getConfiguration()
     {
         list<blng__BillingConfig__c> listofConfiguration = new list<blng__BillingConfig__c>();
@@ -721,13 +1158,19 @@ private class CyberSourceTest
     }
 
     /**
-     * inserts config data, then
-     * inserts gateway, account, payment method
-     * and adds them to the parameter to be passed to the APIs
-     * @param paymentType
-     *
-     * @return
-     */
+    * @name setupData
+    * @description
+    * inserts config data, then
+    * inserts gateway, account, payment method
+    * and adds them to the parameter to be passed to the APIs*
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
     private static blng.TransactionParameter setupData(String paymentType) {
         insert getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
@@ -788,12 +1231,17 @@ private class CyberSourceTest
     }
 
     /**
-     * calls setupData, then inserts PaymentTransaction
-     * and adds it to the parameter to be passed to the APIs
-     * @param paymentType
-     *
-     * @return
-     */
+    * @name setupDataWithPaymentTransaction
+    * @description calls setupData, then inserts PaymentTransaction
+    * and adds it to the parameter to be passed to the APIs
+    * @Param paymentType
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
     private static blng.TransactionParameter setupDataWithPaymentTransaction(String paymentType) {
         blng.TransactionParameter transactionParameter = setupData(paymentType);
         blng__PaymentTransaction__c paymentTransaction = new blng__PaymentTransaction__c(
@@ -812,9 +1260,9 @@ private class CyberSourceTest
     }
 
     /**
-     * assembles parameter for the callout, makes the api call, asserts
+     * @name invokeAPIAndVerifyResponse
+     * @description assembles parameter for the callout, makes the api call, asserts
      * returns the TransactionResult for the caller to make further asserts particular to the test cases
-     *
      * @param apiMethod
      * @param transactionParameter
      * @param responseCode
@@ -822,8 +1270,12 @@ private class CyberSourceTest
      * @param responseMessage
      * @param responseCodeMessage
      * @param gatewayId
-     *
-     * @return
+     * @return NA
+     * @exception NA
+     * @author Lopa
+     * @created 2018-06-5
+     * @remark
+     * @change
      */
     private static blng.TransactionResult invokeAPIAndVerifyResponse(
             String apiMethod,

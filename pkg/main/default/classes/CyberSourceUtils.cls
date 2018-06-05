@@ -2589,23 +2589,19 @@ public class CyberSourceUtils
         Map<String, blng.TransactionResult> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionResult>();
         Schema.DisplayType fielddataType;
         // check invoice config
-        if(NULL != invoiceDetailAPIValue)
-        {
+        if(NULL != invoiceDetailAPIValue) {
             fielddataType = ((Schema.getGlobalDescribe().get('blng__Invoice__c')).getDescribe().fields.getMap()).get(invoiceDetailAPIValue).getDescribe().getType();
         }
         // field added has to be of type TEXTAREA, else it is an error
-        if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA)
-        {
+        if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA) {
             return handleInvoiceConfigError(invoiceDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionParameter);
         }
         // now check invoice line config
-        if(NULL != invoiceLineDetailAPIValue)
-        {
+        if(NULL != invoiceLineDetailAPIValue) {
             fielddataType = ((Schema.getGlobalDescribe().get('blng__InvoiceLine__c')).getDescribe().fields.getMap()).get(invoiceLineDetailAPIValue).getDescribe().getType();
         }
         // field added has to be of type TEXTAREA, else it is an error
-        if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA)
-        {
+        if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA) {
             return handleInvoiceConfigError(invoiceLineDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionParameter);
         }
         return mapOfProcessIdToTransactionParameter;
