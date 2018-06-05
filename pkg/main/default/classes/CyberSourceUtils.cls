@@ -2576,55 +2576,56 @@ public class CyberSourceUtils
      * Method verifies if any field name was added to Invoice and InvoiceLine config
      * If the field type is not TEXTAREA, then the process is aborted and the appropriate
      * TransactionResult is returned.
-     * @param mapOfTransactionParameterById
+     * @param mapOfProcessIdToTransactionParameterById
      * @param invoiceDetailAPIValue
      *
      * @return
      */
     public static Map<String, blng.TransactionResult> validateInvoiceConfig(
-            Map<String, blng.TransactionParameter> mapOfTransactionParameterById,
+            Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameterById,
             String invoiceDetailAPIValue)
     {
         String invoiceLineDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_LINE_DETAIL').blng__StringValue__c;
-        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        Map<String, blng.TransactionResult> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionResult>();
         Schema.DisplayType fielddataType;
+        // check invoice config
         if(NULL != invoiceDetailAPIValue)
         {
             fielddataType = ((Schema.getGlobalDescribe().get('blng__Invoice__c')).getDescribe().fields.getMap()).get(invoiceDetailAPIValue).getDescribe().getType();
         }
+        // field added has to be of type TEXTAREA, else it is an error
         if(NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA)
         {
-            string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-            blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-            transactionParameterToProcess.transactionResult.setIsSuccess(false);
-            transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-            transactionParameterToProcess.transactionResult.setResponseMessage(invoiceDetailAPIValue + ' field Data type must be Text Area (Long)');
-            transactionParameterToProcess.transactionResult.setId(idToProcess);
-            transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-            transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-            mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-            return mapOfTransactionResultById;
+            return handleInvoiceConfigError(invoiceDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionParameter);
         }
+        // now check invoice line config
         if(NULL != invoiceLineDetailAPIValue)
         {
             fielddataType = ((Schema.getGlobalDescribe().get('blng__InvoiceLine__c')).getDescribe().fields.getMap()).get(invoiceLineDetailAPIValue).getDescribe().getType();
         }
+        // field added has to be of type TEXTAREA, else it is an error
         if(NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA)
         {
-            string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-            blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-            transactionParameterToProcess.transactionResult.setIsSuccess(false);
-            transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-            transactionParameterToProcess.transactionResult.setResponseMessage(invoiceLineDetailAPIValue + ' field Data type must be Text Area (Long)');
-            transactionParameterToProcess.transactionResult.setId(idToProcess);
-            transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-            transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-            mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-            return mapOfTransactionResultById;
+            return handleInvoiceConfigError(invoiceLineDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionParameter);
         }
-        return mapOfTransactionResultById;
+        return mapOfProcessIdToTransactionParameter;
     }
 
+    private static Map<String, blng.TransactionResult> handleInvoiceConfigError(
+            string configAPIValue,
+            Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameterById,
+            Map<String, blng.TransactionResult> mapOfProcessIdToTransactionParameter) {
+        string idToProcess = (new list<string>(mapOfProcessIdToTransactionParameterById.keySet())[0]);
+        blng.TransactionParameter transactionParameterToProcess = mapOfProcessIdToTransactionParameterById.get(idToProcess);
+        transactionParameterToProcess.transactionResult.setIsSuccess(false);
+        transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
+        transactionParameterToProcess.transactionResult.setResponseMessage(configAPIValue + ' field Data type must be Text Area (Long)');
+        transactionParameterToProcess.transactionResult.setId(idToProcess);
+        transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+        transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
+        mapOfProcessIdToTransactionParameter.put(idToProcess,transactionParameterToProcess.transactionResult);
+        return mapOfProcessIdToTransactionParameter;
+    }
         /**
         * @name getErrorCyberSourceCode
         * @description Return's Map of Cyber source error description By code

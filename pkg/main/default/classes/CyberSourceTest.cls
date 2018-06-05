@@ -41,12 +41,12 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
         transactionParameter.setFirstName('');
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
         paymentGatewayParameter.setTransactionType(GENERATE_TOKEN);
         Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
+        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfProcessIdToTransactionParameter, paymentGatewayParameter);
         if(response.size() > 0) {
             blng.TransactionResult transactionResult = response.values().get(0);
             System.assertEquals(1, transactionResult.getErrors().size());
@@ -55,112 +55,167 @@ private class CyberSourceTest
         Test.stopTest();
     }
 
-    // generate token tests
+    /**
+     * generate token success case
+     */
     public static testMethod void GenerateTokenSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // setupData sets the payment token, but since generate token does does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        callAndVerify(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
+    /**
+     * generate token reject case
+     */
     public static testMethod void GenerateTokenReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // setupData sets the payment token, but since generate token does does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(GENERATE_TOKEN, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
+        invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
     }
 
+    /**
+     * generate token missing email case
+     */
     public static testMethod void GenerateTokenMissingEmail()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // setupData sets the payment token, but since generate token does does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // set the email as blank
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
-        blng.TransactionResult transactionResult = callAndVerify(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
     }
 
-    // void token tests
+    /**
+     * void token success case
+     */
     public static testMethod void VoidTokenTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        callAndVerify(VOID_TOKEN_TRANSACTION, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        invokeAPIAndVerifyResponse(VOID_TOKEN_TRANSACTION, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
+    /**
+     * void token reject case
+     */
     public static testMethod void VoidTokenTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(VOID_TOKEN_TRANSACTION, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
+        invokeAPIAndVerifyResponse(VOID_TOKEN_TRANSACTION, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
     }
 
-    // authorize transaction tests
+    /**
+     * authorize transaction success case
+     */
     public static testMethod void AuthorizeTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // payment token does not exist for this api call, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * authorize transaction reject case
+     */
     public static testMethod void AuthorizeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // payment token does not exist for this api call, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * authorize transaction pending case
+     */
     public static testMethod void AuthorizeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // payment token does not exist for this api call, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * authorize transaction empty decision case
+     */
     public static testMethod void AuthorizeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // payment token does not exist for this api call, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(AUTHORIZE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
-    // capture transaction tests
+    /**
+     * capture transaction ACH success case
+     */
     public static testMethod void CaptureTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * capture transaction CC success case
+     */
     public static testMethod void CaptureTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // this API call for credit card needs an invoice
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * capture transaction reject case
+     */
     public static testMethod void CaptureTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * capture transaction pending case
+     */
     public static testMethod void CaptureTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * capture transaction empty decision case
+     */
     public static testMethod void CaptureTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(CAPTURE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
     /**
@@ -175,9 +230,9 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.startTest();
-        CyberSourceUtils.getInstance().generateCaptureLevel3XML(mapOfTransactionParameter);
+        CyberSourceUtils.getInstance().generateCaptureLevel3XML(mapOfProcessIdToTransactionParameter);
         System.assertNotEquals(null, transactionParameter.getRequestBody(), 'Request body should be populated');
         Test.stopTest();
     }
@@ -194,237 +249,349 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.startTest();
-        CyberSourceUtils.getInstance().generateChargeLevel3XML(mapOfTransactionParameter);
+        CyberSourceUtils.getInstance().generateChargeLevel3XML(mapOfProcessIdToTransactionParameter);
         System.assertNotEquals(null, transactionParameter.getRequestBody(), 'Request body should be populated');
         Test.stopTest();
     }
 
-    // charge transaction tests
+    /**
+     * charge transaction missing email case
+     */
     public static testMethod void ChargeTransactionMissingEmail()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // empty the email field
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
-        blng.TransactionResult transactionResult = callAndVerify(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
     }
 
+    /**
+     * charge transaction ACH success case
+     */
     public static testMethod void ChargeTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void ChargeTransactionCCnoPayTxnSuccess()
-    {
-        blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
-    }
-
-    public static testMethod void ChargeTransactionCCwithPayTxnSuccess()
+    /**
+     * charge transaction 'CC with payment transaction' success case
+     */
+    public static testMethod void ChargeTransactionCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * charge transaction 'CC with no payment transaction' success case
+     */
+    public static testMethod void ChargeTransactionCCnoPaymentTransactionSuccess()
+    {
+        blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
+    }
+
+    /**
+     * charge transaction reject case
+     */
     public static testMethod void ChargeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, INVALID_FIELD_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * charge transaction pending case
+     */
     public static testMethod void ChargeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '102', PENDING, null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '102', PENDING, null, null, GATEWAY_ID);
     }
 
+    /**
+     * charge transaction empty decision case
+     */
     public static testMethod void ChargeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(CHARGE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
-    
-    // Void transaction tests
+
+    /**
+     * void transaction ACH success case
+     */
     public static testMethod void VoidTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        callAndVerify(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * void transaction CC success case
+     */
     public static testMethod void VoidTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * void transaction reject case
+     */
     public static testMethod void VoidTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(VOID_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * void transaction pending case
+     */
     public static testMethod void VoidTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(VOID_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * void transaction empty decision case
+     */
     public static testMethod void VoidTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(VOID_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
-    // refund tests
+    /**
+     * refund transaction ACH success case
+     */
     public static testMethod void RefundTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void RefundTransactionCCPaymentTransactionSuccess()
+    /**
+     * refund transaction 'CC with payment transaction' success case
+     */
+    public static testMethod void RefundTransactionCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void RefundTransactionCCSuccess()
+    /**
+     * refund transaction 'CC without payment transaction' success case
+     */
+    public static testMethod void RefundTransactionCCnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * refund transaction reject case
+     */
     public static testMethod void RefundTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(REFUND_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * refund transaction pending case
+     */
     public static testMethod void RefundTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * refund transaction empty decision case
+     */
     public static testMethod void RefundTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
-    //NonReferredRefund tests
-    public static testMethod void NonReferredRefundACHPaymentTransactionSuccess()
+    /**
+     * NonReferred Refund 'ACH with payment transaction' success case
+     */
+    public static testMethod void NonReferredRefundACHwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void NonReferredRefundACHPaymentMethodSuccess()
+    /**
+     * NonReferred Refund 'ACH without payment transaction' success case
+     */
+    public static testMethod void NonReferredRefundACHnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void NonReferredRefundCCPaymentTransactionSuccess()
+    /**
+     * NonReferred Refund 'CC with payment transaction' success case
+     */
+    public static testMethod void NonReferredRefundCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
-    public static testMethod void NonReferredRefundCCPaymentMethodSuccess()
+    /**
+     * NonReferred Refund 'CC without payment transaction' success case
+     */
+    public static testMethod void NonReferredRefundCCnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * NonReferred Refund reject case
+     */
     public static testMethod void NonReferredRefundReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * NonReferred Refund pending case
+     */
     public static testMethod void NonReferredRefundPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * NonReferred Refund empty decision case
+     */
     public static testMethod void NonReferredRefundEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(NON_REFERRED_REFUND, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
-    //Void Refund Transaction tests
+    /**
+     * Void Refund ACH success case
+     */
     public static testMethod void VoidRefundTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
-        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * Void Refund CC success case
+     */
     public static testMethod void VoidRefundTransactionCCSuccess()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * Void Refund reject case
+     */
     public static testMethod void VoidRefundTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * Void Refund pending case
+     */
     public static testMethod void VoidRefundTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
     }
 
+    /**
+     * Void Refund empty decision case
+     */
     public static testMethod void VoidRefundTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupDataWithPaymentTransaction(PAYMENTTYPE_ACH);
+        // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        callAndVerify(VOID_REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
     }
 
-    //GetPaymentStatus tests
+    /**
+     * Payment Status success case
+     */
     public static testMethod void GetPaymentStatusSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // this api call does not need payment token, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        callAndVerify(GET_PAYMENT_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        invokeAPIAndVerifyResponse(GET_PAYMENT_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
+    /**
+     * Payment Status reject case
+     */
     public static testMethod void GetPaymentStatusReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // this api call does not need payment token, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
-        callAndVerify(GET_PAYMENT_STATUS, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
+        invokeAPIAndVerifyResponse(GET_PAYMENT_STATUS, transactionParameter, '101', FAILURE, null, REJECT_MESSAGE, null);
     }
 
-    //GetRefundStatus calls GetPaymentStatus
+    /**
+     * Refund Status calls Payment Status, so we test one case only
+     */
     public static testMethod void GetRefundStatusSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
+        // this api call does not need payment token, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        callAndVerify(GET_REFUND_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        invokeAPIAndVerifyResponse(GET_REFUND_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
     }
 
     /**
@@ -458,7 +625,7 @@ private class CyberSourceTest
     }
 
     /**
-     * inserts the config data
+     * inserts the gateway config data
      *
      * @return
      */
@@ -562,7 +729,7 @@ private class CyberSourceTest
      * @return
      */
     private static blng.TransactionParameter setupData(String paymentType) {
-        insert CyberSourceTest.getConfiguration();
+        insert getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
                 blng__GatewayType__c = 'CyberSource',
                 TestMode__c = true,
@@ -575,28 +742,31 @@ private class CyberSourceTest
         insert account;
 
         blng__PaymentMethod__c paymentMethod = new blng__PaymentMethod__c(
+                blng__Account__c = account.id,
+                blng__PaymentType__c = paymentType,
                 blng__BillingEmail__c = 'mani@test.com',
                 blng__BillingPhone__c = '650-965-6000',
                 blng__BillingFirstName__c = 'Manigandan',
                 blng__BillingLastName__c = 'SA',
-                blng__Account__c = account.id,
-                blng__CVV__c = '123',
-                blng__CardType__c = 'Mastercard',
-                blng__CardNumber__c = '4111111111111111',
-                blng__CardExpirationYear__c = '2021',
-                blng__CardExpirationMonth__c = '02',
                 blng__BillingCity__c = 'Mountain View',
                 blng__BillingStateProvince__c = 'CA',
                 blng__BillingZipPostal__c = '60602-1304',
                 blng__BillingCountry__c = 'United States',
-                blng__PaymentGatewayToken__c = '0138580717791111',
-                blng__PaymentType__c = paymentType,
-                blng__BankAccountNumber__c='4100',
-                blng__BankAccountName__c='ABC',
-                blng__BankAccountType__c='CHECKING',
-                blng__BankName__c='Test',
-                blng__BankRoutingCode__c='071923284'
+                blng__PaymentGatewayToken__c = '0138580717791111'
         );
+        if (PAYMENTTYPE_CREDITCARD.equals(paymentType)) {
+            paymentMethod.blng__CVV__c = '123';
+            paymentMethod.blng__CardType__c = 'Mastercard';
+            paymentMethod.blng__CardNumber__c = '4111111111111111';
+            paymentMethod.blng__CardExpirationYear__c = '2021';
+            paymentMethod.blng__CardExpirationMonth__c = '02';
+        } else {
+            paymentMethod.blng__BankAccountNumber__c='4100';
+            paymentMethod.blng__BankAccountName__c='ABC';
+            paymentMethod.blng__BankAccountType__c='CHECKING';
+            paymentMethod.blng__BankName__c='Test';
+            paymentMethod.blng__BankRoutingCode__c='071923284';
+        }
         insert paymentMethod;
 
         blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
@@ -642,7 +812,7 @@ private class CyberSourceTest
     }
 
     /**
-     * assembles rapameters for the callout, makes the api call, asserts
+     * assembles parameter for the callout, makes the api call, asserts
      * returns the TransactionResult for the caller to make further asserts particular to the test cases
      *
      * @param apiMethod
@@ -655,7 +825,7 @@ private class CyberSourceTest
      *
      * @return
      */
-    private static blng.TransactionResult callAndVerify(
+    private static blng.TransactionResult invokeAPIAndVerifyResponse(
             String apiMethod,
             blng.TransactionParameter transactionParameter,
             String responseCode,
@@ -663,13 +833,13 @@ private class CyberSourceTest
             String responseMessage,
             String responseCodeMessage,
             String gatewayId) {
-        Map<String, blng.TransactionParameter> mapOfTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
+        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
         paymentGatewayParameter.setTransactionType(apiMethod);
 
         Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfTransactionParameter, paymentGatewayParameter);
+        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfProcessIdToTransactionParameter, paymentGatewayParameter);
         System.assertNotEquals(0, response.size(), apiMethod + ' should return a transaction result');
         blng.TransactionResult transactionResult = response.values().get(0);
 
