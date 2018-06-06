@@ -125,7 +125,7 @@ private class CyberSourceTest
         // set the email as blank
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
         blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
-        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 
     /**
@@ -414,7 +414,7 @@ private class CyberSourceTest
         // empty the email field
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
         blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
-        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus());
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 
     /**
@@ -1015,7 +1015,7 @@ private class CyberSourceTest
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         transactionResult.setResponseCode('100');
         CyberSourceAPI.populateGatewayStatus(transactionResult);
-        System.assertEquals(blng.TransactionResult.GatewayStatusType.Success, transactionResult.getGatewayStatus());
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.Success, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 
     /**
@@ -1034,7 +1034,7 @@ private class CyberSourceTest
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         transactionResult.setResponseCode('MISSING_CODE');
         CyberSourceAPI.populateGatewayStatus(transactionResult);
-        System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 
     /**
@@ -1052,7 +1052,7 @@ private class CyberSourceTest
     {
         blng.TransactionResult transactionResult = new blng.TransactionResult();
         CyberSourceAPI.populateGatewayStatus(transactionResult);
-        System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus());
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.Indeterminate, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 
     /**

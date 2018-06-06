@@ -2573,14 +2573,20 @@ public class CyberSourceUtils
     }
 
     /**
-     * Method verifies if any field name was added to Invoice and InvoiceLine config
-     * If the field type is not TEXTAREA, then the process is aborted and the appropriate
-     * TransactionResult is returned.
-     * @param mapOfProcessIdToTransactionParameterById
-     * @param invoiceDetailAPIValue
-     *
-     * @return
-     */
+    * @name validateInvoiceConfig
+    * @description
+    * Method verifies if any field name was added to Invoice and InvoiceLine config
+    * If the field type is not TEXTAREA, then the process is aborted and the appropriate
+    * TransactionResult is returned.
+    * @param mapOfProcessIdToTransactionParameterById
+    * @param invoiceDetailAPIValue
+    * @return Map<String, blng.TransactionResult>
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
     public static Map<String, blng.TransactionResult> validateInvoiceConfig(
             Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameterById,
             String invoiceDetailAPIValue)
@@ -2607,6 +2613,19 @@ public class CyberSourceUtils
         return mapOfProcessIdToTransactionParameter;
     }
 
+    /**
+    * @name handleInvoiceConfigError
+    * @description sets the error response messages in TransactionResult
+    * @param configAPIValue
+    * @param mapOfProcessIdToTransactionParameterById
+    * @param mapOfProcessIdToTransactionParameter
+    * @return Map<String, blng.TransactionResult>
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-5
+    * @remark
+    * @change
+    */
     private static Map<String, blng.TransactionResult> handleInvoiceConfigError(
             string configAPIValue,
             Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameterById,
