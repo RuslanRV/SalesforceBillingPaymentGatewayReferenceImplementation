@@ -20,6 +20,7 @@ private class CyberSourceTest
     private static final String EMAIL_MISSING = 'Email is Missing';
     private static final String INVALID_FIELD_MESSAGE = 'Invalid Field X'; // some arbitrary value we have in the soap responses
     private static final String GATEWAY_ID = '4436893298465000001516'; // some arbitrary value we have in the soap responses
+    private static final String SUBSCRIPTION_ID = '123456'; // some arbitrary value we have in the soap responses
 
     private static final String GENERATE_TOKEN = 'generateToken';
     private static final String AUTHORIZE_TRANSACTION = 'authorizeTransaction';
@@ -82,7 +83,8 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // setupData sets the payment token, but since generate token does does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        System.assertEquals(SUBSCRIPTION_ID, transactionResult.getPaymentToken(), 'Wrong Payment Token');
     }
 
     /**
@@ -142,7 +144,8 @@ private class CyberSourceTest
     public static testMethod void testVoidTokenTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_ACH);
-        invokeAPIAndVerifyResponse(VOID_TOKEN_TRANSACTION, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(VOID_TOKEN_TRANSACTION, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        System.assertEquals(SUBSCRIPTION_ID, transactionResult.getPaymentToken(), 'Wrong Payment Token');
     }
 
     /**
@@ -178,8 +181,6 @@ private class CyberSourceTest
     public static testMethod void testAuthorizeTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        // payment token does not exist for this api call, so empty it
-        transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '100', SUCCESS, INVALID_FIELD_MESSAGE, SUCCESS_MESSAGE, GATEWAY_ID);
     }
 
@@ -197,8 +198,6 @@ private class CyberSourceTest
     public static testMethod void testAuthorizeTransactionReject()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        // payment token does not exist for this api call, so empty it
-        transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
         invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, REJECT_MESSAGE, GATEWAY_ID);
@@ -218,8 +217,6 @@ private class CyberSourceTest
     public static testMethod void testAuthorizeTransactionPending()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        // payment token does not exist for this api call, so empty it
-        transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // change the response message to be the pending message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
         invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
@@ -239,8 +236,6 @@ private class CyberSourceTest
     public static testMethod void testAuthorizeTransactionEmptyDecision()
     {
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
-        // payment token does not exist for this api call, so empty it
-        transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // change the response message to be the empty <decision> message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
         invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
@@ -956,7 +951,8 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // this api call does not need payment token, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        invokeAPIAndVerifyResponse(GET_PAYMENT_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GET_PAYMENT_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        System.assertEquals(SUBSCRIPTION_ID, transactionResult.getPaymentToken(), 'Wrong Payment Token');
     }
 
     /**
@@ -996,7 +992,8 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = setupData(PAYMENTTYPE_CREDITCARD);
         // this api call does not need payment token, so empty it
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
-        invokeAPIAndVerifyResponse(GET_REFUND_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GET_REFUND_STATUS, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        System.assertEquals(SUBSCRIPTION_ID, transactionResult.getPaymentToken(), 'Wrong Payment Token');
     }
 
     /**
