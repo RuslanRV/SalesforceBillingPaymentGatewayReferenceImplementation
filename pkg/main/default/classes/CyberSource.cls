@@ -108,7 +108,7 @@ public class CyberSource
     {
         try {
              Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            if(!mapOfTransactionParameterById.IsEmpty())
+            if(!mapOfTransactionParameterById.isEmpty())
             {
                 // check validate Customer Details
                 CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
@@ -467,7 +467,7 @@ public class CyberSource
         try {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
             Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
-            if (mapOfTransactionResultById.size() > 0) {
+            if (!mapOfTransactionResultById.isEmpty()) {
                 return mapOfTransactionResultById;
             }
             for(String idToProcess : mapOfTransactionParameterById.keySet())
@@ -598,7 +598,7 @@ public class CyberSource
         try {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
             Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
-            if (mapOfTransactionResultById.size() > 0) {
+            if (!mapOfTransactionResultById.isEmpty()) {
                 return mapOfTransactionResultById;
             }
             for(String idToProcess : mapOfTransactionParameterById.keySet())
@@ -893,7 +893,7 @@ public class CyberSource
         try {
             String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
             Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
-            if (mapOfTransactionResultById.size() > 0) {
+            if (!mapOfTransactionResultById.isEmpty()) {
                 return mapOfTransactionResultById;
             }
             for(String idToProcess : mapOfTransactionParameterById.keySet())
@@ -1290,7 +1290,7 @@ public class CyberSource
     public Map<String, blng.TransactionResult> getPaymentStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         try {
-            if(!mapOfTransactionParameterById.IsEmpty())
+            if(!mapOfTransactionParameterById.isEmpty())
             {
                 CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
                 // Calling CyberSourceUtils class to populate the Request for generate get Payment Status XML
@@ -1403,7 +1403,7 @@ public class CyberSource
                      WHERE ResponseCode__c = :returnCode
                      LIMIT 1
              ];
-             if (gatewayStatusMaps.size() > 0) {
+             if (!gatewayStatusMaps.isEmpty()) {
                  gatewayStatus = mapGatewayStatusEnumTypesByStrings.get(gatewayStatusMaps.get(0).GatewayStatus__c);
                  if (gatewayStatus == null) {
                      gatewayStatus = defaultGatewayStatus;
