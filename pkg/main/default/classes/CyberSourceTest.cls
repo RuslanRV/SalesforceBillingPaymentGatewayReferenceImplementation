@@ -1233,17 +1233,17 @@ private class CyberSourceTest
     */
     private static blng.TransactionParameter createParamNoPaymentTransaction(String paymentType) {
         // Query Account
-        blng.QueryBuilder qBuilderForAccount = new QueryBuilder(Account.SObjectType);
+        blng.QueryBuilder qBuilderForAccount = new blng.QueryBuilder(Account.SObjectType);
         qBuilderForAccount.getSelectClause().
                 addFields(Schema.SObjectType.Account.fields.getMap().values());
 
         // Query Gateway
-        blng.QueryBuilder qBuilderForGateway = new QueryBuilder(blng__PaymentGateway__c.SObjectType);
+        blng.QueryBuilder qBuilderForGateway = new blng.QueryBuilder(blng__PaymentGateway__c.SObjectType);
         qBuilderForGateway.getSelectClause().
                 addFields(Schema.SObjectType.blng__PaymentGateway__c.fields.getMap().values());
 
         // Query PaymentMethod
-        blng.QueryBuilder qBuilderForPaymentMethod = new QueryBuilder(blng__PaymentMethod__c.SObjectType);
+        blng.QueryBuilder qBuilderForPaymentMethod = new blng.QueryBuilder(blng__PaymentMethod__c.SObjectType);
         qBuilderForPaymentMethod.getSelectClause().
                 addFields(Schema.SObjectType.blng__PaymentMethod__c.fields.getMap().values());
 
@@ -1283,7 +1283,7 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(paymentType);
 
         // Query Payment Transaction
-        blng.QueryBuilder qBuilderForPaymentTransaction = new QueryBuilder(blng__PaymentTransaction__c.SObjectType);
+        blng.QueryBuilder qBuilderForPaymentTransaction = new blng.QueryBuilder(blng__PaymentTransaction__c.SObjectType);
         qBuilderForPaymentTransaction.getSelectClause().
                 addFields(Schema.SObjectType.blng__PaymentTransaction__c.fields.getMap().values());
 
