@@ -1233,19 +1233,19 @@ private class CyberSourceTest
     */
     private static blng.TransactionParameter createParamNoPaymentTransaction(String paymentType) {
         // Query Account
-        QueryBuilder qBuilderForAccount = new QueryBuilder(Account.SObjectType);
+        blng.QueryBuilder qBuilderForAccount = new QueryBuilder(Account.SObjectType);
         qBuilderForAccount.getSelectClause().
                 addFields(Schema.SObjectType.Account.fields.getMap().values());
 
         // Query Gateway
-        QueryBuilder qBuilderForGateway = new QueryBuilder(PaymentGateway__c.SObjectType);
+        blng.QueryBuilder qBuilderForGateway = new QueryBuilder(blng__PaymentGateway__c.SObjectType);
         qBuilderForGateway.getSelectClause().
-                addFields(Schema.SObjectType.PaymentGateway__c.fields.getMap().values());
+                addFields(Schema.SObjectType.blng__PaymentGateway__c.fields.getMap().values());
 
         // Query PaymentMethod
-        QueryBuilder qBuilderForPaymentMethod = new QueryBuilder(PaymentMethod__c.SObjectType);
+        blng.QueryBuilder qBuilderForPaymentMethod = new QueryBuilder(blng__PaymentMethod__c.SObjectType);
         qBuilderForPaymentMethod.getSelectClause().
-                addFields(Schema.SObjectType.PaymentMethod__c.fields.getMap().values());
+                addFields(Schema.SObjectType.blng__PaymentMethod__c.fields.getMap().values());
 
         blng.TransactionParameter transactionParameter = new blng.TransactionParameter();
         transactionParameter.SetAccount((Account)Database.query(qBuilderForAccount.buildSOQL())[0]);
@@ -1260,8 +1260,8 @@ private class CyberSourceTest
         transactionParameter.setPhone('111');
         transactionParameter.setCurrencyId('USD');
         transactionParameter.setAmount('1.00');
-        transactionParameter.setGateWay((PaymentGateway__c)Database.query(qBuilderForGateway.buildSOQL())[0]);
-        transactionParameter.setPaymentMethod((PaymentMethod__c) Database.query(qBuilderForPaymentMethod.buildSOQL())[0]);
+        transactionParameter.setGateWay((blng__PaymentGateway__c)Database.query(qBuilderForGateway.buildSOQL())[0]);
+        transactionParameter.setPaymentMethod((blng__PaymentMethod__c) Database.query(qBuilderForPaymentMethod.buildSOQL())[0]);
         transactionParameter.getPaymentMethod().blng__PaymentType__c = paymentType;
         transactionParameter.getGateWay().TestMode__c = true;
         return transactionParameter;
@@ -1283,11 +1283,11 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(paymentType);
 
         // Query Payment Transaction
-        QueryBuilder qBuilderForPaymentTransaction = new QueryBuilder(PaymentTransaction__c.SObjectType);
+        blng.QueryBuilder qBuilderForPaymentTransaction = new QueryBuilder(blng__PaymentTransaction__c.SObjectType);
         qBuilderForPaymentTransaction.getSelectClause().
-                addFields(Schema.SObjectType.PaymentTransaction__c.fields.getMap().values());
+                addFields(Schema.SObjectType.blng__PaymentTransaction__c.fields.getMap().values());
 
-        transactionParameter.setTransaction((PaymentTransaction__c) Database.query(qBuilderForPaymentTransaction.buildSOQL())[0]);
+        transactionParameter.setTransaction((blng__PaymentTransaction__c) Database.query(qBuilderForPaymentTransaction.buildSOQL())[0]);
         transactionParameter.getTransaction().blng__RequestTypeOfPayment__c = paymentType;
         return transactionParameter;
     }
