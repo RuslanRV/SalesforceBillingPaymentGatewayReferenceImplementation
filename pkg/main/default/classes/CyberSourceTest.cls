@@ -1171,7 +1171,10 @@ private class CyberSourceTest
     static void setup() {
         insert getConfiguration();
         blng__PaymentGateway__c gateway = new blng__PaymentGateway__c(
+                Name = 'CyberSource',
                 blng__GatewayType__c = 'CyberSource',
+                blng__Default__c = true,
+                blng__Active__c = true,
                 TestMode__c = true,
                 MerchantID__c = 'salesforcebilling',
                 MerchantReference__c= 'salesforcebilling',
@@ -1233,17 +1236,17 @@ private class CyberSourceTest
     */
     private static blng.TransactionParameter createParamNoPaymentTransaction(String paymentType) {
         // Query Account
-        blng.QueryBuilder qBuilderForAccount = new blng.QueryBuilder(Account.SObjectType);
+        CyberSourceQueryUtils qBuilderForAccount = new CyberSourceQueryUtils(Account.SObjectType);
         qBuilderForAccount.getSelectClause().
                 addFields(Schema.SObjectType.Account.fields.getMap().values());
 
         // Query Gateway
-        blng.QueryBuilder qBuilderForGateway = new blng.QueryBuilder(blng__PaymentGateway__c.SObjectType);
+        CyberSourceQueryUtils qBuilderForGateway = new CyberSourceQueryUtils(blng__PaymentGateway__c.SObjectType);
         qBuilderForGateway.getSelectClause().
                 addFields(Schema.SObjectType.blng__PaymentGateway__c.fields.getMap().values());
 
         // Query PaymentMethod
-        blng.QueryBuilder qBuilderForPaymentMethod = new blng.QueryBuilder(blng__PaymentMethod__c.SObjectType);
+        CyberSourceQueryUtils qBuilderForPaymentMethod = new CyberSourceQueryUtils(blng__PaymentMethod__c.SObjectType);
         qBuilderForPaymentMethod.getSelectClause().
                 addFields(Schema.SObjectType.blng__PaymentMethod__c.fields.getMap().values());
 
@@ -1264,6 +1267,9 @@ private class CyberSourceTest
         transactionParameter.setPaymentMethod((blng__PaymentMethod__c) Database.query(qBuilderForPaymentMethod.buildSOQL())[0]);
         transactionParameter.getPaymentMethod().blng__PaymentType__c = paymentType;
         transactionParameter.getGateWay().TestMode__c = true;
+        transactionParameter.getGateWay().MerchantID__c = 'salesforcebilling';
+        transactionParameter.getGateWay().MerchantReference__c = 'salesforcebilling';
+        transactionParameter.getGateWay().TransactionSecurityKey__c = '465456';
         return transactionParameter;
     }
 
@@ -1283,7 +1289,7 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(paymentType);
 
         // Query Payment Transaction
-        blng.QueryBuilder qBuilderForPaymentTransaction = new blng.QueryBuilder(blng__PaymentTransaction__c.SObjectType);
+        CyberSourceQueryUtils qBuilderForPaymentTransaction = new CyberSourceQueryUtils(blng__PaymentTransaction__c.SObjectType);
         qBuilderForPaymentTransaction.getSelectClause().
                 addFields(Schema.SObjectType.blng__PaymentTransaction__c.fields.getMap().values());
 
