@@ -66,9 +66,14 @@ public class CyberSource
         // default Gateway Status
         private static final blng.TransactionResult.GatewayStatusType defaultGatewayStatus = blng.TransactionResult.GatewayStatusType.Indeterminate;
     // ============================================================================
-    // VARIABLES
+    // EXCEPTION CONSTANTS
     // ============================================================================
-       
+    private static final String FAILED_GATEWAY_SETTINGS = 'Gateway is missing required settings';
+    private static final String FAILED_CUSTOMER_VALIDATION = 'Customer validation failed';
+    private static final String FAILED_XML_GENERATION = 'XML generation failed';
+    private static final String FAILED_CALLOUT = 'Gateway callout failed';
+    private static final String FAILED_POPULATING_RESULT = 'Error in populating transaction result';
+    private static final String FAILED_IN_CATCH_ALL = 'Error in gateway API service';
     // ============================================================================
     // Methods
     // ============================================================================
@@ -160,12 +165,11 @@ public class CyberSource
                 }
             } 
             // Calling populate Transaction Result For token class to Return map of transaction results
-            
             return populateTransactionResultForToken(mapOfTransactionParameterById);
         }
         catch (Exception e) 
         {
-            throw e; 
+            throw e;
         }    
     }
     
@@ -182,20 +186,18 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure
-                if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
-                {
+                if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT) {
                     // The response is success
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
                     transactionParameterToProcess.transactionResult.setIsSuccess(true);
-                }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
-                {
+                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT) {
                     // The response is FAILURE
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
@@ -203,24 +205,21 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
-                
-                if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
-                {
+
+                if (NULL != transactionParameterToProcess.transactionResult.getResponseCode()) {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
-                } 
+                }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw e; 
-        }   
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
    /**
     * @name voidTokenTransaction
@@ -293,15 +292,16 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForVoidToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
-                    //The response is success 
+                    //The response is success
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
                     transactionParameterToProcess.transactionResult.setIsSuccess(true);
                 }
@@ -314,24 +314,21 @@ public class CyberSource
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
-                
+
                 if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
                 {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
-                } 
+                }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw e; 
-        }   
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
     /**
     * @name authorizeTransaction
@@ -401,39 +398,31 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForAuthorize(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet()) {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure
-                if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
-                {
+                if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT) {
                     // The response is success
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
                     transactionParameterToProcess.transactionResult.setIsSuccess(true);
-                }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
-                {
+                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT) {
                     // The response is failure
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
-                {
+                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING) {
                     // The response is PENDING
                     transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
+                } else {
                     transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
-                if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
-                {
+                if (NULL != transactionParameterToProcess.transactionResult.getResponseCode()) {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
                 }
                 //Populating payment gateway response
@@ -441,15 +430,13 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw e; 
-        }    
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
     /**
     * @name captureTransaction
@@ -531,56 +518,46 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForCapture(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for (String idToProcess : mapOfTransactionParameterById.KeySet()) {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure
-                if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
-                {
+                if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT) {
                     //The response is success
                     transactionParameterToProcess.transactionResult.setResponseToValidate(SUCCESS);
                     transactionParameterToProcess.transactionResult.setIsSuccess(true);
                     transactionParameterToProcess.transactionResult.setResponseMessage('SUCCESS');
-                }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT)
-                {
-                     //The response is failure
+                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == REJECT) {
+                    //The response is failure
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                     transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
-                }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
-                {
-                     //The response is Pending
+                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING) {
+                    //The response is Pending
                     transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
-                   transactionParameterToProcess.transactionResult.setResponseToValidate('');
+                } else {
+                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
-               transactionParameterToProcess.transactionResult.setId(idToProcess);
-               transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
-               if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
-                {
+                transactionParameterToProcess.transactionResult.setId(idToProcess);
+                transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
+                if (NULL != transactionParameterToProcess.transactionResult.getResponseCode()) {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
                 }
                 //Populating payment gateway response
-               transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
-               //Populate gateway status
-               populateGatewayStatus(transactionParameterToProcess.transactionResult);
-               mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+                transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw e; 
-        }      
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
     /**
     * @name chargeTransaction
@@ -687,11 +664,12 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForCharge(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure or pending
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
@@ -718,12 +696,12 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
-               transactionParameterToProcess.transactionResult.setId(idToProcess);
+                transactionParameterToProcess.transactionResult.setId(idToProcess);
                 if (transactionParameterToProcess.transactionResult.getResponseToValidate() != EMAIL_MISSING)
                 {
                    transactionParameterToProcess.transactionResult.setResponseCode(transactionParameterToProcess.getResponseValueByKey().get(REASONCODE));
                 }
-               if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
+                if(NULL != transactionParameterToProcess.transactionResult.getResponseCode())
                 {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
                 }
@@ -737,19 +715,15 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 }
                 //Populating payment gateway response
-                
-               transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
-               //Populate gateway status
-               populateGatewayStatus(transactionParameterToProcess.transactionResult);
-               mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+                transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
+                //Populate gateway status
+                populateGatewayStatus(transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw e; 
-        }      
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
 
     /**
@@ -807,10 +781,10 @@ public class CyberSource
             // Calling populate Transaction Result For void class to Return map of transaction results
             return populateTransactionResultForVoid(mapOfTransactionParameterById);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
-            throw  e; 
-        }         
+            throw  e;
+        }
     }
     
      /**
@@ -826,11 +800,12 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForVoid(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure or Pending
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
@@ -866,15 +841,12 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw  e; 
-        }     
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
 
     /**
@@ -940,10 +912,10 @@ public class CyberSource
             // Calling populate Transaction Result For Refund class to Return map of transaction results
             return populateTransactionResultForRefund(mapOfTransactionParameterById);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
-            throw  e; 
-        }     
+            throw  e;
+        }
     }
 
      /**
@@ -959,11 +931,12 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure or Pending
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
@@ -999,15 +972,12 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw  e;  
-        }    
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
 /**
     * @name nonReferencedRefund
@@ -1100,11 +1070,12 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultFornonReferencedRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure or Pending
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
@@ -1140,15 +1111,12 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw  e;  
-        }    
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     } 
 
     /**
@@ -1225,11 +1193,12 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForvoidRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure or pending
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
@@ -1265,15 +1234,12 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            // Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw  e; 
-        }     
+        // Return map of transaction results
+        return mapOfTransactionResultById;
     }
 
     /**
@@ -1347,11 +1313,12 @@ public class CyberSource
     */ 
     public Map<String, blng.TransactionResult> populateTransactionResultForgetPaymentStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            for(String idToProcess : mapOfTransactionParameterById.KeySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        for(String idToProcess : mapOfTransactionParameterById.KeySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 //Populating the transaction Parameter class based on the response is success or failure
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
@@ -1377,15 +1344,12 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
-                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            //Return map of transaction results
-            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
-        {
-            throw e; 
-        }   
+        //Return map of transaction results
+        return mapOfTransactionResultById;
     }
 
     /**
@@ -1412,4 +1376,29 @@ public class CyberSource
          }
          transactionResult.setGatewayStatus(gatewayStatus);
      }
+
+    /**
+    * @name handleError
+    * @description populates TransactionResult with error values
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-20
+    * @remark
+    * @change
+    */
+    private void handleError(blng.TransactionResult transactionResult,
+            String pointOfFailure,
+            blng.TransactionResult.GatewayStatusType gatewayStatus,
+            Exception e) {
+        transactionResult.setIsSuccess(false);
+        transactionResult.setError(pointOfFailure + (e != null ? ': ' + e.getMessage() : ''));
+        transactionResult.setResponseToValidate(FAILURE);
+        if (transactionResult.getResponseCode() != null) {
+            populateGatewayStatus(transactionResult);
+        } else {
+            transactionResult.setGatewayStatus(gatewayStatus);
+        }
+    }
 }
