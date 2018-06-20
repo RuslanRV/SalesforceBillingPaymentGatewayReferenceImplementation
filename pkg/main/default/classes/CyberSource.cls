@@ -39,16 +39,6 @@ public class CyberSource
         private static final String PAYMENTTYPE_CREDITCARD = 'Credit Card';
         private static final String PAYMENTTYPE_ACH = 'ACH';
         public static String TEST_REQUEST_BODY_CYBER_SOURCE = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision>ACCEPT</c:decision><c:reasonCode>100</c:reasonCode><c:invalidField>Invalid Field X</c:invalidField><c:subscriptionID>123456</c:subscriptionID><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>100</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>100</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>100</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
-        private static final String GENERATE_TOKEN = 'generateToken ';
-        private static final String POPULATE_GENERATE_TOKEN = 'populateTransactionResultForToken ';
-        private static final String AUTHORIZE_TRANSACTION = 'authorizeTransaction ';
-        private static final String POPULATE_AUTHORIZE_TRANSACTION = 'populateTransactionResultForAuthorize ';
-        private static final String CHARGE_TRANSACTION = 'chargeTransaction ';
-        private static final String POPULATE_CHARGE_TRANSACTION = 'populateTransactionResultForCharge ';
-        private static final String VOID_TRANSACTION = 'voidTransaction ';
-        private static final String POPULATE_VOID_TRANSACTION = 'populateTransactionResultForVoid ';
-        private static final String REFUND_TRANSACTION = 'refundTransaction ';
-        private static final String POPULATE_REFUND_TRANSACTION = 'populateTransactionResultForRefund ';
     // ============================================================================
     // STATIC VARIABLES
     // ============================================================================    
@@ -68,12 +58,12 @@ public class CyberSource
     // ============================================================================
     // EXCEPTION CONSTANTS
     // ============================================================================
-    private static final String FAILED_GATEWAY_SETTINGS = 'Gateway is missing required settings';
-    private static final String FAILED_CUSTOMER_VALIDATION = 'Customer validation failed';
-    private static final String FAILED_XML_GENERATION = 'XML generation failed';
-    private static final String FAILED_CALLOUT = 'Gateway callout failed';
-    private static final String FAILED_POPULATING_RESULT = 'Error in populating transaction result';
-    private static final String FAILED_IN_CATCH_ALL = 'Error in gateway API service';
+        private static final String FAILED_GATEWAY_SETTINGS = 'Gateway is missing required settings';
+        private static final String FAILED_CUSTOMER_VALIDATION = 'Customer validation failed';
+        private static final String FAILED_XML_GENERATION = 'XML generation failed';
+        private static final String FAILED_CALLOUT = 'Gateway callout failed';
+        private static final String FAILED_POPULATING_RESULT = 'Error in populating transaction result';
+        private static final String FAILED_IN_CATCH_ALL = 'Error in gateway API service';
     // ============================================================================
     // Methods
     // ============================================================================
@@ -111,66 +101,59 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> generateToken(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-             Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
-            if(!mapOfTransactionParameterById.isEmpty())
-            {
-                // check validate Customer Details
-                CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
-                // Calling CyberSourceUtils class to populate the Request for generate Token XML
-                CyberSourceUtils.getInstance().generateTokenXML(mapOfTransactionParameterById.Values());
-                for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
-                {
-                    try {
-                        // Calling CyberSourceHttpService class to send a Request
-                        if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c) )
-                        {
-                            try {
-                                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                                sendHttpRequest.addHeader('Content-type', 'text/xml');
-                                sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                                // Sends the request to payment gateway
-                                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION, transactionParameterToProcess.getRequestBody());
-
-                                if (!Test.isRunningTest()) {
-                                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-
-                                } else {
-                                    Dom.Document doc = new Dom.Document();
-                                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
-                                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                                }
-                            } catch (Exception e) {
-                                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                            }
-                        } else {
-                            string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
-                            transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
-                            transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                            transactionParameterToProcess.transactionResult.setResponseMessage('FAILURE');
-                            transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                            transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information: Email');
-                            transactionParameterToProcess.transactionResult.setGatewayId(NULL);
-                            transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-                            mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
-                            return mapOfTransactionResultById;
-                        }
-                    }
-                    catch (Exception e) 
-                    {
-                        transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                        transactionParameterToProcess.transactionResult.setError(e.getMessage());
-                    }    
-                }
-            } 
-            // Calling populate Transaction Result For token class to Return map of transaction results
-            return populateTransactionResultForToken(mapOfTransactionParameterById);
-        }
-        catch (Exception e) 
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = new Map<String, blng.TransactionResult>();
+        if(!mapOfTransactionParameterById.isEmpty())
         {
-            throw e;
-        }    
+            // TODO validate cust and generate XML will be inside for-loop and have their own try-catch
+            // check validate Customer Details
+            CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
+            // Calling CyberSourceUtils class to populate the Request for generate Token XML
+            CyberSourceUtils.getInstance().generateTokenXML(mapOfTransactionParameterById.Values());
+            for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+            {
+                try {
+                    // Calling CyberSourceHttpService class to send a Request
+                    if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c) )
+                    {
+                        try {
+                            CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                            sendHttpRequest.addHeader('Content-type', 'text/xml');
+                            sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                            // Sends the request to payment gateway
+                            sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION, transactionParameterToProcess.getRequestBody());
+
+                            if (!Test.isRunningTest()) {
+                                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                                transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                            } else {
+                                Dom.Document doc = new Dom.Document();
+                                doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                                transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                            }
+                        } catch (Exception e) {
+                            handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                        }
+                    } else {
+                        string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
+                        transactionParameterToProcess.transactionResult.setResponseToValidate('FAILURE');
+                        transactionParameterToProcess.transactionResult.setIsSuccess(false);
+                        transactionParameterToProcess.transactionResult.setResponseMessage('FAILURE');
+                        transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                        transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information: Email');
+                        transactionParameterToProcess.transactionResult.setGatewayId(NULL);
+                        transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
+                        mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
+                        return mapOfTransactionResultById;
+                    }
+                }
+                catch (Exception e)
+                {
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_IN_CATCH_ALL, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                }
+            }
+        }
+        // Calling populate Transaction Result For token class to Return map of transaction results
+        return populateTransactionResultForToken(mapOfTransactionParameterById);
     }
     
     /**
@@ -231,49 +214,41 @@ public class CyberSource
     * @created 2017-06-02
     * @remark 
     * @change
-    */  
+    */
     public Map<String, blng.TransactionResult> voidTokenTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            if(!mapOfTransactionParameterById.IsEmpty())
-            {
-                // check validate Customer Details
-                //CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
-                // Calling CyberSourceUtils class to populate the Request for generate void token XML
-                CyberSourceUtils.getInstance().generateVoidTokenXML(mapOfTransactionParameterById.Values());
-                for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
-                {
-                    try {
-                        // Calling CyberSourceHttpService class to send a Request
-                        CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                        sendHttpRequest.addHeader('Content-type', 'text/xml');
-                        sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                        // Sends the request to payment gateway
-                        sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                        if(!Test.isRunningTest())
-                        {
-                            // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                            transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                             
-                        }
-                        else
-                        {
-                            Dom.Document doc = new Dom.Document();
-                            doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                            transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                        }
-                    } catch (Exception e) {
-                        handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                    }
-                }
-            } 
-            // Calling populate Transaction Result For Void Token class to Return map of transaction results
-            return populateTransactionResultForVoidToken(mapOfTransactionParameterById);
-        }
-        catch (Exception e) 
+        if(!mapOfTransactionParameterById.IsEmpty())
         {
-            throw e; 
-        }    
+            // TODO generateXML will be inside for-loop and will have its own try-catch
+            // Calling CyberSourceUtils class to populate the Request for generate void token XML
+            CyberSourceUtils.getInstance().generateVoidTokenXML(mapOfTransactionParameterById.Values());
+            for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+            {
+                try {
+                    // Calling CyberSourceHttpService class to send a Request
+                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                    sendHttpRequest.addHeader('Content-type', 'text/xml');
+                    sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                    // Sends the request to payment gateway
+                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                    if(!Test.isRunningTest())
+                    {
+                        // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                    }
+                    else
+                    {
+                        Dom.Document doc = new Dom.Document();
+                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                    }
+                } catch (Exception e) {
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                }
+            }
+        }
+        // Calling populate Transaction Result For Void Token class to Return map of transaction results
+        return populateTransactionResultForVoidToken(mapOfTransactionParameterById);
     }
     
     /**
@@ -320,6 +295,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
@@ -340,43 +316,35 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> authorizeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            // Calling CyberSourceUtils class to populate the Request for generate Authorize XML
-            CyberSourceUtils.getInstance().generateAuthorizeXML(mapOfTransactionParameterById);
-            for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
-            {
-                try {
-                    // Calling CyberSourceHttpService class to send a Request
-                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    // Sends the request to payment gateway
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                    if(!Test.isRunningTest())
-                    {
-
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                    }
-                    else
-                    {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                }
-            }
-            // Calling populate Transaction Result For Authorize class to Return map of transaction results
-			
-            return populateTransactionResultForAuthorize(mapOfTransactionParameterById);
-        }
-        
-        catch (Exception e) 
+        // TODO generateXML will be inside for-loop and will have its one try-catch
+        // Calling CyberSourceUtils class to populate the Request for generate Authorize XML
+        CyberSourceUtils.getInstance().generateAuthorizeXML(mapOfTransactionParameterById);
+        for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
         {
-            throw e; 
-        }    
+            try {
+                // Calling CyberSourceHttpService class to send a Request
+                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                sendHttpRequest.addHeader('Content-type', 'text/xml');
+                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                // Sends the request to payment gateway
+                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                if(!Test.isRunningTest())
+                {
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                }
+                else
+                {
+                    Dom.Document doc = new Dom.Document();
+                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+            }
+        }
+        // Calling populate Transaction Result For Authorize class to Return map of transaction results
+        return populateTransactionResultForAuthorize(mapOfTransactionParameterById);
     }
     
     /**
@@ -445,61 +413,57 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> captureTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
-            if (!mapOfTransactionResultById.isEmpty()) {
-                return mapOfTransactionResultById;
-            }
-            for(String idToProcess : mapOfTransactionParameterById.keySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try {
-                    if (transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD) {
-                        if (NULL != invoiceDetailAPIValue) {
-                            CyberSourceUtils.getInstance().generateCaptureLevel3XML(new Map<String, blng.TransactionParameter>{
-                                    idToProcess => transactionParameterToProcess
-                            });
-                        } else {
-                            // Calling CyberSourceUtils class to populate the Request for generate Capture XML for Credit card
-                            CyberSourceUtils.getInstance().generateCaptureXML(new Map<String, blng.TransactionParameter>{
-                                    idToProcess => transactionParameterToProcess
-                            });
-                        }
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
-                }
-                try {
-                    // Calling CyberSourceHttpService class to send a Request
-                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    // Sends the request to payment gateway
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                    if(!Test.isRunningTest())
-                    {
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                    }
-                    else
-                    {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                }
-            }
-            // Calling populate Transaction Result For Capture class to Return map of transaction results
-            return populateTransactionResultForCapture(mapOfTransactionParameterById);
+        String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
+        if (!mapOfTransactionResultById.isEmpty()) {
+            return mapOfTransactionResultById;
         }
-        catch (Exception e) 
+        // there is no invoice config error, so we proceed
+        for(String idToProcess : mapOfTransactionParameterById.keySet())
         {
-            
-            throw  e; 
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                if (transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD) {
+                    if (NULL != invoiceDetailAPIValue) {
+                        CyberSourceUtils.getInstance().generateCaptureLevel3XML(new Map<String, blng.TransactionParameter>{
+                                idToProcess => transactionParameterToProcess
+                        });
+                    } else {
+                        // Calling CyberSourceUtils class to populate the Request for generate Capture XML for Credit card
+                        CyberSourceUtils.getInstance().generateCaptureXML(new Map<String, blng.TransactionParameter>{
+                                idToProcess => transactionParameterToProcess
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                continue;
+            }
+            try {
+                // Calling CyberSourceHttpService class to send a Request
+                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                sendHttpRequest.addHeader('Content-type', 'text/xml');
+                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                // Sends the request to payment gateway
+                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                if(!Test.isRunningTest())
+                {
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                }
+                else
+                {
+                    Dom.Document doc = new Dom.Document();
+                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+            }
         }
+        // Calling populate Transaction Result For Capture class to Return map of transaction results
+        return populateTransactionResultForCapture(mapOfTransactionParameterById);
     }
     /**
     * @name populateTransactionResultForCapture
@@ -568,15 +532,17 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> chargeTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
-            if (!mapOfTransactionResultById.isEmpty()) {
-                return mapOfTransactionResultById;
-            }
-            for(String idToProcess : mapOfTransactionParameterById.keySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+        String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
+        if (!mapOfTransactionResultById.isEmpty()) {
+            return mapOfTransactionResultById;
+        }
+        // there are no invoice config errors, so we proceed
+        for(String idToProcess : mapOfTransactionParameterById.keySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 if(!String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c))
                 {
                     try {
@@ -599,6 +565,7 @@ public class CyberSource
                         }
                     } catch (Exception e) {
                        handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                        continue;
                     }
                     try {
                          // Calling CyberSourceHttpService class to send a Request
@@ -635,15 +602,12 @@ public class CyberSource
                     mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
                     return mapOfTransactionResultById;
                 }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_IN_CATCH_ALL, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
-            // Calling populate Transaction Result For Charge class to Return map of transaction results
-            return populateTransactionResultForCharge(mapOfTransactionParameterById);
         }
-        catch (Exception e) 
-        {
-            
-            throw  e; 
-        }
+        // Calling populate Transaction Result For Charge class to Return map of transaction results
+        return populateTransactionResultForCharge(mapOfTransactionParameterById);
     }
     
     /**
@@ -700,11 +664,11 @@ public class CyberSource
                 {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(CyberSourceUtils.getErrorCyberSourceCode().get(transactionParameterToProcess.transactionResult.getResponseCode()));
                 }
-                if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == 'ACH')
+                if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_ACH)
                 {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 }
-                if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == 'Credit Card' 
+                if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD
                    && transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD) != NULL )
                 {
                     transactionParameterToProcess.transactionResult.setResponseCodeMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
@@ -713,6 +677,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setGatewayId(transactionParameterToProcess.getResponseValueByKey().get(REQUEST_ID));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
@@ -734,53 +699,49 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> voidTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            for(String idToProcess : mapOfTransactionParameterById.keySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try {
-                    if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
-                    {
-                        // Calling Utils class to populate the Request for generate void for credit card XML
-                        CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
-                    }
-                    else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
-                    {
-                        // Calling Utils class to populate the Request for generate void for ACH XML
-                        CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
-                }
-                try {
-                    // Calling CyberSourceHttpService class to send a Request
-                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    // Sends the request to payment gateway
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                    if(!Test.isRunningTest())
-                    {
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                    }
-                    else
-                    {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                }
-            }
-            // Calling populate Transaction Result For void class to Return map of transaction results
-            return populateTransactionResultForVoid(mapOfTransactionParameterById);
-        }
-        catch (Exception e)
+        for(String idToProcess : mapOfTransactionParameterById.keySet())
         {
-            throw  e;
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
+                {
+                    // Calling Utils class to populate the Request for generate void for credit card XML
+                    CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                }
+                else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
+                {
+                    // Calling Utils class to populate the Request for generate void for ACH XML
+                    CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                continue;
+            }
+            try {
+                // Calling CyberSourceHttpService class to send a Request
+                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                sendHttpRequest.addHeader('Content-type', 'text/xml');
+                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                // Sends the request to payment gateway
+                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                if(!Test.isRunningTest())
+                {
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                }
+                else
+                {
+                    Dom.Document doc = new Dom.Document();
+                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+            }
         }
+        // Calling populate Transaction Result For void class to Return map of transaction results
+        return populateTransactionResultForVoid(mapOfTransactionParameterById);
     }
     
      /**
@@ -837,6 +798,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
@@ -858,61 +820,58 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> refundTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
-            Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
-            if (!mapOfTransactionResultById.isEmpty()) {
-                return mapOfTransactionResultById;
-            }
-            for(String idToProcess : mapOfTransactionParameterById.keySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try {
-                   if(NULL != transactionParameterToProcess.getTransaction())
-                   {
-                        if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
-                        {
-                            // Calling CyberSourceUtils class to populate the Request for generate Refund XML for Credit card
-                            CyberSourceUtils.getInstance().generateRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                        }
-                        else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
-                        {
-                            // Calling CyberSourceUtils class to populate the Request for generate Refund XML for ACH
-                            CyberSourceUtils.getInstance().generateACHRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                        }
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
-                }
-                try {
-                    // Calling CyberSourceHttpService class to send a Request
-                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    // Sends the request to payment gateway
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                    if(!Test.isRunningTest())
-                    {
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                    }
-                    else
-                    {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                }
-            }
-            // Calling populate Transaction Result For Refund class to Return map of transaction results
-            return populateTransactionResultForRefund(mapOfTransactionParameterById);
+        String invoiceDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_DETAIL').blng__StringValue__c;
+        Map<String, blng.TransactionResult> mapOfTransactionResultById = CyberSourceUtils.validateInvoiceConfig(mapOfTransactionParameterById, invoiceDetailAPIValue);
+        if (!mapOfTransactionResultById.isEmpty()) {
+            return mapOfTransactionResultById;
         }
-        catch (Exception e)
+        // there are no invoice config error, so we proceed
+        for(String idToProcess : mapOfTransactionParameterById.keySet())
         {
-            throw  e;
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                if(NULL != transactionParameterToProcess.getTransaction())
+                {
+                    if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
+                    {
+                        // Calling CyberSourceUtils class to populate the Request for generate Refund XML for Credit card
+                        CyberSourceUtils.getInstance().generateRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                    }
+                    else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
+                    {
+                        // Calling CyberSourceUtils class to populate the Request for generate Refund XML for ACH
+                        CyberSourceUtils.getInstance().generateACHRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                    }
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                continue;
+            }
+            try {
+                // Calling CyberSourceHttpService class to send a Request
+                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                sendHttpRequest.addHeader('Content-type', 'text/xml');
+                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                // Sends the request to payment gateway
+                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                if(!Test.isRunningTest())
+                {
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                }
+                else
+                {
+                    Dom.Document doc = new Dom.Document();
+                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+            }
         }
+        // Calling populate Transaction Result For Refund class to Return map of transaction results
+        return populateTransactionResultForRefund(mapOfTransactionParameterById);
     }
 
      /**
@@ -969,6 +928,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
@@ -989,70 +949,66 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> nonReferencedRefund(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            for(String idToProcess : mapOfTransactionParameterById.keySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try {
-                   if(NULL != transactionParameterToProcess.getTransaction())
-                   {
-                        if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
-                        {
-                            // Calling CyberSourceUtils class to populate the Request for generate non Referenced Refund XML for credit card
-                            CyberSourceUtils.getInstance().generateCardnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
-                        }
-                        else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
-                        {
-                            // Calling CyberSourceUtils class to populate the Request for generate non Referenced Refund XML for ACH
-                            CyberSourceUtils.getInstance().generateACHnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                        }
-                    } 
-                    else if(NULL != transactionParameterToProcess.getPaymentMethod())
+        for(String idToProcess : mapOfTransactionParameterById.keySet())
+        {
+            blng.TransactionParameter transactionParameterToProcess;
+            try {
+                transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+                if(NULL != transactionParameterToProcess.getTransaction())
+                {
+                    if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
                     {
-                        if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
-                        {
-                            // Calling Utils class to populate the Request for CC Payment
-                            CyberSourceUtils.getInstance().generateCardnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                        }
-                        else
-                        {
-                            // Calling Utils class to populate the Request for ACH Payment
-                            CyberSourceUtils.getInstance().generateACHnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                        }
+                        // Calling CyberSourceUtils class to populate the Request for generate non Referenced Refund XML for credit card
+                        CyberSourceUtils.getInstance().generateCardnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                     }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
-                }
-                try {
-                    // Calling CyberSourceHttpService class to send a Request  
-                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    // Sends the request to payment gateway
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    System.debug('sendHttpRequest.getResponse().getbody()->'+sendHttpRequest.getResponse().getbody());
-                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                    if(!Test.isRunningTest())
+                    else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
                     {
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                        // Calling CyberSourceUtils class to populate the Request for generate non Referenced Refund XML for ACH
+                        CyberSourceUtils.getInstance().generateACHnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                    }
+                }
+                else if(NULL != transactionParameterToProcess.getPaymentMethod())
+                {
+                    if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
+                    {
+                        // Calling Utils class to populate the Request for CC Payment
+                        CyberSourceUtils.getInstance().generateCardnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                     }
                     else
                     {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                        // Calling Utils class to populate the Request for ACH Payment
+                        CyberSourceUtils.getInstance().generateACHnonReferencedRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                     }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
                 }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                continue;
             }
-            // Calling populate Transaction Result For non Referenced Refund class to Return map of transaction results
-            return populateTransactionResultFornonReferencedRefund(mapOfTransactionParameterById);
+            try {
+                // Calling CyberSourceHttpService class to send a Request
+                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                sendHttpRequest.addHeader('Content-type', 'text/xml');
+                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                // Sends the request to payment gateway
+                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                System.debug('sendHttpRequest.getResponse().getbody()->'+sendHttpRequest.getResponse().getbody());
+                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                if(!Test.isRunningTest())
+                {
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                }
+                else
+                {
+                    Dom.Document doc = new Dom.Document();
+                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+            }
         }
-        catch (Exception e) 
-        {
-            throw  e; 
-        }     
+        // Calling populate Transaction Result For non Referenced Refund class to Return map of transaction results
+        return populateTransactionResultFornonReferencedRefund(mapOfTransactionParameterById);
     }
 
      /**
@@ -1109,6 +1065,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
@@ -1130,53 +1087,48 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> voidRefundTransaction(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            for(String idToProcess : mapOfTransactionParameterById.keySet())
-            {
-                blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
-                try {
-                    if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
-                    {
-                        // Calling Utils class to populate the Request for generate Void Refund for credit card XML
-                        CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});  
-                    }
-                    else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
-                    {
-                        // Calling Utils class to populate the Request for generate Void Refund for ACH XML
-                        CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
-                }
-                try {
-                    // Calling CyberSourceHttpService class to send a Request
-                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                    sendHttpRequest.addHeader('Content-type', 'text/xml');
-                    sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                    // Sends the request to payment gateway
-                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                    if(!Test.isRunningTest())
-                    {
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                    }
-                    else
-                    {
-                        Dom.Document doc = new Dom.Document();
-                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                }
-            }
-            // Calling populate Transaction Result For void refund class to Return map of transaction results
-            return populateTransactionResultForvoidRefund(mapOfTransactionParameterById);
-        }
-        catch (Exception e) 
+        for(String idToProcess : mapOfTransactionParameterById.keySet())
         {
-            throw  e; 
-        }         
+            blng.TransactionParameter transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
+            try {
+                if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
+                {
+                    // Calling Utils class to populate the Request for generate Void Refund for credit card XML
+                    CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                }
+                else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
+                {
+                    // Calling Utils class to populate the Request for generate Void Refund for ACH XML
+                    CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                continue;
+            }
+            try {
+                // Calling CyberSourceHttpService class to send a Request
+                CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                sendHttpRequest.addHeader('Content-type', 'text/xml');
+                sendHttpRequest.setAuthorizationHeader(transactionParameterToProcess.getGateWay().MerchantId__c,transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                // Sends the request to payment gateway
+                sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                if(!Test.isRunningTest())
+                {
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+                }
+                else
+                {
+                    Dom.Document doc = new Dom.Document();
+                    doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                    transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                }
+            } catch (Exception e) {
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+            }
+        }
+        // Calling populate Transaction Result For void refund class to Return map of transaction results
+        return populateTransactionResultForvoidRefund(mapOfTransactionParameterById);
     }
     
     /**
@@ -1233,6 +1185,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
@@ -1254,46 +1207,41 @@ public class CyberSource
     */  
     public Map<String, blng.TransactionResult> getPaymentStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
-        try {
-            if(!mapOfTransactionParameterById.isEmpty())
-            {
-                CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
-                // Calling CyberSourceUtils class to populate the Request for generate get Payment Status XML
-                CyberSourceUtils.getInstance().generateGetPaymentStatusXML(mapOfTransactionParameterById.Values());
-                for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
-                {
-                    try {
-                        // Calling CyberSourceHttpService class to send a Request
-                        CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
-                        sendHttpRequest.addHeader('Content-type', 'text/xml');
-                        sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
-                        // Sends the request to payment gateway
-                        sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
-                        system.debug('sendHttpRequest.getResponse()-->'+sendHttpRequest.getResponse());
-                        // Populating the map of Response for transaction parameter class from the response received by payment gateway
-                        if(!Test.isRunningTest())
-                        {
-                            transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
-                             
-                        }
-                        else
-                        {
-                            Dom.Document doc = new Dom.Document();
-                            doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);     
-                            transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
-                        }
-                    } catch (Exception e) {
-                        handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
-                    }
-                } 
-            } 
-            // Calling populate Transaction Result For get Payment Status class to Return map of transaction results
-            return populateTransactionResultForgetPaymentStatus(mapOfTransactionParameterById);
-        }
-        catch (Exception e) 
+        if(!mapOfTransactionParameterById.isEmpty())
         {
-            throw e; 
-        }    
+            // TODO the validate and generateXML will be changed and put inside the for-loop with their own try-catch
+            CyberSourceUtils.validateCustomerDetails(mapOfTransactionParameterById.Values());
+            // Calling CyberSourceUtils class to populate the Request for generate get Payment Status XML
+            CyberSourceUtils.getInstance().generateGetPaymentStatusXML(mapOfTransactionParameterById.Values());
+            for(blng.TransactionParameter transactionParameterToProcess : mapOfTransactionParameterById.Values())
+            {
+                try {
+                    // Calling CyberSourceHttpService class to send a Request
+                    CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
+                    sendHttpRequest.addHeader('Content-type', 'text/xml');
+                    sendHttpRequest.setTokenisationHeader(transactionParameterToProcess.getGateWay().MerchantId__c, transactionParameterToProcess.getGateWay().TransactionSecurityKey__c);
+                    // Sends the request to payment gateway
+                    sendHttpRequest.post(transactionParameterToProcess.getGateWay().TestMode__c ? CYBER_SOURCE_ENDPOINT_URL_SANDBOX : CYBER_SOURCE_ENDPOINT_URL_PRODUCTION,transactionParameterToProcess.getRequestBody());
+                    system.debug('sendHttpRequest.getResponse()-->'+sendHttpRequest.getResponse());
+                    // Populating the map of Response for transaction parameter class from the response received by payment gateway
+                    if(!Test.isRunningTest())
+                    {
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(sendHttpRequest.getResponse().getBodyDocument().getRootElement()));
+
+                    }
+                    else
+                    {
+                        Dom.Document doc = new Dom.Document();
+                        doc.load(TEST_REQUEST_BODY_CYBER_SOURCE);
+                        transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
+                    }
+                } catch (Exception e) {
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                }
+            }
+        }
+        // Calling populate Transaction Result For get Payment Status class to Return map of transaction results
+        return populateTransactionResultForgetPaymentStatus(mapOfTransactionParameterById);
     }
     
     /**
@@ -1340,6 +1288,7 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setPaymentToken(transactionParameterToProcess.getResponseValueByKey().get(SUBSCRIPTIONID));
                 //Populate gateway status
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
+                mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
