@@ -64,6 +64,16 @@ public class CyberSource
         private static final String FAILED_CALLOUT = 'Gateway callout failed';
         private static final String FAILED_POPULATING_RESULT = 'Error in populating transaction result';
         private static final String FAILED_IN_CATCH_ALL = 'Error in gateway API service';
+        private static final String IN_GET_STATUS = ' in Get Status'; // this is used by refund status and payment status
+        private static final String IN_GENERATE_TOKEN = ' in Generate Token';
+        private static final String IN_AUTHORIZE_TRANSACTION = ' in Authorize Token';
+        private static final String IN_CHARGE_TRANSACTION = ' in Charge Transaction';
+        private static final String IN_CAPTURE_TRANSACTION = ' in Capture Transaction';
+        private static final String IN_VOID_TOKEN = ' in Void Token';
+        private static final String IN_VOID_TRANSACTION = ' in Void Transaction';
+        private static final String IN_REFUND_TRANSACTION = ' in Refund Transaction';
+        private static final String IN_VOID_REFUND_TRANSACTION = ' in Void Refund Transaction';
+        private static final String IN_NONREFERENCED_REFUND = ' in Non-Referenced Refund';
     // ============================================================================
     // Methods
     // ============================================================================
@@ -129,7 +139,7 @@ public class CyberSource
                                 transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                             }
                         } catch (Exception e) {
-                            handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                            handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
                         }
                     } else {
                         string idToProcess = (new list<string>(mapOfTransactionParameterById.keySet())[0]);
@@ -146,7 +156,7 @@ public class CyberSource
                 }
                 catch (Exception e)
                 {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_IN_CATCH_ALL, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_IN_CATCH_ALL + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
                 }
             }
         }
@@ -200,7 +210,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -245,7 +255,7 @@ public class CyberSource
                         transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                     }
                 } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_VOID_TOKEN, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
                 }
             }
         }
@@ -303,7 +313,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess,transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_VOID_TOKEN, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -346,7 +356,7 @@ public class CyberSource
                     transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_AUTHORIZE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For Authorize class to Return map of transaction results
@@ -404,7 +414,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_AUTHORIZE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -447,7 +457,7 @@ public class CyberSource
                     }
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_CAPTURE_TRANSACTION, blng.TransactionResult.GatewayStatusType.SystemError, e);
                 continue;
             }
             try {
@@ -469,7 +479,7 @@ public class CyberSource
                     transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_CAPTURE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For Capture class to Return map of transaction results
@@ -527,7 +537,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_CAPTURE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -578,7 +588,7 @@ public class CyberSource
                             CyberSourceUtils.getInstance().generateACHChargeXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                         }
                     } catch (Exception e) {
-                       handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                       handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_CHARGE_TRANSACTION, blng.TransactionResult.GatewayStatusType.SystemError, e);
                         continue;
                     }
                     try {
@@ -601,7 +611,7 @@ public class CyberSource
                              transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                          }
                     } catch (Exception e) {
-                        handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                        handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_CHARGE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
                     }
                 } else
                 {
@@ -617,7 +627,7 @@ public class CyberSource
                     return mapOfTransactionResultById;
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_IN_CATCH_ALL, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_IN_CATCH_ALL + IN_CHARGE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For Charge class to Return map of transaction results
@@ -697,7 +707,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_CHARGE_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -733,7 +743,7 @@ public class CyberSource
                     CyberSourceUtils.getInstance().generateVoidXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_VOID_TRANSACTION, blng.TransactionResult.GatewayStatusType.SystemError, e);
                 continue;
             }
             try {
@@ -755,7 +765,7 @@ public class CyberSource
                     transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_VOID_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For void class to Return map of transaction results
@@ -822,7 +832,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_VOID_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -867,7 +877,7 @@ public class CyberSource
                     }
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_REFUND_TRANSACTION, blng.TransactionResult.GatewayStatusType.SystemError, e);
                 continue;
             }
             try {
@@ -889,7 +899,7 @@ public class CyberSource
                     transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_REFUND_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For Refund class to Return map of transaction results
@@ -956,7 +966,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_REFUND_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -1007,7 +1017,7 @@ public class CyberSource
                     }
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_NONREFERENCED_REFUND, blng.TransactionResult.GatewayStatusType.SystemError, e);
                 continue;
             }
             try {
@@ -1030,7 +1040,7 @@ public class CyberSource
                     transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_NONREFERENCED_REFUND, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For non Referenced Refund class to Return map of transaction results
@@ -1097,7 +1107,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_NONREFERENCED_REFUND, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
@@ -1132,7 +1142,7 @@ public class CyberSource
                     CyberSourceUtils.getInstance().generateVoidRefundXML(new Map<String, blng.TransactionParameter> {idToProcess => transactionParameterToProcess});
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION, blng.TransactionResult.GatewayStatusType.SystemError, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_VOID_REFUND_TRANSACTION, blng.TransactionResult.GatewayStatusType.SystemError, e);
                 continue;
             }
             try {
@@ -1154,7 +1164,7 @@ public class CyberSource
                     transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                 }
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_VOID_REFUND_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Calling populate Transaction Result For void refund class to Return map of transaction results
@@ -1221,7 +1231,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_VOID_REFUND_TRANSACTION, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         // Return map of transaction results
@@ -1270,7 +1280,7 @@ public class CyberSource
                         transactionParameterToProcess.mapOfResponseValueByKey.putAll(CyberSourceUtils.getElements(doc.getRootElement()));
                     }
                 } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_CALLOUT + IN_GET_STATUS, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
                 }
             }
         }
@@ -1328,7 +1338,7 @@ public class CyberSource
                 populateGatewayStatus(transactionParameterToProcess.transactionResult);
                 mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
             } catch (Exception e) {
-                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
+                handleError(transactionParameterToProcess.transactionResult, FAILED_POPULATING_RESULT + IN_GET_STATUS, blng.TransactionResult.GatewayStatusType.Indeterminate, e);
             }
         }
         //Return map of transaction results
