@@ -15,7 +15,7 @@ private class CyberSourceTest
     private static final String PAYMENTTYPE_CREDITCARD = 'Credit Card';
     private static final String PAYMENTTYPE_ACH = 'ACH';
     private static final String SUCCESS_MESSAGE = 'Successful transaction'; // hardcoded in utils for 100
-    private static final String REJECT_MESSAGE = 'The request is missing one or more required fields.Possible action: see the reply fields missingField_0...N for which fields are missing. Resend the request with the complete information. For information about missing or invalid fields'; // hardcoded in utils for 101
+    private static final String REJECT_MESSAGE = 'The request is missing one or more required fields. Possible action: see the reply fields missingField_0...N for which fields are missing. Resend the request with the complete information. For information about missing or invalid fields'; // hardcoded in utils for 101
     private static final String PENDING_MESSAGE = 'Invalid data'; // hardcoded in utils for 102
     private static final String EMAIL_MISSING = 'Email is Missing';
     private static final String INVALID_FIELD_MESSAGE = 'Invalid Field X'; // some arbitrary value we have in the soap responses
@@ -41,30 +41,43 @@ private class CyberSourceTest
     * @return NA
     * @exception NA
     * @author Lopa
-    * @created 2018-06-5
+    * @created 2018-06-22
     * @remark
     * @change
     */
-    /**
-     * TODO this will change after we implement the service improvements
-     */
     public static testMethod void testValidateCustomerFailure()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
         transactionParameter.setFirstName('');
-        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
-        paymentGatewayParameter.setTransactionType(GENERATE_TOKEN);
-        Test.startTest();
-        Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfProcessIdToTransactionParameter, paymentGatewayParameter);
-        if(response.size() > 0) {
-            blng.TransactionResult transactionResult = response.values().get(0);
-            System.assertEquals(1, transactionResult.getErrors().size());
-            System.assertEquals('First Name is missing', transactionResult.getErrors().get(0));
-        }
-        Test.stopTest();
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, null, FAILURE, null, null, null);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
+        System.assertEquals(2, transactionResult.getErrors().size());
+        System.assertEquals('First Name is missing', transactionResult.getErrors().get(0));
+        System.assertEquals('Customer validation failed in Generate Token', transactionResult.getErrors().get(1));
+    }
+
+    /**
+    * @name testValidateCustomerFailure
+    * @description validate one of the failures to make sure the customer validation works
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Lopa
+    * @created 2018-06-22
+    * @remark
+    * @change
+    */
+    public static testMethod void testValidateGatewaySettingsFailure()
+    {
+        blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        //overwrite from setup
+        transactionParameter.getGateWay().MerchantID__c = '';
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, null, FAILURE, null, null, null);
+        System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
+        System.assertEquals(2, transactionResult.getErrors().size());
+        System.assertEquals('MerchantId is missing', transactionResult.getErrors().get(0));
+        System.assertEquals('Gateway is missing required settings in Generate Token', transactionResult.getErrors().get(1));
     }
 
     /**
@@ -125,7 +138,7 @@ private class CyberSourceTest
         // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // set the email as blank
-        transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
+        transactionParameter.setEmailId('');
         blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
@@ -357,9 +370,8 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.startTest();
-        CyberSourceUtils.getInstance().generateCaptureLevel3XML(mapOfProcessIdToTransactionParameter);
+        CyberSourceUtils.getInstance().generateCaptureLevel3XML(transactionParameter);
         System.assertNotEquals(null, transactionParameter.getRequestBody(), 'Request body should be populated');
         Test.stopTest();
     }
@@ -385,9 +397,8 @@ private class CyberSourceTest
         blng__Invoice__c invoice = new blng__Invoice__c (blng__Account__c = transactionParameter.getAccount().Id);
         insert invoice;
         transactionParameter.setInvoice(invoice);
-        Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
         Test.startTest();
-        CyberSourceUtils.getInstance().generateChargeLevel3XML(mapOfProcessIdToTransactionParameter);
+        CyberSourceUtils.getInstance().generateChargeLevel3XML(transactionParameter);
         System.assertNotEquals(null, transactionParameter.getRequestBody(), 'Request body should be populated');
         Test.stopTest();
     }
@@ -407,7 +418,7 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
         // empty the email field
-        transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
+        transactionParameter.setEmailId('');
         blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
