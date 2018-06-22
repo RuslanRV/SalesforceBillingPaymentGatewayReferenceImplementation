@@ -58,8 +58,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testValidateCustomerFailure
-    * @description validate one of the failures to make sure the customer validation works
+    * @name testValidateGatewaySettingsFailure
+    * @description validate one of the failures to make sure the gateway settings validation works
     * @Param
     * @return NA
     * @exception NA
