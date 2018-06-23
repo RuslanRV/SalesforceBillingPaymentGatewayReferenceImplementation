@@ -11,6 +11,7 @@ private class CyberSourceTest
     private static final String TEST_REQUEST_BODY_EMPTY_DECISION = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision></c:decision><c:reasonCode>103</c:reasonCode><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>103</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>103</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>103</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
     private static final String SUCCESS = 'SUCCESS';
     private static final String FAILURE = 'FAILURE';
+    private static final String ERROR = 'ERROR';
     private static final String PENDING = 'PENDING';
     private static final String PAYMENTTYPE_CREDITCARD = 'Credit Card';
     private static final String PAYMENTTYPE_ACH = 'ACH';
@@ -51,7 +52,7 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
         transactionParameter.setFirstName('');
-        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, null, FAILURE, null, null, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, ERROR, FAILURE, 'First Name is missing. Customer validation failed in Generate Token', null, null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
         System.assertEquals(2, transactionResult.getErrors().size());
         System.assertEquals('First Name is missing', transactionResult.getErrors().get(0));
@@ -74,7 +75,7 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
         transactionParameter.getGateWay().MerchantID__c = '';
-        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, null, FAILURE, null, null, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, ERROR, FAILURE, 'MerchantId is missing. Gateway is missing required settings in Generate Token', null, null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
         System.assertEquals(2, transactionResult.getErrors().size());
         System.assertEquals('MerchantId is missing', transactionResult.getErrors().get(0));

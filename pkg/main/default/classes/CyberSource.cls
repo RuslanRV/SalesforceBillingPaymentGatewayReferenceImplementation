@@ -30,6 +30,7 @@ public class CyberSource
         private static final String PENDING = 'PENDING';
         private static final String SUCCESS = 'SUCCESS';
         private static final String FAILURE = 'FAILURE';
+        private static final String ERROR = 'ERROR';
         private static final String DECISION = 'decision';
         private static final String EMAIL_MISSING = 'Email is Missing';
         private static final String EMAIL_MISSING_MESSAGE = 'Missing Information: Email';
@@ -135,7 +136,6 @@ public class CyberSource
                         // handle special case for missing email. CustomerValidation could have errored out for any reason, but as long as email is missing we need these additional steps
                         if(String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
                             transactionParameterToProcess.transactionResult.setResponseMessage(FAILURE);
-                            transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
                             transactionParameterToProcess.transactionResult.setResponseCodeMessage(EMAIL_MISSING_MESSAGE);
                         }
                         continue;
@@ -635,7 +635,6 @@ public class CyberSource
                 transactionParameterToProcess.transactionResult.setResponseToValidate(EMAIL_MISSING);
                 transactionParameterToProcess.transactionResult.setResponseMessage(EMAIL_MISSING);
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
-                transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
                 transactionParameterToProcess.transactionResult.setResponseCodeMessage(EMAIL_MISSING_MESSAGE);
                 continue;
             }
@@ -1498,20 +1497,32 @@ public class CyberSource
     * @return NA
     * @exception NA
     * @author Lopa
-    * @created 2018-06-20
+    * @created 2018-06-23
     * @remark
-    * @change exception handling changed
+    * @change
     */
     private void handleError(blng.TransactionResult transactionResult,
             String pointOfFailure,
             blng.TransactionResult.GatewayStatusType gatewayStatus,
             Exception e) {
+        String newErrorMessage = pointOfFailure + (e != null ? ': ' + e.getMessage() : '');
+        // set the response message by concatenating all errors
+        List<String> prevErrors = transactionResult.getErrors();
+        String prevErrorMessage = '';
+        for (String err : prevErrors) {
+            prevErrorMessage += (String.isEmpty(prevErrorMessage) ? '' : '. ') + err;
+        }
+        prevErrorMessage += (String.isEmpty(prevErrorMessage) ? '' : '. ') + newErrorMessage;
+        transactionResult.setResponseMessage(prevErrorMessage.length() < 255 ? prevErrorMessage : prevErrorMessage.substring(0, 254));
+        // set the rest of the values
         transactionResult.setIsSuccess(false);
-        transactionResult.setError(pointOfFailure + (e != null ? ': ' + e.getMessage() : ''));
+        transactionResult.setError(newErrorMessage);
         transactionResult.setResponseToValidate(FAILURE);
         if (transactionResult.getResponseCode() != null) {
             populateGatewayStatus(transactionResult);
         } else {
+            // set the response code to ERROR if it does not exist, which will be in all cases except when the response returns from the gateway
+            transactionResult.setResponseCode(ERROR);
             transactionResult.setGatewayStatus(gatewayStatus);
         }
     }
