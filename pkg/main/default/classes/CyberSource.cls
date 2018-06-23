@@ -129,7 +129,8 @@ public class CyberSource
                 // validate customer
                 try {
                     CyberSourceUtils.validateCustomerDetails(transactionParameterToProcess);
-                    if (!transactionParameterToProcess.transactionResult.getErrors().IsEmpty()) {
+                    if (!transactionParameterToProcess.transactionResult.getErrors().IsEmpty()
+                            || String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
                         handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.ValidationError, null);
                         // handle special case for missing email. CustomerValidation could have errored out for any reason, but as long as email is missing we need these additional steps
                         if(String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
@@ -143,14 +144,7 @@ public class CyberSource
                     handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.ValidationError, e);
                     continue;
                 }
-                // if transactionParameterToProcess.getEmailId() is not null, then customerValidation will not have caught missing email, handle it here
-                if (String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.ValidationError, null);
-                    transactionParameterToProcess.transactionResult.setResponseMessage(FAILURE);
-                    transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                    transactionParameterToProcess.transactionResult.setResponseCodeMessage(EMAIL_MISSING_MESSAGE);
-                    continue;
-                }
+
                 // Calling CyberSourceUtils class to populate the Request for generate Token XML
                 try {
                     CyberSourceUtils.getInstance().generateTokenXML(transactionParameterToProcess);
