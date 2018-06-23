@@ -1506,15 +1506,20 @@ public class CyberSource
             blng.TransactionResult.GatewayStatusType gatewayStatus,
             Exception e) {
         String newErrorMessage = pointOfFailure + (e != null ? ': ' + e.getMessage() : '');
-        // set the response message by concatenating all previous errors in the right order
-        String prevErrorMessage = newErrorMessage;
-        List<String> prevErrors = transactionResult.getErrors();
-        if (!prevErrors.isEmpty()) {
-            for (Integer i = prevErrors.size() - 1; i >=0; i--) {
-                prevErrorMessage = prevErrors[i] + '. ' + prevErrorMessage;
+
+        // if there was no exception, set the response message by concatenating all previous errors in the right order
+        // else set it to newErrorMessage
+        if (null == e) {
+            String prevErrorMessage = '';
+            List<String> prevErrors = transactionResult.getErrors();
+            for (String err : prevErrors) {
+                prevErrorMessage += (String.isEmpty(prevErrorMessage) ? '' : '. ') + err;
             }
+            transactionResult.setResponseMessage(prevErrorMessage.length() < 255 ? prevErrorMessage : prevErrorMessage.substring(0, 251) + '...');
+        } else {
+            transactionResult.setResponseMessage(newErrorMessage);
         }
-        transactionResult.setResponseMessage(prevErrorMessage.length() < 255 ? prevErrorMessage : prevErrorMessage.substring(0, 251) + '...');
+
         // set the rest of the values
         transactionResult.setIsSuccess(false);
         transactionResult.setError(newErrorMessage);

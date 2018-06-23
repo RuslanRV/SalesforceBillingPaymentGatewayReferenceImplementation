@@ -52,7 +52,7 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
         transactionParameter.setFirstName('');
-        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, ERROR, FAILURE, 'First Name is missing. Customer validation failed in Generate Token', null, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, ERROR, FAILURE, 'First Name is missing', null, null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
         System.assertEquals(2, transactionResult.getErrors().size());
         System.assertEquals('First Name is missing', transactionResult.getErrors().get(0));
@@ -75,7 +75,7 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
         //overwrite from setup
         transactionParameter.getGateWay().MerchantID__c = '';
-        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, ERROR, FAILURE, 'MerchantId is missing. Gateway is missing required settings in Generate Token', null, null);
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, ERROR, FAILURE, 'MerchantId is missing', null, null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
         System.assertEquals(2, transactionResult.getErrors().size());
         System.assertEquals('MerchantId is missing', transactionResult.getErrors().get(0));
