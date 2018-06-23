@@ -1514,7 +1514,7 @@ public class CyberSource
                 prevErrorMessage = prevErrors[i] + '. ' + prevErrorMessage;
             }
         }
-        transactionResult.setResponseMessage(prevErrorMessage.length() < 255 ? prevErrorMessage : prevErrorMessage.substring(0, 254));
+        transactionResult.setResponseMessage(prevErrorMessage.length() < 255 ? prevErrorMessage : prevErrorMessage.substring(0, 251) + '...');
         // set the rest of the values
         transactionResult.setIsSuccess(false);
         transactionResult.setError(newErrorMessage);
