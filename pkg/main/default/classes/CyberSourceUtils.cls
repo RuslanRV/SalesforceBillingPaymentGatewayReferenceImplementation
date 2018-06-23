@@ -30,7 +30,6 @@ public class CyberSourceUtils {
     private static Boolean IS_MULTICURRENCY_ORG = UserInfo.isMultiCurrencyOrganization();
     private static String CURRENCYISOCODE = 'CurrencyIsoCode';
     private static final String TEXTAREA = 'TEXTAREA';
-    public static final String MISSING_EMAIL = 'Email is missing';
 
     // ============================================================================
     // STATIC VARIABLES
@@ -2284,7 +2283,7 @@ public class CyberSourceUtils {
         } else if (String.IsBlank(transactionParameterToProcess.getCountry())) {
             transactionParameterToProcess.transactionResult.setError('Country is missing');
         } else if (String.IsBlank(transactionParameterToProcess.getEmailId())) {
-            transactionParameterToProcess.transactionResult.setError(MISSING_EMAIL);
+            transactionParameterToProcess.transactionResult.setError('Email is missing');
         }
     }
 

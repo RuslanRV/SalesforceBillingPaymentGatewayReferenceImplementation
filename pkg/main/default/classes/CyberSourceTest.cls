@@ -18,6 +18,7 @@ private class CyberSourceTest
     private static final String REJECT_MESSAGE = 'The request is missing one or more required fields. Possible action: see the reply fields missingField_0...N for which fields are missing. Resend the request with the complete information. For information about missing or invalid fields'; // hardcoded in utils for 101
     private static final String PENDING_MESSAGE = 'Invalid data'; // hardcoded in utils for 102
     private static final String EMAIL_MISSING = 'Email is Missing';
+    private static final String EMAIL_MISSING_MESSAGE = 'Missing Information: Email';
     private static final String INVALID_FIELD_MESSAGE = 'Invalid Field X'; // some arbitrary value we have in the soap responses
     private static final String GATEWAY_ID = '4436893298465000001516'; // some arbitrary value we have in the soap responses
     private static final String SUBSCRIPTION_ID = '123456'; // some arbitrary value we have in the soap responses
@@ -138,8 +139,8 @@ private class CyberSourceTest
         // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // set the email as blank
-        transactionParameter.setEmailId('');
-        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, 'Missing Information: Email', null);
+        transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, 'ERROR', FAILURE, FAILURE, EMAIL_MISSING_MESSAGE, null);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 
@@ -418,8 +419,8 @@ private class CyberSourceTest
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
         // empty the email field
-        transactionParameter.setEmailId('');
-        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, 'Missing Information: Email', NULL);
+        transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, EMAIL_MISSING_MESSAGE, NULL);
         System.assertEquals(blng.TransactionResult.GatewayStatusType.ValidationError, transactionResult.getGatewayStatus(), 'Wrong Gateway Status');
     }
 

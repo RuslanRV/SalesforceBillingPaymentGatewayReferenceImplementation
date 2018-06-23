@@ -32,6 +32,7 @@ public class CyberSource
         private static final String FAILURE = 'FAILURE';
         private static final String DECISION = 'decision';
         private static final String EMAIL_MISSING = 'Email is Missing';
+        private static final String EMAIL_MISSING_MESSAGE = 'Missing Information: Email';
         private static final String SUBSCRIPTIONID = 'subscriptionID';
         private static final String REASONCODE = 'reasonCode';
         private static final String REQUEST_ID = 'requestID';
@@ -130,16 +131,24 @@ public class CyberSource
                     CyberSourceUtils.validateCustomerDetails(transactionParameterToProcess);
                     if (!transactionParameterToProcess.transactionResult.getErrors().IsEmpty()) {
                         handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.ValidationError, null);
-                        // handle special case for missing email
-                        if (transactionParameterToProcess.transactionResult.getErrors().get(0).equals(CyberSourceUtils.MISSING_EMAIL)) {
+                        // handle special case for missing email. CustomerValidation could have errored out for any reason, but as long as email is missing we need these additional steps
+                        if(String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
                             transactionParameterToProcess.transactionResult.setResponseMessage(FAILURE);
                             transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                            transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information: Email');
+                            transactionParameterToProcess.transactionResult.setResponseCodeMessage(EMAIL_MISSING_MESSAGE);
                         }
                         continue;
                     }
                 } catch (Exception e) {
                     handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.ValidationError, e);
+                    continue;
+                }
+                // if transactionParameterToProcess.getEmailId() is not null, then customerValidation will not have caught missing email, handle it here
+                if (String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
+                    handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.ValidationError, null);
+                    transactionParameterToProcess.transactionResult.setResponseMessage(FAILURE);
+                    transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
+                    transactionParameterToProcess.transactionResult.setResponseCodeMessage(EMAIL_MISSING_MESSAGE);
                     continue;
                 }
                 // Calling CyberSourceUtils class to populate the Request for generate Token XML
@@ -627,13 +636,13 @@ public class CyberSource
                 continue;
             }
             // handle special case for missing email
-            if (String.IsBlank(transactionParameterToProcess.getEmailId())) {
+            if (String.IsBlank(transactionParameterToProcess.getPaymentMethod().blng__BillingEmail__c)) {
                 handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_CHARGE_TRANSACTION, blng.TransactionResult.GatewayStatusType.ValidationError, null);
                 transactionParameterToProcess.transactionResult.setResponseToValidate(EMAIL_MISSING);
                 transactionParameterToProcess.transactionResult.setResponseMessage(EMAIL_MISSING);
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
                 transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
-                transactionParameterToProcess.transactionResult.setResponseCodeMessage('Missing Information: Email');
+                transactionParameterToProcess.transactionResult.setResponseCodeMessage(EMAIL_MISSING_MESSAGE);
                 continue;
             }
 
