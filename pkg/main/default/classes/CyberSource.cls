@@ -27,7 +27,6 @@ public class CyberSource
 
         private static final String ACCEPT = 'ACCEPT';
         private static final String REJECT = 'REJECT';
-        private static final String PENDING = 'PENDING';
         private static final String SUCCESS = 'SUCCESS';
         private static final String FAILURE = 'FAILURE';
         private static final String ERROR = 'ERROR';
@@ -440,12 +439,11 @@ public class CyberSource
                     // The response is failure
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING) {
-                    // The response is PENDING
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                }
+                else //The 'decision' is ERROR or REVIEW
+                {
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                } else {
-                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -571,12 +569,9 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                     transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
-                } else if (transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING) {
-                    //The response is Pending
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                } else { //The 'decision' is ERROR or REVIEW
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                } else {
-                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -712,7 +707,7 @@ public class CyberSource
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
-                //Populating the transaction Parameter class based on the response is success or failure or pending
+                //Populating the transaction Parameter class based on the response is success or failure or other
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     //The response is success
@@ -727,15 +722,10 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                     transactionParameterToProcess.transactionResult.setResponseMessage(transactionParameterToProcess.getResponseValueByKey().get(INVALID_FIELD));
                 }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
+                else //The 'decision' is ERROR or REVIEW
                 {
-                    //The response is pending
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
-                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -858,7 +848,7 @@ public class CyberSource
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
-                //Populating the transaction Parameter class based on the response is success or failure or Pending
+                //Populating the transaction Parameter class based on the response is success or failure or other
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     //Response is success
@@ -871,15 +861,10 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
+                else //The 'decision' is ERROR or REVIEW
                 {
-                    //Response is Pending
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
-                   transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -1003,7 +988,7 @@ public class CyberSource
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
-                //Populating the transaction Parameter class based on the response is success or failure or Pending
+                //Populating the transaction Parameter class based on the response is success or failure or other
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     //The response is success
@@ -1016,15 +1001,10 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
+                else //The 'decision' is ERROR or REVIEW
                 {
-                    //The response is Pending
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
-                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -1154,7 +1134,7 @@ public class CyberSource
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
-                //Populating the transaction Parameter class based on the response is success or failure or Pending
+                //Populating the transaction Parameter class based on the response is success or failure or other
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     //The response is success
@@ -1167,15 +1147,10 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
+                else //The 'decision' is ERROR or REVIEW
                 {
-                    //The response is Pending
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
-                    transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
@@ -1290,7 +1265,7 @@ public class CyberSource
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
-                //Populating the transaction Parameter class based on the response is success or failure or pending
+                //Populating the transaction Parameter class based on the response is success or failure or other
                 if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == ACCEPT)
                 {
                     //Response is success
@@ -1303,15 +1278,10 @@ public class CyberSource
                     transactionParameterToProcess.transactionResult.setResponseToValidate(FAILURE);
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
                 }
-                else if(transactionParameterToProcess.getResponseValueByKey().get(DECISION) == PENDING)
+                else //The 'decision' is ERROR or REVIEW
                 {
-                    //The response pending
-                    transactionParameterToProcess.transactionResult.setResponseToValidate(PENDING);
+                    transactionParameterToProcess.transactionResult.setResponseToValidate(transactionParameterToProcess.getResponseValueByKey().get(DECISION));
                     transactionParameterToProcess.transactionResult.setIsSuccess(false);
-                }
-                else
-                {
-                   transactionParameterToProcess.transactionResult.setResponseToValidate('');
                 }
                 //Populating payment gateway response
                 transactionParameterToProcess.transactionResult.setId(idToProcess);
