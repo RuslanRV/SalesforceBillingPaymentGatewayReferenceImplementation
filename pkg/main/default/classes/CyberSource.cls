@@ -1507,15 +1507,13 @@ public class CyberSource
             Exception e) {
         String newErrorMessage = pointOfFailure + (e != null ? ': ' + e.getMessage() : '');
 
-        // if there was no exception, set the response message by concatenating all previous errors in the right order
-        // else set it to newErrorMessage
-        if (null == e) {
+        // if there are previous errors, set the response message by concatenating them in the right order
+        if (!transactionResult.getErrors().isEmpty()) {
             String prevErrorMessage = '';
-            List<String> prevErrors = transactionResult.getErrors();
-            for (String err : prevErrors) {
+            for (String err : transactionResult.getErrors()) {
                 prevErrorMessage += (String.isEmpty(prevErrorMessage) ? '' : '. ') + err;
             }
-            transactionResult.setResponseMessage(prevErrorMessage.length() < 255 ? prevErrorMessage : prevErrorMessage.substring(0, 251) + '...');
+            transactionResult.setResponseMessage(prevErrorMessage);
         } else {
             transactionResult.setResponseMessage(newErrorMessage);
         }
