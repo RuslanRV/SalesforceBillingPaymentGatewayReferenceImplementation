@@ -7,17 +7,15 @@
 private class CyberSourceTest
 {
     private static final String TEST_REQUEST_BODY_REJECT = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision>REJECT</c:decision><c:reasonCode>101</c:reasonCode><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>101</c:reasonCode><c:invalidField>Invalid Field X</c:invalidField><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>101</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>101</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
-    private static final String TEST_REQUEST_BODY_PENDING = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision>PENDING</c:decision><c:reasonCode>102</c:reasonCode><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>102</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>102</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>102</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
-    private static final String TEST_REQUEST_BODY_EMPTY_DECISION = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision></c:decision><c:reasonCode>103</c:reasonCode><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>103</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>103</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>103</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
+    private static final String TEST_REQUEST_BODY_ERROR = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-501816472"><wsu:Created>2015-09-28T07:46:09.286Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c="urn:schemas-cybersource-com:transaction-data-1.115"><c:merchantReferenceCode>acertiscloud_23</c:merchantReferenceCode><c:requestID>4436893298465000001516</c:requestID><c:decision>ERROR</c:decision><c:reasonCode>102</c:reasonCode><c:requestToken>Ahj//wSR4QyHBpJLFB/YIkGLdq1auG7adFqsbNmRST+D2l0cU2T+D2l0cXSBs4NSahk0ky3SA7msQMJEjwhkODSSWKD+wAAASgCk</c:requestToken><c:purchaseTotals><c:currency>USD</c:currency></c:purchaseTotals><c:ccAuthReply><c:reasonCode>102</c:reasonCode><c:amount>49.95</c:amount><c:authorizationCode>888888</c:authorizationCode><c:avsCode>X</c:avsCode><c:avsCodeRaw>I1</c:avsCodeRaw><c:authorizedDateTime>2015-10-01T08:48:50Z</c:authorizedDateTime><c:processorResponse>102</c:processorResponse><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccAuthReply><c:ccCaptureReply><c:reasonCode>102</c:reasonCode><c:requestDateTime>2015-10-01T08:48:50Z</c:requestDateTime><c:amount>49.95</c:amount><c:reconciliationID>17555876NEU1YYHR</c:reconciliationID></c:ccCaptureReply></c:replyMessage></soap:Body></soap:Envelope>';
     private static final String SUCCESS = 'SUCCESS';
     private static final String FAILURE = 'FAILURE';
     private static final String ERROR = 'ERROR';
-    private static final String PENDING = 'PENDING';
     private static final String PAYMENTTYPE_CREDITCARD = 'Credit Card';
     private static final String PAYMENTTYPE_ACH = 'ACH';
     private static final String SUCCESS_MESSAGE = 'Successful transaction'; // hardcoded in utils for 100
     private static final String REJECT_MESSAGE = 'The request is missing one or more required fields. Possible action: see the reply fields missingField_0...N for which fields are missing. Resend the request with the complete information. For information about missing or invalid fields'; // hardcoded in utils for 101
-    private static final String PENDING_MESSAGE = 'Invalid data'; // hardcoded in utils for 102
+    private static final String ERROR_MESSAGE = 'Invalid data'; // hardcoded in utils for 102
     private static final String EMAIL_MISSING = 'Email is Missing';
     private static final String EMAIL_MISSING_MESSAGE = 'Missing Information: Email';
     private static final String INVALID_FIELD_MESSAGE = 'Invalid Field X'; // some arbitrary value we have in the soap responses
@@ -219,8 +217,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testAuthorizeTransactionPending
-    * @description authorize transaction pending case
+    * @name testAuthorizeTransactionError
+    * @description authorize transaction error case
     * @Param
     * @return NA
     * @exception NA
@@ -229,31 +227,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testAuthorizeTransactionPending()
+    public static testMethod void testAuthorizeTransactionError()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-    }
-
-    /**
-    * @name testAuthorizeTransactionEmptyDecision
-    * @description authorize transaction empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testAuthorizeTransactionEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the other message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(AUTHORIZE_TRANSACTION, transactionParameter, '102', ERROR, null, ERROR_MESSAGE, GATEWAY_ID);
     }
 
     /**
@@ -314,8 +293,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testCaptureTransactionPending
-    * @description capture transaction pending case
+    * @name testCaptureTransactionError
+    * @description capture transaction error case
     * @Param
     * @return NA
     * @exception NA
@@ -324,31 +303,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testCaptureTransactionPending()
+    public static testMethod void testCaptureTransactionError()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-    }
-
-    /**
-    * @name testCaptureTransactionEmptyDecision
-    * @description capture transaction empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testCaptureTransactionEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the error message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(CAPTURE_TRANSACTION, transactionParameter, '102', ERROR, null, ERROR_MESSAGE, GATEWAY_ID);
     }
 
     /**
@@ -496,8 +456,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testChargeTransactionPending
-    * @description charge transaction pending case
+    * @name testChargeTransactionError
+    * @description charge transaction error case
     * @Param
     * @return NA
     * @exception NA
@@ -506,31 +466,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testChargeTransactionPending()
+    public static testMethod void testChargeTransactionError()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '102', PENDING, null, null, GATEWAY_ID);
-    }
-
-    /**
-    * @name testChargeTransactionEmptyDecision
-    * @description charge transaction empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testChargeTransactionEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the error message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '102', ERROR, null, null, GATEWAY_ID);
     }
 
     /**
@@ -587,8 +528,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testVoidTransactionPending
-    * @description void transaction pending case
+    * @name testVoidTransactionError
+    * @description void transaction error case
     * @Param
     * @return NA
     * @exception NA
@@ -597,31 +538,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testVoidTransactionPending()
+    public static testMethod void testVoidTransactionError()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-    }
-
-    /**
-    * @name testVoidTransactionEmptyDecision
-    * @description void transaction empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testVoidTransactionEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the error message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(VOID_TRANSACTION, transactionParameter, '102', ERROR, null, ERROR_MESSAGE, GATEWAY_ID);
     }
 
     /**
@@ -695,8 +617,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testRefundTransactionPending
-    * @description refund transaction pending case
+    * @name testRefundTransactionError
+    * @description refund transaction error case
     * @Param
     * @return NA
     * @exception NA
@@ -705,31 +627,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testRefundTransactionPending()
+    public static testMethod void testRefundTransactionError()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-    }
-
-    /**
-    * @name testRefundTransactionEmptyDecision
-    * @description refund transaction empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testRefundTransactionEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the error message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(REFUND_TRANSACTION, transactionParameter, '102', ERROR, null, ERROR_MESSAGE, GATEWAY_ID);
     }
 
     /**
@@ -820,8 +723,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testNonReferredRefundPending
-    * @description NonReferred Refund pending case
+    * @name testNonReferredRefundError
+    * @description NonReferred Refund error case
     * @Param
     * @return NA
     * @exception NA
@@ -830,31 +733,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testNonReferredRefundPending()
+    public static testMethod void testNonReferredRefundError()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-    }
-
-    /**
-    * @name testNonReferredRefundEmptyDecision
-    * @description NonReferred Refund empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testNonReferredRefundEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the error message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(NON_REFERRED_REFUND, transactionParameter, '102', ERROR, null, ERROR_MESSAGE, GATEWAY_ID);
     }
 
     /**
@@ -911,8 +795,8 @@ private class CyberSourceTest
     }
 
     /**
-    * @name testVoidRefundTransactionPending
-    * @description Void Refund pending case
+    * @name testVoidRefundTransactionError
+    * @description Void Refund error case
     * @Param
     * @return NA
     * @exception NA
@@ -921,31 +805,12 @@ private class CyberSourceTest
     * @remark
     * @change
     */
-    public static testMethod void testVoidRefundTransactionPending()
+    public static testMethod void testVoidRefundTransactionError()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the pending message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_PENDING;
-        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '102', PENDING, null, PENDING_MESSAGE, GATEWAY_ID);
-    }
-
-    /**
-    * @name testVoidRefundTransactionEmptyDecision
-    * @description Void Refund empty decision case
-    * @Param
-    * @return NA
-    * @exception NA
-    * @author Lopa
-    * @created 2018-06-5
-    * @remark
-    * @change
-    */
-    public static testMethod void testVoidRefundTransactionEmptyDecision()
-    {
-        blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
-        // change the response message to be the empty <decision> message
-        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_EMPTY_DECISION;
-        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '103', '', null, null, GATEWAY_ID);
+        // change the response message to be the error message
+        CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        invokeAPIAndVerifyResponse(VOID_REFUND_TRANSACTION, transactionParameter, '102', ERROR, null, ERROR_MESSAGE, GATEWAY_ID);
     }
 
     /**
