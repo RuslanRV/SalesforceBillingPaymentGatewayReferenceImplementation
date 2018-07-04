@@ -921,14 +921,14 @@ public class CyberSource
                 continue;
             }
             try {
-                if(NULL != transactionParameterToProcess.getTransaction())
+                if(NULL != transactionParameterToProcess.getPaymentMethod())
                 {
-                    if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_CREDITCARD)
+                    if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_CREDITCARD)
                     {
                         // Calling CyberSourceUtils class to populate the Request for generate Refund XML for Credit card
                         CyberSourceUtils.getInstance().generateRefundXML(transactionParameterToProcess);
                     }
-                    else if(transactionParameterToProcess.getTransaction().blng__RequestTypeOfPayment__c == PAYMENTTYPE_ACH)
+                    else if(transactionParameterToProcess.getPaymentMethod().blng__PaymentType__c == PAYMENTTYPE_ACH)
                     {
                         // Calling CyberSourceUtils class to populate the Request for generate Refund XML for ACH
                         CyberSourceUtils.getInstance().generateACHRefundXML(transactionParameterToProcess);

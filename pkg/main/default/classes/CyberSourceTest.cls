@@ -1138,6 +1138,7 @@ private class CyberSourceTest
         transactionParameter.setState('CA');
         transactionParameter.setZipCode('60602-1304');
         transactionParameter.setCountry('United States');
+        transactionParameter.setGatewayId('1234');
         transactionParameter.setPhone('111');
         transactionParameter.setCurrencyId('USD');
         transactionParameter.setAmount('1.00');
