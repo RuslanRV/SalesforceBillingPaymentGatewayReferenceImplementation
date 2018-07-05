@@ -1644,7 +1644,7 @@ public class CyberSourceUtils {
         writer.writeAttribute('', '', 'run', 'true');
         // Populate captureRequestID start
         writer.writeStartElement('', 'captureRequestID', '');
-        writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
+        writer.writeCharacters(transactionParameterToProcess.getGateWayId());
         writer.writeEndElement();
         // Populate captureRequestID end
         writer.writeEndElement();
@@ -1656,7 +1656,7 @@ public class CyberSourceUtils {
         writer.writeEndElement();
         // Populate Envelope end
         writer.writeEndDocument();
-        transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getTransaction().blng__RequestInvoice__c, transactionParameterToProcess));
+        transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getRequestingInvoiceId(), transactionParameterToProcess));
         writer.close();
     }
 
@@ -1670,6 +1670,7 @@ public class CyberSourceUtils {
      * @created 2016-07-26
      * @remark 
      * @change
+     * RS 2018-07-04 @ W - 5024840
      */
     public void generateACHRefundXML(blng.TransactionParameter transactionParameterToProcess) {
         XmlStreamWriter writer = new XmlStreamWriter();
@@ -1733,7 +1734,7 @@ public class CyberSourceUtils {
         writer.writeAttribute('', '', 'run', 'true');
         // Populate captureRequestID start
         writer.writeStartElement('', 'debitRequestID', '');
-        writer.writeCharacters(transactionParameterToProcess.getTransaction().blng__GatewayID__c);
+        writer.writeCharacters(transactionParameterToProcess.getGateWayId());
         writer.writeEndElement();
         // Populate captureRequestID end
         writer.writeEndElement();
@@ -1745,7 +1746,7 @@ public class CyberSourceUtils {
         writer.writeEndElement();
         // Populate Envelope end
         writer.writeEndDocument();
-        transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getTransaction().blng__RequestInvoice__c, transactionParameterToProcess));
+        transactionParameterToProcess.setRequestBody(getInvoiceDetail(writer.getXmlString(), transactionParameterToProcess.getRequestingInvoiceId(), transactionParameterToProcess));
         writer.close();
     }
 
@@ -2304,9 +2305,10 @@ public class CyberSourceUtils {
     */
     public static Map<String, blng.TransactionResult> validateInvoiceConfig(
             Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameterById,
-            String invoiceDetailAPIValue) {
+            String invoiceDetailAPIValue)
+    {
         String invoiceLineDetailAPIValue = blng__BillingConfig__c.getValues('INVOICE_LINE_DETAIL').blng__StringValue__c;
-        Map<String, blng.TransactionResult> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionResult>();
+        Map<String, blng.TransactionResult> mapOfProcessIdToTransactionResult = new Map<String, blng.TransactionResult>();
         Schema.DisplayType fielddataType;
         // check invoice config
         if (NULL != invoiceDetailAPIValue) {
@@ -2314,7 +2316,7 @@ public class CyberSourceUtils {
         }
         // field added has to be of type TEXTAREA, else it is an error
         if (NULL != invoiceDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA) {
-            return handleInvoiceConfigError(invoiceDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionParameter);
+            return handleInvoiceConfigError(invoiceDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionResult);
         }
         // now check invoice line config
         if (NULL != invoiceLineDetailAPIValue) {
@@ -2322,9 +2324,9 @@ public class CyberSourceUtils {
         }
         // field added has to be of type TEXTAREA, else it is an error
         if (NULL != invoiceLineDetailAPIValue && String.valueOf(fielddataType) != TEXTAREA) {
-            return handleInvoiceConfigError(invoiceLineDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionParameter);
+            return handleInvoiceConfigError(invoiceLineDetailAPIValue, mapOfProcessIdToTransactionParameterById, mapOfProcessIdToTransactionResult);
         }
-        return mapOfProcessIdToTransactionParameter;
+        return mapOfProcessIdToTransactionResult;
     }
 
     /**
@@ -2353,7 +2355,7 @@ public class CyberSourceUtils {
     * @description sets the error response messages in TransactionResult
     * @param configAPIValue
     * @param mapOfProcessIdToTransactionParameterById
-    * @param mapOfProcessIdToTransactionParameter
+    * @param mapOfProcessIdToTransactionResult
     * @return Map<String, blng.TransactionResult>
     * @exception NA
     * @author Lopa
@@ -2364,7 +2366,8 @@ public class CyberSourceUtils {
     private static Map<String, blng.TransactionResult> handleInvoiceConfigError(
             string configAPIValue,
             Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameterById,
-            Map<String, blng.TransactionResult> mapOfProcessIdToTransactionParameter) {
+            Map<String, blng.TransactionResult> mapOfProcessIdToTransactionResult)
+    {
         string idToProcess = (new list<string>(mapOfProcessIdToTransactionParameterById.keySet())[0]);
         blng.TransactionParameter transactionParameterToProcess = mapOfProcessIdToTransactionParameterById.get(idToProcess);
         transactionParameterToProcess.transactionResult.setIsSuccess(false);
@@ -2373,8 +2376,8 @@ public class CyberSourceUtils {
         transactionParameterToProcess.transactionResult.setId(idToProcess);
         transactionParameterToProcess.transactionResult.setResponseCode('ERROR');
         transactionParameterToProcess.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.ValidationError);
-        mapOfProcessIdToTransactionParameter.put(idToProcess, transactionParameterToProcess.transactionResult);
-        return mapOfProcessIdToTransactionParameter;
+        mapOfProcessIdToTransactionResult.put(idToProcess, transactionParameterToProcess.transactionResult);
+        return mapOfProcessIdToTransactionResult;
     }
 
     /**
