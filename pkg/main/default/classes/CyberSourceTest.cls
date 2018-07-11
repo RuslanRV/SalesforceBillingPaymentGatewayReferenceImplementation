@@ -1204,7 +1204,7 @@ private class CyberSourceTest
             String responseCodeMessage,
             String gatewayId) {
         Map<String, blng.TransactionParameter> mapOfProcessIdToTransactionParameter = new Map<String, blng.TransactionParameter> {'123'=> transactionParameter};
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        Test.setMock(HttpCalloutMock.class, new CyberSourceMockHttpResponseGenerator());
         blng.PaymentGatewayParameter paymentGatewayParameter = new blng.PaymentGatewayParameter();
         paymentGatewayParameter.setTransactionType(apiMethod);
 
