@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label>CyberSource Billing Admin</label>
+    <label>CyberSource Admin</label>
     <fieldPermissions>
         <editable>true</editable>
         <field>PaymentGateway__c.MerchantId__c</field>
