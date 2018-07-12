@@ -4,6 +4,7 @@ global class PostInstallClass implements InstallHandler
     global void onInstall(InstallContext context)
     {
     	InsertBillingConfigCustomSettings();
+        InsertPaymentGatewayConfigCustomSettings();
     }
 
     public void InsertBillingConfigCustomSettings()
@@ -54,4 +55,22 @@ global class PostInstallClass implements InstallHandler
     		Insert mapOfBillingConfigurationByName.values();
     	}   
     }
+
+    public void InsertPaymentGatewayConfigCustomSettings()
+    {
+        String gatewayName = 'CyberSource';
+        List<blng__PaymentGatewayConfig__c> listofConfiguration = new List<blng__PaymentGatewayConfig__c>();
+        blng__PaymentGatewayConfig__c gateway = new blng__PaymentGatewayConfig__c(
+                Name = gatewayName,
+                blng__ClassName__c = CyberSource.class.getName().substringBefore(gatewayName) + gatewayName + 'API');
+        listofConfiguration.add(gateway);
+
+        // get the all custom settings to check whether system has already settings or not
+        map<String, blng__PaymentGatewayConfig__c> mapOfConfigurationValues = blng__PaymentGatewayConfig__c.getAll();
+        // if system does not have the gateway, then insert it
+        if(!mapOfConfigurationValues.containskey(gatewayName)) {
+            insert listofConfiguration;
+        }
+    }
+
 }
