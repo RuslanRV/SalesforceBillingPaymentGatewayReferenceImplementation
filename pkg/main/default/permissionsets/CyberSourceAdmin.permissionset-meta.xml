@@ -3,22 +3,22 @@
     <label>CyberSource Admin</label>
     <fieldPermissions>
         <editable>true</editable>
-        <field>PaymentGateway__c.MerchantId__c</field>
+        <field>blng__PaymentGateway__c.MerchantId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>PaymentGateway__c.MerchantReference__c</field>
+        <field>blng__PaymentGateway__c.MerchantReference__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>PaymentGateway__c.TransactionSecurityKey__c</field>
+        <field>blng__PaymentGateway__c.TransactionSecurityKey__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>PaymentGateway__c.TestMode__c</field>
+        <field>blng__PaymentGateway__c.TestMode__c</field>
         <readable>true</readable>
     </fieldPermissions>
 </PermissionSet>
