@@ -77,7 +77,7 @@ global class PostInstallClass implements InstallHandler
         listofConfiguration.add(gateway);
 
         // get the all custom settings to check whether system has already settings or not
-        map<String, blng__PaymentGatewayConfig__c> mapOfConfigurationValues = blng__PaymentGatewayConfig__c.getAll();
+        Map<String, blng__PaymentGatewayConfig__c> mapOfConfigurationValues = blng__PaymentGatewayConfig__c.getAll();
         // if system does not have the gateway, then insert it
         if(!mapOfConfigurationValues.containskey(gatewayName)) {
             insert listofConfiguration;
