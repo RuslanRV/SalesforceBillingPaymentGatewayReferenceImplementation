@@ -1232,7 +1232,6 @@ private class CyberSourceTest
     static void installScript() 
     {
         PostInstallClass postinstall = new PostInstallClass();
-            system.Test.testInstall(postinstall, null);
-        exception e;
+        system.Test.testInstall(postinstall, null);
     }
 }

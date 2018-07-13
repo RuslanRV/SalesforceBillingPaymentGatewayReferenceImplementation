@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>CyberSource Admin</label>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>blng__PaymentGateway__c.MerchantId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>blng__PaymentGateway__c.MerchantReference__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>blng__PaymentGateway__c.TransactionSecurityKey__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>blng__PaymentGateway__c.TestMode__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+</PermissionSet>
