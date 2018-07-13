@@ -56,6 +56,17 @@ global class PostInstallClass implements InstallHandler
     	}   
     }
 
+    /**
+    * @name InsertPaymentGatewayConfigCustomSettings
+    * @description creates a payment gateway config record which is basically has the API class name for a gateway
+    * @Param NA
+    * @return NA
+    * @exception NA
+    * @author Lopa M
+    * @created 2018-07-12
+    * @remark
+    * @change
+    */
     public void InsertPaymentGatewayConfigCustomSettings()
     {
         String gatewayName = 'CyberSource';
