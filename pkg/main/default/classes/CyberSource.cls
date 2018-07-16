@@ -1332,17 +1332,6 @@ public class CyberSource
                     handleError(transactionParameterToProcess.transactionResult, FAILED_GATEWAY_SETTINGS + IN_GET_STATUS, blng.TransactionResult.GatewayStatusType.ValidationError, e);
                     continue;
                 }
-                // validate customer
-                try {
-                    CyberSourceUtils.validateCustomerDetails(transactionParameterToProcess);
-                    if (!transactionParameterToProcess.transactionResult.getErrors().IsEmpty()) {
-                        handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GET_STATUS, blng.TransactionResult.GatewayStatusType.ValidationError, null);
-                        continue;
-                    }
-                } catch (Exception e) {
-                    handleError(transactionParameterToProcess.transactionResult, FAILED_CUSTOMER_VALIDATION + IN_GET_STATUS, blng.TransactionResult.GatewayStatusType.ValidationError, e);
-                    continue;
-                }
                 // create the request XML
                 try {
                     CyberSourceUtils.getInstance().generateGetPaymentStatusXML(transactionParameterToProcess);
