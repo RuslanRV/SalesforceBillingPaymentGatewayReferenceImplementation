@@ -1239,6 +1239,6 @@ private class CyberSourceTest
         System.assertEquals(true, mapOfBillingConfigurationValues.containsKey('INVOICE_LINE_DETAIL'), 'INVOICE_LINE_DETAIL billing config should have been added');
         // get the all payment gateway custom settings to check whether gateway has been added
         Map<String, blng__PaymentGatewayConfig__c> mapOfConfigurationValues = blng__PaymentGatewayConfig__c.getAll();
-        System.assertEquals(true, mapOfConfigurationValues.containsKey('CyberSource'), 'CyberSource payment gateway config should have been added');
+        System.assertEquals(true, mapOfConfigurationValues.containsKey('CyberSource'), 'Payment gateway config should have been added');
     }
 }
