@@ -379,6 +379,7 @@ private class CyberSourceTest
     public static testMethod void testChargeTransactionMissingEmail()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
+
         // empty the email field
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
         blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, 'ERROR', EMAIL_MISSING, EMAIL_MISSING, EMAIL_MISSING_MESSAGE, NULL);
@@ -399,6 +400,8 @@ private class CyberSourceTest
     public static testMethod void testChargeTransactionACHSuccess()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_ACH);
+        // set the gateway status as though its coming from a generateToken call
+        transactionParameter.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.Success);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
@@ -416,6 +419,8 @@ private class CyberSourceTest
     public static testMethod void testChargeTransactionCCwithPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // set the gateway status as though its coming from a generateToken call
+        transactionParameter.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.Success);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
@@ -433,6 +438,8 @@ private class CyberSourceTest
     public static testMethod void testChargeTransactionCCnoPaymentTransactionSuccess()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // set the gateway status as though its coming from a generateToken call
+        transactionParameter.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.Success);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '100', SUCCESS, SUCCESS, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
@@ -452,6 +459,8 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
+        // set the gateway status as though its coming from a generateToken call
+        transactionParameter.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.Success);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '101', FAILURE, INVALID_FIELD_MESSAGE, INVALID_FIELD_MESSAGE, GATEWAY_ID);
     }
 
@@ -471,6 +480,8 @@ private class CyberSourceTest
         blng.TransactionParameter transactionParameter = createParamWithPaymentTransaction(PAYMENTTYPE_ACH);
         // change the response message to be the error message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_ERROR;
+        // set the gateway status as though its coming from a generateToken call
+        transactionParameter.transactionResult.setGatewayStatus(blng.TransactionResult.GatewayStatusType.Success);
         invokeAPIAndVerifyResponse(CHARGE_TRANSACTION, transactionParameter, '102', ERROR, null, null, GATEWAY_ID);
     }
 

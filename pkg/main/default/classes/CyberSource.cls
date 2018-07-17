@@ -151,6 +151,10 @@ public class CyberSource
                     handleError(transactionParameterToProcess.transactionResult, FAILED_XML_GENERATION + IN_GENERATE_TOKEN, blng.TransactionResult.GatewayStatusType.SystemError, e);
                     continue;
                 }
+                // when generateToken is called before chargeTransaction, it passes the same transactionParam, which already has a gateway status.
+                // populateTransactionResultForCharge looks for the gateway status!=null and decides whether the chargeTransaction failed in this method
+                // So we need to nullify it before starting the callout process
+                transactionParameterToProcess.transactionResult.setGatewayStatus(null);
                 // Calling CyberSourceHttpService class to send a Request
                 try {
                     CyberSourceHttpService sendHttpRequest = CyberSourceHttpService.getInstance();
@@ -196,7 +200,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -311,7 +315,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -426,7 +430,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -554,7 +558,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -703,7 +707,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -844,7 +848,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -984,7 +988,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -1130,7 +1134,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -1261,7 +1265,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
@@ -1386,7 +1390,7 @@ public class CyberSource
             try {
                 transactionParameterToProcess = mapOfTransactionParameterById.get(idToProcess);
                 // if this invoice ran into issues we should not change its return values
-                if (null != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
+                if (NULL != transactionParameterToProcess.transactionResult.getGatewayStatus()) {
                     mapOfTransactionResultById.put(idToProcess, transactionParameterToProcess.transactionResult);
                     continue;
                 }
