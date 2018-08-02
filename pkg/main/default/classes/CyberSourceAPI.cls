@@ -12,10 +12,12 @@
 // Use Cases or Requirements:  
 // @UseCase number - @requirement Description       
 // =============================================================================================  
-// Changes: @Date Author
-//          @Description
+// Changes:
+//      @author Lopa Mukherjee
+//      @created 2018-08-02
+//      @description Added interface PaymentGateWayStatus to populate the GatewayStatus in the return param to Billing
 // ============================================================================================= 
-global class CyberSourceAPI implements blng.PaymentGateWay,blng.PaymentGateWays
+global class CyberSourceAPI implements blng.PaymentGateWay, blng.PaymentGateWays, blng.PaymentGateWayStatus
 {
     // ============================================================================
     // CONSTANT 
