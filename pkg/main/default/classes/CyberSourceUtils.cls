@@ -191,6 +191,11 @@ public class CyberSourceUtils {
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
         writer.writeEndElement();
         // Populate expirationYear end
+        // Populate securityCode (CVV) start
+        writer.writeStartElement('', 'securityCode', '');
+        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
+        writer.writeEndElement();
+        // Populate securityCode end
         if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
             // Populate cardType start
             writer.writeStartElement('', 'cardType', '');
@@ -452,6 +457,11 @@ public class CyberSourceUtils {
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
         writer.writeEndElement();
         // Populate expirationYear end
+        // Populate securityCode (CVV) start
+        writer.writeStartElement('', 'securityCode', '');
+        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
+        writer.writeEndElement();
+        // Populate securityCode end
         if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
             // Populate cardType start
             writer.writeStartElement('', 'cardType', '');
@@ -494,7 +504,7 @@ public class CyberSourceUtils {
         writer.close();
     }
 
-/**
+    /**
      * @name generateCaptureXML
      * @description Method to Generate Charge XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
@@ -720,6 +730,11 @@ public class CyberSourceUtils {
                 writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
                 writer.writeEndElement();
                 // Populate expirationYear end
+                // Populate securityCode (CVV) start
+                writer.writeStartElement('', 'securityCode', '');
+                writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
+                writer.writeEndElement();
+                // Populate securityCode end
                 if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
                     // Populate cardType start
                     writer.writeStartElement('', 'cardType', '');
@@ -1131,6 +1146,11 @@ public class CyberSourceUtils {
                 writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
                 writer.writeEndElement();
                 // Populate expirationYear end
+                // Populate securityCode (CVV) start
+                writer.writeStartElement('', 'securityCode', '');
+                writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
+                writer.writeEndElement();
+                // Populate securityCode end
                 if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
                     // Populate cardType start
                     writer.writeStartElement('', 'cardType', '');
@@ -1879,6 +1899,11 @@ public class CyberSourceUtils {
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
         writer.writeEndElement();
         // Populate expirationYear end
+        // Populate securityCode (CVV) start
+        writer.writeStartElement('', 'securityCode', '');
+        writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
+        writer.writeEndElement();
+        // Populate securityCode end
         if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
             // Populate cardType start
             writer.writeStartElement('', 'cardType', '');
@@ -1922,7 +1947,7 @@ public class CyberSourceUtils {
         transactionParameterToProcess.setRequestBody(writer.getXmlString());
         writer.close();
     }
-/**
+    /**
      * @name generateACHnonReferencedRefundXML
      * @description Method to Generate ACH non Referenced Refund XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
