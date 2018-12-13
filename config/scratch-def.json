@@ -2,7 +2,7 @@
   "orgName": "CyberSource SFDX",
   "adminEmail": "nope@steelbrick.com",
   "edition": "Developer",
-  "features": ["DebugApex"],
+  "features": ["DebugApex", "CPQ"],
   "orgPreferences": {
     "enabled": [
       "DisableParallelApexTesting",
