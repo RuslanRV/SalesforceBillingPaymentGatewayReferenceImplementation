@@ -1155,6 +1155,8 @@ private class CyberSourceTest
         transactionParameter.setAmount('1.00');
         transactionParameter.setGateWay((blng__PaymentGateway__c)Database.query(qBuilderForGateway.buildSOQL())[0]);
         transactionParameter.setPaymentMethod((blng__PaymentMethod__c) Database.query(qBuilderForPaymentMethod.buildSOQL())[0]);
+        //Adding CVV seperately as it does not get saved in database
+        transactionParameter.getPaymentMethod().blng__CVV__c = '123';
         transactionParameter.getPaymentMethod().blng__PaymentType__c = paymentType;
         transactionParameter.getGateWay().TestMode__c = true;
         transactionParameter.getGateWay().MerchantID__c = 'salesforcebilling';
