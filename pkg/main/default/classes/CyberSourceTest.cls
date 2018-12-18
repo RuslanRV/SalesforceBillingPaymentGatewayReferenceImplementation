@@ -144,6 +144,28 @@ private class CyberSourceTest
     }
 
     /**
+    * @name testGenerateTokenForMissingCVV
+    * @description generate token missing cvv case
+    * @Param
+    * @return NA
+    * @exception NA
+    * @author Arundhati
+    * @created 2018-12-14
+    * @remark
+    * @change
+    */
+    public static testMethod void testGenerateTokenForMissingCVV()
+    {
+        blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
+        // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
+        transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
+        // set the CVV as blank
+        transactionParameter.getPaymentMethod().blng__CVV__c = '';
+        blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
+        System.assertEquals(SUBSCRIPTION_ID, transactionResult.getPaymentToken(), 'Wrong Payment Token');
+    }
+
+    /**
     * @name testVoidTokenTransactionSuccess
     * @description void token success case
     * @Param
@@ -1223,6 +1245,21 @@ private class CyberSourceTest
 
         Test.startTest();
         Map<String, blng.TransactionResult> response = CyberSourceAPI.processPayments(mapOfProcessIdToTransactionParameter, paymentGatewayParameter);
+
+        //Test if CVV is set in 'cvNumber' xml ELement
+        if(apiMethod.equals(GENERATE_TOKEN) || apiMethod.equals(AUTHORIZE_TRANSACTION) || apiMethod.equals(CHARGE_TRANSACTION)
+            || apiMethod.equals(NON_REFERRED_REFUND) || apiMethod.equals(REFUND_TRANSACTION)){
+            transactionParameter = mapOfProcessIdToTransactionParameter.get('123');
+            blng__PaymentMethod__c paymentMethod = transactionParameter.getPaymentMethod();
+            String cardMapping = (new CyberSourceUtils()).getCardMapping(paymentMethod);
+            if (NULL == cardMapping) {
+                Dom.Document doc = new Dom.Document();
+                doc.load(transactionParameter.getRequestBody());
+                Map<String, String> requestTokensMap = AuthorizeDotNetUtils.getElements(doc.getRootElement());
+                String cvv = requestTokensMap.get('cvNumber');
+                System.assertEquals(paymentMethod.blng__CVV__c, cvv, 'CVV code not set');
+            }
+        }
         System.assertNotEquals(0, response.size(), apiMethod + ' should return a transaction result');
         blng.TransactionResult transactionResult = response.values().get(0);
 

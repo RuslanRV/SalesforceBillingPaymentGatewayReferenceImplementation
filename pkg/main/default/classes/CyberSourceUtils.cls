@@ -191,11 +191,11 @@ public class CyberSourceUtils {
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
         writer.writeEndElement();
         // Populate expirationYear end
-        // Populate securityCode (CVV) start
-        writer.writeStartElement('', 'securityCode', '');
+        // Populate cvNumber (CVV) start
+        writer.writeStartElement('', 'cvNumber', '');
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
         writer.writeEndElement();
-        // Populate securityCode end
+        // Populate cvNumber end
         if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
             // Populate cardType start
             writer.writeStartElement('', 'cardType', '');
@@ -333,7 +333,7 @@ public class CyberSourceUtils {
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
      * @return NA
      * @exception
-     * @author Balachary 
+     * @author Balachary
      * @created 2017-06-01
      * @remark
      * @change
@@ -457,11 +457,11 @@ public class CyberSourceUtils {
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
         writer.writeEndElement();
         // Populate expirationYear end
-        // Populate securityCode (CVV) start
-        writer.writeStartElement('', 'securityCode', '');
+        // Populate cvNumber (CVV) start
+        writer.writeStartElement('', 'cvNumber', '');
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
         writer.writeEndElement();
-        // Populate securityCode end
+        // Populate cvNumber end
         if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
             // Populate cardType start
             writer.writeStartElement('', 'cardType', '');
@@ -730,11 +730,11 @@ public class CyberSourceUtils {
                 writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
                 writer.writeEndElement();
                 // Populate expirationYear end
-                // Populate securityCode (CVV) start
-                writer.writeStartElement('', 'securityCode', '');
+                // Populate cvNumber (CVV) start
+                writer.writeStartElement('', 'cvNumber', '');
                 writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
                 writer.writeEndElement();
-                // Populate securityCode end
+                // Populate cvNumber end
                 if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
                     // Populate cardType start
                     writer.writeStartElement('', 'cardType', '');
@@ -1021,7 +1021,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
-     * @remark 
+     * @remark
      * @change
      */
     public void generateChargeLevel3XML(blng.TransactionParameter transactionParameterToProcess) {
@@ -1146,11 +1146,11 @@ public class CyberSourceUtils {
                 writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
                 writer.writeEndElement();
                 // Populate expirationYear end
-                // Populate securityCode (CVV) start
-                writer.writeStartElement('', 'securityCode', '');
+                // Populate cvNumber (CVV) start
+                writer.writeStartElement('', 'cvNumber', '');
                 writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
                 writer.writeEndElement();
-                // Populate securityCode end
+                // Populate cvNumber end
                 if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
                     // Populate cardType start
                     writer.writeStartElement('', 'cardType', '');
@@ -1343,7 +1343,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
-     * @remark 
+     * @remark
      * @change
      */
     public void generateACHChargeXML(blng.TransactionParameter transactionParameterToProcess) {
@@ -1510,7 +1510,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Raghavendra Reddy
      * @created 2017-05-30
-     * @remark 
+     * @remark
      * @change
      */
     public void generateVoidXML(blng.TransactionParameter transactionParameterToProcess) {
@@ -1599,7 +1599,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
-     * @remark 
+     * @remark
      * @change
      */
     public void generateRefundXML(blng.TransactionParameter transactionParameterToProcess) {
@@ -1688,7 +1688,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-26
-     * @remark 
+     * @remark
      * @change
      * RS 2018-07-04 @ W - 5024840
      */
@@ -1899,11 +1899,11 @@ public class CyberSourceUtils {
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CardExpirationYear__c);
         writer.writeEndElement();
         // Populate expirationYear end
-        // Populate securityCode (CVV) start
-        writer.writeStartElement('', 'securityCode', '');
+        // Populate cvNumber (CVV) start
+        writer.writeStartElement('', 'cvNumber', '');
         writer.writeCharacters(transactionParameterToProcess.getPaymentMethod().blng__CVV__c);
         writer.writeEndElement();
-        // Populate securityCode end
+        // Populate cvNumber end
         if (transactionParameterToProcess.getPaymentMethod().blng__CardType__c == 'VISA') {
             // Populate cardType start
             writer.writeStartElement('', 'cardType', '');
