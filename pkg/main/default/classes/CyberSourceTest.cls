@@ -1255,7 +1255,7 @@ private class CyberSourceTest
             if (NULL == cardMapping) {
                 Dom.Document doc = new Dom.Document();
                 doc.load(transactionParameter.getRequestBody());
-                Map<String, String> requestTokensMap = AuthorizeDotNetUtils.getElements(doc.getRootElement());
+                Map<String, String> requestTokensMap = CyberSourceUtils.getElements(doc.getRootElement());
                 String cvv = requestTokensMap.get('cvNumber');
                 System.assertEquals(paymentMethod.blng__CVV__c, cvv, 'CVV code not set');
             }
