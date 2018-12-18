@@ -94,7 +94,7 @@ private class CyberSourceTest
     public static testMethod void testGenerateTokenSuccess()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
+        // createParamNoPaymentTransaction sets the payment token, but since generate token does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         blng.TransactionResult transactionResult = invokeAPIAndVerifyResponse(GENERATE_TOKEN, transactionParameter, '100', SUCCESS, null, SUCCESS_MESSAGE, null);
         System.assertEquals(SUBSCRIPTION_ID, transactionResult.getPaymentToken(), 'Wrong Payment Token');
