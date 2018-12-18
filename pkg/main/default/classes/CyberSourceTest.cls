@@ -114,7 +114,7 @@ private class CyberSourceTest
     public static testMethod void testGenerateTokenReject()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
+        // createParamNoPaymentTransaction sets the payment token, but since generate token does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // change the response message to be the reject message
         CyberSource.TEST_REQUEST_BODY_CYBER_SOURCE = TEST_REQUEST_BODY_REJECT;
@@ -135,7 +135,7 @@ private class CyberSourceTest
     public static testMethod void testGenerateTokenForMissingEmail()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
+        // createParamNoPaymentTransaction sets the payment token, but since generate token does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // set the email as blank
         transactionParameter.getPaymentMethod().blng__BillingEmail__c = '';
@@ -157,7 +157,7 @@ private class CyberSourceTest
     public static testMethod void testGenerateTokenForMissingCVV()
     {
         blng.TransactionParameter transactionParameter = createParamNoPaymentTransaction(PAYMENTTYPE_CREDITCARD);
-        // createParamNoPaymentTransaction sets the payment token, but since generate token does does require it, remove it here
+        // createParamNoPaymentTransaction sets the payment token, but since generate token does require it, remove it here
         transactionParameter.getPaymentMethod().blng__PaymentGatewayToken__c = '';
         // set the CVV as blank
         transactionParameter.getPaymentMethod().blng__CVV__c = '';
