@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GatewayStatus__c</fullName>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Corresponding Gateway Status</inlineHelpText>
+    <label>Corresponding Gateway Status</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Success</fullName>
+                <default>true</default>
+                <label>Success</label>
+            </value>
+            <value>
+                <fullName>Decline</fullName>
+                <default>false</default>
+                <label>Decline</label>
+            </value>
+            <value>
+                <fullName>ValidationError</fullName>
+                <default>false</default>
+                <label>Validation Error</label>
+            </value>
+            <value>
+                <fullName>PermanentFail</fullName>
+                <default>false</default>
+                <label>Permanent Fail</label>
+            </value>
+            <value>
+                <fullName>RequiresReview</fullName>
+                <default>false</default>
+                <label>Requires Review</label>
+            </value>
+            <value>
+                <fullName>Indeterminate</fullName>
+                <default>false</default>
+                <label>Indeterminate</label>
+            </value>
+            <value>
+                <fullName>SystemError</fullName>
+                <default>false</default>
+                <label>System Error</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

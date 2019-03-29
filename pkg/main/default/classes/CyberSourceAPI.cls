@@ -12,10 +12,12 @@
 // Use Cases or Requirements:  
 // @UseCase number - @requirement Description       
 // =============================================================================================  
-// Changes: @Date Author
-//          @Description
+// Changes:
+//      @author Lopa Mukherjee
+//      @created 2018-08-02
+//      @description Added interface PaymentGateWayStatus to populate the GatewayStatus in the return param to Billing
 // ============================================================================================= 
-global class CyberSourceAPI implements blng.PaymentGateWay,blng.PaymentGateWays
+global class CyberSourceAPI implements blng.PaymentGateWay, blng.PaymentGateWays, blng.PaymentGateWayStatus
 {
     // ============================================================================
     // CONSTANT 
@@ -303,8 +305,19 @@ global class CyberSourceAPI implements blng.PaymentGateWay,blng.PaymentGateWays
     * @remark 
     * @change
     */      
-    global static Map<String, blng.TransactionResult> getRefundStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById) 
+    global static Map<String, blng.TransactionResult> getRefundStatus(Map<String, blng.TransactionParameter> mapOfTransactionParameterById)
     {
         return service().getPaymentStatus(mapOfTransactionParameterById);
+    }
+
+    /**
+     * @name populateGatewayStatus
+     * @description Method that populates the GatewayStatus enum on the TransactionResult,
+     * given return codes that are already set in the TransactionResults
+     * @param transactionResult
+     */
+    global static void populateGatewayStatus(blng.TransactionResult transactionResult)
+    {
+        service().populateGatewayStatus(transactionResult);
     }
 }
