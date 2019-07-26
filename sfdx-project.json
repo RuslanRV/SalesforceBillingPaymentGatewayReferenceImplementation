@@ -6,17 +6,17 @@
     {
       "path" : "pkg", "default": true,
       "id": "0Ho1O0000004CABSA2",
-      "versionName": "Summer '19",
-      "versionDescription": "Summer '19",
-      "versionNumber": "220.0.0.NEXT",
+      "versionName": "Winter '20",
+      "versionDescription": "Winter '20",
+      "versionNumber": "222.0.0.NEXT",
       "ancestorId": null,
       "dependencies": [
         {
           "packageId": "0Ho1O0000004C9ISAU",
-          "versionNumber": "220.0.0.LATEST"
+          "versionNumber": "222.0.0.LATEST"
         },{
           "packageId": "0Ho1O0000004C9DSAU",
-          "versionNumber": "220.0.0.LATEST"
+          "versionNumber": "222.0.0.LATEST"
         }
       ],
       "orgPreferences": {
