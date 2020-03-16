@@ -1,22 +1,22 @@
-// ============================================================================================= 
-//  Object: CyberSourceUtils 
+// =============================================================================================
+//  Object: CyberSourceUtils
 //  Company: Salesforce
 //  Author:  Vinod KR/ Manigandan SA
 //  Purpose: This class for all the functionality of CyberSource payment gateway XML Generator
 //  Methods: Following are the methods and one line description
-//              
+//
 //  Created: 2016-07-14
-// ============================================================================================= 
-//  Use Cases or Requirements: 
-//  @UseCase number - @requirement Description      
-// ============================================================================================= 
+// =============================================================================================
+//  Use Cases or Requirements:
+//  @UseCase number - @requirement Description
+// =============================================================================================
 //  Changes: @Date Author
 //           @Description
-// ============================================================================================= 
+// =============================================================================================
 public class CyberSourceUtils {
     //implements PaymentTransactionXMLGenerator
     // ============================================================================
-    // CONSTANT 
+    // CONSTANT
     // ============================================================================
     private static final String GENERATE_TOKEN_XML = 'generateTokenXML ';
     private static final String GENERATE_AUTHORIZE_XML = 'generateAuthorizeXML ';
@@ -30,6 +30,10 @@ public class CyberSourceUtils {
     private static Boolean IS_MULTICURRENCY_ORG = UserInfo.isMultiCurrencyOrganization();
     private static String CURRENCYISOCODE = 'CurrencyIsoCode';
     private static final String TEXTAREA = 'TEXTAREA';
+    private static final String COMMERCE_INDICATOR_INTERNET = 'internet';
+    private static final String COMMERCE_INDICATOR_RECURRING = 'recurring';
+    private static final String CARD_TYPE_VISA = 'visa';
+
 
     // ============================================================================
     // STATIC VARIABLES
@@ -44,7 +48,7 @@ public class CyberSourceUtils {
     private static Map<string, string> mapOfResponseValueByKey = new Map<string, string>();
     // ============================================================================
     // Methods
-    // ============================================================================ 
+    // ============================================================================
 
     /**
      * @name getInstance
@@ -54,7 +58,7 @@ public class CyberSourceUtils {
      * @exception To do
      * @author Manigandan SA / Vinod KR
      * @created 2016-07-15
-     * @remark 
+     * @remark
      * @change
      */
     public static CyberSourceUtils getInstance() {
@@ -598,6 +602,50 @@ public class CyberSourceUtils {
     }
 
     /**
+     * Write CommerceIndicator (VISA mandate param) conditionally.
+     */
+    private static void processCommerceIndicator(XmlStreamWriter writer, blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile) {
+        if (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && isCrendentialOnFile) {
+            writeCommerceIndicatorForPaymentCenter(writer);
+        } else if (transactionUseCase == blng.TransactionUseCase.PAYMENT_RUN) {
+            writeCommerceIndicatorForPaymentRun(writer);
+        }
+    }
+
+    /**
+     * Write SubsequentAuth (VISA mandate param) conditionally.
+     */
+    private static void processSubsequentAuth(XmlStreamWriter writer, blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile) {
+        if (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && isCrendentialOnFile) {
+            writeSubsequentAuthForPaymentCenter(writer);
+        }
+    }
+
+    private static void writeSubsequentAuthForPaymentCenter(XmlStreamWriter writer){
+        writer.writeStartElement('', 'subsequentAuth', '');
+        writer.writeCharacters('true');
+        writer.writeEndElement();
+    }
+
+    private static void writeCommerceIndicatorForPaymentCenter(XmlStreamWriter writer){
+        writer.writeStartElement('', 'commerceIndicator', '');
+        writer.writeCharacters(COMMERCE_INDICATOR_INTERNET);
+        writer.writeEndElement();
+    }
+
+    private static void writeCommerceIndicatorForPaymentRun(XmlStreamWriter writer){
+        writer.writeStartElement('', 'commerceIndicator', '');
+        writer.writeCharacters(COMMERCE_INDICATOR_RECURRING);
+        writer.writeEndElement();
+    }
+
+    private static Boolean useXsdForVisaMandate(blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile, String cardType) {
+        Boolean usexsd = (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER || transactionUseCase == blng.TransactionUseCase.PAYMENT_RUN)
+            && isCrendentialOnFile && CARD_TYPE_VISA.equalsIgnoreCase(cardType);
+        return usexsd;
+    }
+
+    /**
      * @name generateChargeXML
      * @description Method to Generate Charge XML
      * @param Map[Key => String [unique Id],Value => TransactionParameter]
@@ -610,6 +658,9 @@ public class CyberSourceUtils {
      */
     public void generateChargeXML(blng.TransactionParameter transactionParameterToProcess) {
         XmlStreamWriter writer = new XmlStreamWriter();
+        blng.TransactionUseCase transactionUseCase = transactionParameterToProcess.getTransactionUseCase();
+        Boolean isCrendentialOnFile = transactionParameterToProcess.getIsCredentialsOnFile();
+        String cardType = transactionParameterToProcess.getPaymentMethod().blng__CardType__c;
         if (NULL == transactionParameterToProcess.getTransaction()) {
             // Populate Document start
             writer.writeStartDocument('utf-8', '1.0');
@@ -644,7 +695,11 @@ public class CyberSourceUtils {
             writer.writeStartElement('s', 'Body', '');
             // Populate RequestMessage start
             writer.writeStartElement('', 'requestMessage', '');
-            writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+            if (useXsdForVisaMandate(transactionUseCase, isCrendentialOnFile, cardType)) {
+                writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.164');
+            } else {
+                writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+            }
             // Populate merchantID start
             writer.writeStartElement('', 'merchantID', '');
             writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
@@ -765,7 +820,10 @@ public class CyberSourceUtils {
                 // Populate ccAuthService start
                 writer.writeStartElement('', 'ccAuthService', '');
                 writer.writeAttribute('', '', 'run', 'true');
-
+                // Write CommerceIndicator conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processCommerceIndicator(writer, transactionUseCase, isCrendentialOnFile);
+                }
                 // Populate authType start
                 writer.writeStartElement('', 'authType', '');
                 writer.writeCharacters('AUTOCAPTURE');
@@ -781,6 +839,10 @@ public class CyberSourceUtils {
                 //writer.writeEndElement();
                 writer.writeEndElement();
                 // Populate ccCaptureService End
+                // Write SubsequentAuth conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                }
             } else {
                 // Populate purchaseTotals start
                 writer.writeStartElement('', 'purchaseTotals', '');
@@ -805,6 +867,10 @@ public class CyberSourceUtils {
                 // Populate ccAuthService start
                 writer.writeStartElement('', 'ccAuthService', '');
                 writer.writeAttribute('', '', 'run', 'true');
+                // Write CommerceIndicator conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processCommerceIndicator(writer, transactionUseCase, isCrendentialOnFile);
+                }
                 // Populate authType start
                 writer.writeStartElement('', 'authType', '');
                 writer.writeCharacters('AUTOCAPTURE');
@@ -820,6 +886,10 @@ public class CyberSourceUtils {
                 //writer.writeEndElement();
                 writer.writeEndElement();
                 // Populate ccCaptureService End
+                // Write SubsequentAuth conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                }
             }
             writer.writeEndElement();
             // Populate RequestMessage end
@@ -1026,6 +1096,9 @@ public class CyberSourceUtils {
      */
     public void generateChargeLevel3XML(blng.TransactionParameter transactionParameterToProcess) {
         XmlStreamWriter writer = new XmlStreamWriter();
+        blng.TransactionUseCase transactionUseCase = transactionParameterToProcess.getTransactionUseCase();
+        Boolean isCrendentialOnFile = transactionParameterToProcess.getIsCredentialsOnFile();
+        String cardType = transactionParameterToProcess.getPaymentMethod().blng__CardType__c;
         if (NULL == transactionParameterToProcess.getTransaction()) {
             // Populate Document start
             writer.writeStartDocument('utf-8', '1.0');
@@ -1060,7 +1133,11 @@ public class CyberSourceUtils {
             writer.writeStartElement('s', 'Body', '');
             // Populate RequestMessage start
             writer.writeStartElement('', 'requestMessage', '');
-            writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+            if (useXsdForVisaMandate(transactionUseCase, isCrendentialOnFile, cardType)) {
+                writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.164');
+            } else {
+                writer.writeAttribute('', '', 'xmlns', 'urn:schemas-cybersource-com:transaction-data-1.115');
+            }
             // Populate merchantID start
             writer.writeStartElement('', 'merchantID', '');
             writer.writeCharacters(transactionParameterToProcess.getGateWay().MerchantId__c);
@@ -1181,7 +1258,10 @@ public class CyberSourceUtils {
                 // Populate ccAuthService start
                 writer.writeStartElement('', 'ccAuthService', '');
                 writer.writeAttribute('', '', 'run', 'true');
-
+                // Write CommerceIndicator conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processCommerceIndicator(writer, transactionUseCase, isCrendentialOnFile);
+                }
                 // Populate authType start
                 writer.writeStartElement('', 'authType', '');
                 writer.writeCharacters('AUTOCAPTURE');
@@ -1197,6 +1277,10 @@ public class CyberSourceUtils {
                 writer.writeEndElement();
                 writer.writeEndElement();
                 // Populate ccCaptureService End
+                // Write SubsequentAuth conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                }
             } else {
                 // Populate purchaseTotals start
                 writer.writeStartElement('', 'purchaseTotals', '');
@@ -1221,6 +1305,10 @@ public class CyberSourceUtils {
                 // Populate ccAuthService start
                 writer.writeStartElement('', 'ccAuthService', '');
                 writer.writeAttribute('', '', 'run', 'true');
+                // Write CommerceIndicator conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processCommerceIndicator(writer, transactionUseCase, isCrendentialOnFile);
+                }
                 // Populate authType start
                 writer.writeStartElement('', 'authType', '');
                 writer.writeCharacters('AUTOCAPTURE');
@@ -1236,6 +1324,10 @@ public class CyberSourceUtils {
                 writer.writeEndElement();
                 writer.writeEndElement();
                 // Populate ccCaptureService End
+                // Write SubsequentAuth conditionally
+                if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
+                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                }
             }
             writer.writeEndElement();
             // Populate RequestMessage end
@@ -1955,7 +2047,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Manigandan SA
      * @created 2017-05-30
-     * @remark 
+     * @remark
      * @change
      */
     public void generateACHnonReferencedRefundXML(blng.TransactionParameter transactionParameterToProcess) {
@@ -2117,7 +2209,7 @@ public class CyberSourceUtils {
      * @exception
      * @author Raghavendra Reddy
      * @created 2017-05-30
-     * @remark 
+     * @remark
      * @change
      */
     public void generateVoidRefundXML(blng.TransactionParameter transactionParameterToProcess) {
@@ -2266,7 +2358,7 @@ public class CyberSourceUtils {
      * @exception NA
      * @author Raghavendra Reddy
      * @created 2017-05-30
-     * @remark 
+     * @remark
      * @change
      */
     public static Map<string, string> getElements(DOM.XMLNode node) {
@@ -2475,7 +2567,7 @@ public class CyberSourceUtils {
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-15
-    * @remark 
+    * @remark
     * @change
     */
     public String validateCurrency(blng.TransactionParameter transactionParameterToProcess) {
@@ -2504,7 +2596,7 @@ public class CyberSourceUtils {
     * @exception
     * @author Manigandan SA / Vinod KR
     * @created 2016-07-15
-    * @remark 
+    * @remark
     * @change
     */
     public String getCurrencyISOCode(SObject sObjectInstance) {
@@ -2543,12 +2635,12 @@ public class CyberSourceUtils {
     /**
     * @name getInvoiceDetail
     * @description Method is to get Invoice Details
-    * @param 
+    * @param
     * @return String
     * @exception NA
     * @author DL
     * @created 2017-06-13
-    * @remark 
+    * @remark
     * @change
     */
     public string getInvoiceDetail(String xMLRequest, Id invoiceId, blng.TransactionParameter transactionParameterToProcess) {
@@ -2605,12 +2697,12 @@ public class CyberSourceUtils {
     /**
     * @name getInvoiceLineDetail
     * @description Method is to get Invoice Details
-    * @param 
+    * @param
     * @return String
     * @exception NA
     * @author DL
     * @created 2017-06-13
-    * @remark 
+    * @remark
     * @change
     */
     public string getInvoiceLineDetail(String xMLRequest, Id invoiceId, blng.TransactionParameter transactionParameterToProcess) {
