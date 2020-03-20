@@ -1,19 +1,31 @@
 {
-  "orgName": "CyberSource SFDX",
-  "adminEmail": "nope@steelbrick.com",
-  "edition": "Developer",
-  "features": ["DebugApex", "CPQ"],
-  "orgPreferences": {
-    "enabled": [
-      "DisableParallelApexTesting",
-      "ChatterEnabled",
-      "S1DesktopEnabled",
-      "Translation",
-      "IsEntitlementsEnabled",
-      "IsNegativeQuantityEnabled",
-      "IsOrdersEnabled",
-      "IsReductionOrdersEnabled"
+    "orgName": "CyberSource SFDX",
+    "adminEmail": "nope@steelbrick.com",
+    "edition": "Developer",
+    "features": [
+        "DebugApex",
+        "CPQ"
     ],
-    "disabled": []
-  }
+    "settings": {
+        "apexSettings": {
+            "enableDisableParallelApexTesting": true
+        },
+        "chatterSettings": {
+            "enableChatter": true
+        },
+        "lightningExperienceSettings": {
+            "enableS1DesktopEnabled": true
+        },
+        "languageSettings": {
+            "enableTranslationWorkbench": true
+        },
+        "entitlementSettings": {
+            "enableEntitlements": true
+        },
+        "orderSettings": {
+            "enableNegativeQuantity": true,
+            "enableOrders": true,
+            "enableReductionOrders": true
+        }
+    }
 }
