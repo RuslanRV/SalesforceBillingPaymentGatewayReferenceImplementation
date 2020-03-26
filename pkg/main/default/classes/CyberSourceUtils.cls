@@ -605,7 +605,7 @@ public class CyberSourceUtils {
      * Write CommerceIndicator (VISA mandate param) conditionally.
      */
     private static void processCommerceIndicator(XmlStreamWriter writer, blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile) {
-        if (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && isCrendentialOnFile) {
+        if (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && TRUE == isCrendentialOnFile) {
             writeCommerceIndicatorForPaymentCenter(writer);
         } else if (transactionUseCase == blng.TransactionUseCase.PAYMENT_RUN) {
             writeCommerceIndicatorForPaymentRun(writer);
@@ -615,34 +615,35 @@ public class CyberSourceUtils {
     /**
      * Write SubsequentAuth (VISA mandate param) conditionally.
      */
-    private static void processSubsequentAuth(XmlStreamWriter writer, blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile) {
-        if (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && isCrendentialOnFile) {
+    private static void processSubsequentAuthForPaymentCenter(XmlStreamWriter writer, blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile) {
+        if (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && TRUE == isCrendentialOnFile) {
             writeSubsequentAuthForPaymentCenter(writer);
         }
     }
 
-    private static void writeSubsequentAuthForPaymentCenter(XmlStreamWriter writer){
+    private static void writeSubsequentAuthForPaymentCenter(XmlStreamWriter writer) {
         writer.writeStartElement('', 'subsequentAuth', '');
         writer.writeCharacters('true');
         writer.writeEndElement();
     }
 
-    private static void writeCommerceIndicatorForPaymentCenter(XmlStreamWriter writer){
+    private static void writeCommerceIndicatorForPaymentCenter(XmlStreamWriter writer) {
         writer.writeStartElement('', 'commerceIndicator', '');
         writer.writeCharacters(COMMERCE_INDICATOR_INTERNET);
         writer.writeEndElement();
     }
 
-    private static void writeCommerceIndicatorForPaymentRun(XmlStreamWriter writer){
+    private static void writeCommerceIndicatorForPaymentRun(XmlStreamWriter writer) {
         writer.writeStartElement('', 'commerceIndicator', '');
         writer.writeCharacters(COMMERCE_INDICATOR_RECURRING);
         writer.writeEndElement();
     }
 
     private static Boolean useXsdForVisaMandate(blng.TransactionUseCase transactionUseCase, Boolean isCrendentialOnFile, String cardType) {
-        Boolean usexsd = (transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER || transactionUseCase == blng.TransactionUseCase.PAYMENT_RUN)
-            && isCrendentialOnFile && CARD_TYPE_VISA.equalsIgnoreCase(cardType);
-        return usexsd;
+        Boolean useXsdForVisaMandate = CARD_TYPE_VISA.equalsIgnoreCase(cardType) &&
+        ((transactionUseCase == blng.TransactionUseCase.PAYMENT_CENTER && TRUE == isCrendentialOnFile)
+        || (transactionUseCase == blng.TransactionUseCase.PAYMENT_RUN));
+        return useXsdForVisaMandate;
     }
 
     /**
@@ -841,7 +842,7 @@ public class CyberSourceUtils {
                 // Populate ccCaptureService End
                 // Write SubsequentAuth conditionally
                 if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
-                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                	processSubsequentAuthForPaymentCenter(writer, transactionUseCase, isCrendentialOnFile);
                 }
             } else {
                 // Populate purchaseTotals start
@@ -888,7 +889,7 @@ public class CyberSourceUtils {
                 // Populate ccCaptureService End
                 // Write SubsequentAuth conditionally
                 if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
-                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                	processSubsequentAuthForPaymentCenter(writer, transactionUseCase, isCrendentialOnFile);
                 }
             }
             writer.writeEndElement();
@@ -1279,7 +1280,7 @@ public class CyberSourceUtils {
                 // Populate ccCaptureService End
                 // Write SubsequentAuth conditionally
                 if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
-                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                	processSubsequentAuthForPaymentCenter(writer, transactionUseCase, isCrendentialOnFile);
                 }
             } else {
                 // Populate purchaseTotals start
@@ -1326,7 +1327,7 @@ public class CyberSourceUtils {
                 // Populate ccCaptureService End
                 // Write SubsequentAuth conditionally
                 if (CARD_TYPE_VISA.equalsIgnoreCase(cardType)) {
-                	processSubsequentAuth(writer, transactionUseCase, isCrendentialOnFile);
+                	processSubsequentAuthForPaymentCenter(writer, transactionUseCase, isCrendentialOnFile);
                 }
             }
             writer.writeEndElement();
