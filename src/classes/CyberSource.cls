@@ -3,7 +3,7 @@
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root
- https://github.com/forcedotcom/SalesforceBillingPaymentGatewayReferenceImplementation/blob/master/LICENSE.txt 
+ * https://github.com/forcedotcom/SalesforceBillingPaymentGatewayReferenceImplementation/blob/master/LICENSE.txt 
  */
 // ============================================================================================= 
 //  Object: CyberSource 
